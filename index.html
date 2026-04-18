@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Vulnerability Handbook — Interactive guides for web security vulnerabilities with hands-on labs.">
+<meta name="author" content="iamshafayat">
+<title>Vuln Handbook</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ── RESET ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(139,92,246,.5);border-radius:10px}
+::selection{background:rgba(139,92,246,.3);color:#fff}
+
+/* ── TOKENS ── */
+:root{
+  --ff-head:'Manrope',sans-serif;
+  --ff-body:'Inter',sans-serif;
+
+  /* aurora palette */
+  --c1:#7c3aed;   /* violet */
+  --c2:#0891b2;   /* cyan */
+  --c3:#059669;   /* emerald */
+  --c4:#db2777;   /* pink */
+  --c5:#d97706;   /* amber */
+
+  --bg:#03040d;
+  --surface:rgba(255,255,255,.04);
+  --surface2:rgba(255,255,255,.07);
+  --surface3:rgba(255,255,255,.11);
+  --border:rgba(255,255,255,.08);
+  --border2:rgba(255,255,255,.14);
+  --t1:#f0f4ff;
+  --t2:#94a3b8;
+  --t3:#475569;
+
+  --ease:cubic-bezier(.16,1,.3,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ── BODY ── */
+body{
+  font-family:var(--ff-body);
+  background:var(--bg);
+  color:var(--t2);
+  min-height:100vh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── AURORA BG ── */
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.aurora-blob{
+  position:absolute;border-radius:50%;
+  filter:blur(120px);
+  mix-blend-mode:screen;
+  animation:drift 20s ease-in-out infinite;
+}
+.ab1{width:70vw;height:70vw;max-width:800px;max-height:800px;
+  top:-20%;left:-20%;
+  background:radial-gradient(circle,rgba(124,58,237,.35),transparent 65%);
+  animation-duration:24s;}
+.ab2{width:60vw;height:60vw;max-width:700px;max-height:700px;
+  top:10%;right:-15%;
+  background:radial-gradient(circle,rgba(8,145,178,.28),transparent 65%);
+  animation-duration:28s;animation-delay:-8s;}
+.ab3{width:55vw;height:55vw;max-width:650px;max-height:650px;
+  bottom:-15%;left:15%;
+  background:radial-gradient(circle,rgba(5,150,105,.22),transparent 65%);
+  animation-duration:22s;animation-delay:-14s;}
+.ab4{width:40vw;height:40vw;max-width:480px;max-height:480px;
+  bottom:5%;right:10%;
+  background:radial-gradient(circle,rgba(219,39,119,.18),transparent 65%);
+  animation-duration:30s;animation-delay:-4s;}
+
+@keyframes drift{
+  0%,100%{transform:translate(0,0) scale(1)}
+  25%{transform:translate(40px,-50px) scale(1.06)}
+  50%{transform:translate(-25px,35px) scale(.94)}
+  75%{transform:translate(30px,20px) scale(1.03)}
+}
+
+/* noise overlay */
+.noise{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.028;
+}
+
+.pw{position:relative;z-index:2}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:18px;left:50%;transform:translateX(-50%);
+  z-index:900;
+  width:calc(100% - 40px);max-width:900px;
+  animation:navIn .8s var(--ease) .2s backwards;
+}
+@keyframes navIn{from{opacity:0;transform:translateX(-50%) translateY(-20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+.nav-pill{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 10px 10px 22px;
+  border-radius:100px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(40px) saturate(1.8);
+  -webkit-backdrop-filter:blur(40px) saturate(1.8);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04) inset,
+    0 8px 32px rgba(0,0,0,.4),
+    0 0 60px rgba(124,58,237,.08);
+  transition:border-color .3s,box-shadow .3s;
+}
+.nav-pill:hover{
+  border-color:rgba(255,255,255,.16);
+  box-shadow:0 0 0 1px rgba(255,255,255,.07) inset,0 12px 40px rgba(0,0,0,.45),0 0 80px rgba(124,58,237,.12);
+}
+
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-logo{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#0891b2);
+  display:grid;place-items:center;font-size:18px;
+  box-shadow:0 0 20px rgba(124,58,237,.4);
+}
+.nav-name{font-family:var(--ff-head);font-size:15px;font-weight:700;color:var(--t1);letter-spacing:-.3px}
+
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-link{
+  padding:6px 14px;border-radius:100px;
+  font-size:13px;font-weight:500;color:var(--t2);
+  text-decoration:none;transition:all .2s;
+  border:1px solid transparent;
+}
+.nav-link:hover{color:var(--t1);background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.08)}
+
+.nav-cta{
+  padding:8px 18px;border-radius:100px;
+  background:linear-gradient(135deg,rgba(124,58,237,.8),rgba(8,145,178,.7));
+  border:1px solid rgba(255,255,255,.15);
+  color:#fff;font-size:13px;font-weight:600;
+  text-decoration:none;
+  backdrop-filter:blur(10px);
+  box-shadow:0 0 20px rgba(124,58,237,.3);
+  transition:all .25s;
+}
+.nav-cta:hover{box-shadow:0 0 30px rgba(124,58,237,.5);transform:translateY(-1px)}
+
+.mob-menu{display:none;background:none;border:none;color:var(--t1);font-size:22px;cursor:pointer;padding:6px 10px;border-radius:10px;transition:background .2s}
+.mob-menu:hover{background:rgba(255,255,255,.06)}
+
+/* Mobile drawer */
+.mob-drawer{
+  display:none;
+  position:fixed;top:80px;left:20px;right:20px;z-index:800;
+  background:rgba(10,12,24,.85);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:24px;
+  backdrop-filter:blur(50px);
+  -webkit-backdrop-filter:blur(50px);
+  padding:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  transform:translateY(-10px);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s var(--ease),transform .25s var(--ease);
+}
+.mob-drawer.open{
+  opacity:1;transform:translateY(0);pointer-events:all;
+}
+.mob-drawer a{
+  display:flex;align-items:center;
+  padding:14px 18px;border-radius:14px;
+  font-size:15px;font-weight:600;color:var(--t1);
+  text-decoration:none;
+  transition:background .2s;
+}
+.mob-drawer a:hover{background:rgba(255,255,255,.07)}
+.mob-drawer .mob-cta{
+  margin-top:6px;
+  background:linear-gradient(135deg,rgba(124,58,237,.8),rgba(8,145,178,.7));
+  border:1px solid rgba(255,255,255,.15);
+  border-radius:14px;
+  justify-content:center;
+  box-shadow:0 0 20px rgba(124,58,237,.25);
+}
+.mob-drawer .mob-cta:hover{background:linear-gradient(135deg,rgba(124,58,237,.95),rgba(8,145,178,.9))}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  padding:140px 20px 80px;
+}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:6px 16px 6px 8px;border-radius:100px;
+  background:rgba(124,58,237,.12);
+  border:1px solid rgba(124,58,237,.25);
+  backdrop-filter:blur(20px);
+  font-size:12px;font-weight:600;color:#a78bfa;
+  letter-spacing:.05em;text-transform:uppercase;
+  margin-bottom:32px;
+  animation:fadeUp .7s var(--ease) .4s backwards;
+}
+.hero-badge-dot{
+  width:20px;height:20px;border-radius:50%;
+  background:linear-gradient(135deg,#7c3aed,#06b6d4);
+  display:grid;place-items:center;font-size:10px;
+}
+
+.hero-title{
+  font-family:var(--ff-head);
+  font-size:clamp(48px,8vw,96px);
+  font-weight:800;
+  color:var(--t1);
+  line-height:1.0;
+  letter-spacing:-2px;
+  margin-bottom:8px;
+  animation:fadeUp .8s var(--ease) .5s backwards;
+}
+.hero-title span{
+  background:linear-gradient(135deg,#a78bfa,#22d3ee,#34d399);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.hero-sub{
+  font-size:clamp(15px,2vw,19px);
+  font-weight:300;
+  color:var(--t2);
+  max-width:540px;
+  line-height:1.7;
+  margin-bottom:44px;
+  animation:fadeUp .8s var(--ease) .6s backwards;
+}
+
+.hero-actions{
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center;
+  animation:fadeUp .8s var(--ease) .7s backwards;
+}
+
+.btn-primary{
+  padding:14px 32px;border-radius:100px;
+  background:linear-gradient(135deg,#7c3aed,#0891b2);
+  border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-size:15px;font-weight:600;
+  text-decoration:none;
+  box-shadow:0 0 40px rgba(124,58,237,.35);
+  transition:all .3s var(--ease);
+  display:flex;align-items:center;gap:8px;
+}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 0 60px rgba(124,58,237,.5)}
+
+.btn-ghost{
+  padding:14px 28px;border-radius:100px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(20px);
+  color:var(--t1);font-size:15px;font-weight:500;
+  text-decoration:none;
+  transition:all .3s;
+  display:flex;align-items:center;gap:8px;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18);transform:translateY(-2px)}
+
+/* scroll indicator */
+.scroll-hint{
+  margin-top:60px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:fadeUp .8s var(--ease) 1s backwards;
+}
+.scroll-hint span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--t3)}
+.scroll-line{width:1px;height:48px;background:linear-gradient(to bottom,rgba(139,92,246,.5),transparent);animation:scrollPulse 2s ease-in-out infinite}
+@keyframes scrollPulse{0%,100%{opacity:.4;transform:scaleY(.8)}50%{opacity:1;transform:scaleY(1)}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── STATS STRIP ── */
+.stats-strip{
+  padding:0 20px 80px;
+}
+.stats-glass{
+  max-width:900px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:28px;
+  backdrop-filter:blur(40px);
+  overflow:hidden;
+}
+.stat-item{
+  padding:28px 20px;text-align:center;
+  border-right:1px solid rgba(255,255,255,.06);
+  transition:background .3s;
+}
+.stat-item:last-child{border-right:none}
+.stat-item:hover{background:rgba(255,255,255,.04)}
+.stat-num{
+  font-family:var(--ff-head);font-size:36px;font-weight:800;
+  background:linear-gradient(135deg,#a78bfa,#22d3ee);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.stat-lbl{font-size:12px;color:var(--t3);margin-top:4px;letter-spacing:.04em}
+
+/* ── SECTION ── */
+.section{padding:0 20px 100px}
+.cx{max-width:1180px;margin:0 auto}
+
+.section-label{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#a78bfa;
+  font-weight:600;margin-bottom:16px;
+}
+.section-label::before{content:'';width:20px;height:1px;background:#7c3aed}
+
+.section-title{
+  font-family:var(--ff-head);
+  font-size:clamp(28px,4vw,44px);
+  font-weight:800;color:var(--t1);
+  letter-spacing:-1px;
+  margin-bottom:12px;
+}
+.section-desc{font-size:16px;color:var(--t2);max-width:520px;line-height:1.7;margin-bottom:56px}
+
+/* ── CARD GRID ── */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  gap:20px;
+}
+
+/* glass card */
+.vcard{
+  position:relative;
+  border-radius:24px;
+  padding:28px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(30px);
+  -webkit-backdrop-filter:blur(30px);
+  overflow:hidden;
+  transition:transform .35s var(--ease),border-color .3s,box-shadow .3s;
+  cursor:default;
+  opacity:0;transform:translateY(28px);
+}
+.vcard.visible{opacity:1;transform:translateY(0)}
+.vcard:hover{
+  transform:translateY(-6px);
+  border-color:rgba(255,255,255,.15);
+  box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.05) inset;
+}
+
+/* active card — clickable */
+.vcard.active{cursor:pointer}
+.vcard.active::before{
+  content:'';position:absolute;inset:0;border-radius:24px;
+  background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(8,145,178,.05));
+  z-index:0;
+}
+.vcard.active:hover{
+  box-shadow:0 24px 70px rgba(124,58,237,.2),0 0 0 1px rgba(124,58,237,.15) inset;
+  border-color:rgba(124,58,237,.3);
+}
+
+/* colored top glow per card */
+.vcard .glow-top{
+  position:absolute;top:-1px;left:30px;right:30px;height:1px;
+  border-radius:100px;
+}
+.vcard.v-xss .glow-top{background:linear-gradient(90deg,transparent,rgba(124,58,237,.8),transparent)}
+.vcard.v-sqli .glow-top{background:linear-gradient(90deg,transparent,rgba(8,145,178,.6),transparent)}
+.vcard.v-csrf .glow-top{background:linear-gradient(90deg,transparent,rgba(5,150,105,.6),transparent)}
+.vcard.v-ssrf .glow-top{background:linear-gradient(90deg,transparent,rgba(217,119,6,.6),transparent)}
+.vcard.v-idor .glow-top{background:linear-gradient(90deg,transparent,rgba(219,39,119,.6),transparent)}
+.vcard.v-rce .glow-top{background:linear-gradient(90deg,transparent,rgba(239,68,68,.6),transparent)}
+.vcard.v-lfi .glow-top{background:linear-gradient(90deg,transparent,rgba(20,184,166,.6),transparent)}
+.vcard.v-xxe .glow-top{background:linear-gradient(90deg,transparent,rgba(168,85,247,.6),transparent)}
+
+.card-inner{position:relative;z-index:1}
+
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.card-icon-wrap{
+  width:52px;height:52px;border-radius:16px;
+  display:grid;place-items:center;font-size:24px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(10px);
+  flex-shrink:0;
+}
+.card-badges{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.badge{
+  padding:4px 10px;border-radius:100px;
+  font-size:11px;font-weight:600;letter-spacing:.04em;
+}
+.badge-live{background:rgba(5,150,105,.15);border:1px solid rgba(5,150,105,.3);color:#34d399}
+.badge-soon{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--t3)}
+
+.card-title{
+  font-family:var(--ff-head);
+  font-size:19px;font-weight:700;color:var(--t1);
+  margin-bottom:10px;letter-spacing:-.4px;
+}
+.card-desc{font-size:14px;line-height:1.7;color:var(--t2);margin-bottom:20px}
+
+.card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.tag{
+  padding:3px 10px;border-radius:100px;
+  font-size:11px;font-weight:500;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.07);
+  color:var(--t3);
+}
+
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:18px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.card-link{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:#a78bfa;
+  text-decoration:none;
+  transition:gap .2s;
+}
+.card-link:hover{gap:10px}
+.card-link svg{width:14px;height:14px}
+.card-dim{font-size:12px;color:var(--t3)}
+
+/* big featured card */
+.vcard.featured{
+  grid-column:span 2;
+  background:rgba(124,58,237,.06);
+  border-color:rgba(124,58,237,.2);
+}
+.vcard.featured:hover{
+  border-color:rgba(124,58,237,.35);
+  box-shadow:0 28px 80px rgba(124,58,237,.2),0 0 0 1px rgba(124,58,237,.1) inset;
+}
+.feat-layout{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center}
+.feat-labs{
+  display:flex;gap:10px;flex-wrap:wrap;
+  margin-top:20px;
+}
+.lab-pill{
+  padding:8px 16px;border-radius:100px;
+  background:rgba(124,58,237,.12);
+  border:1px solid rgba(124,58,237,.2);
+  font-size:12px;font-weight:600;color:#c4b5fd;
+  transition:all .2s;
+}
+.lab-pill:hover{background:rgba(124,58,237,.22)}
+
+.feat-visual{
+  width:160px;height:160px;flex-shrink:0;
+  position:relative;
+}
+.feat-ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:1px solid rgba(124,58,237,.2);
+  animation:spin 12s linear infinite;
+}
+.feat-ring2{
+  position:absolute;inset:14px;border-radius:50%;
+  border:1px dashed rgba(8,145,178,.3);
+  animation:spin 8s linear infinite reverse;
+}
+.feat-core{
+  position:absolute;inset:36px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(124,58,237,.3),rgba(8,145,178,.2));
+  display:grid;place-items:center;font-size:40px;
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 0 40px rgba(124,58,237,.3);
+}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* ── HOW IT WORKS ── */
+.how-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+}
+.how-card{
+  padding:32px 28px;border-radius:24px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  backdrop-filter:blur(20px);
+  transition:all .3s;
+  opacity:0;transform:translateY(24px);
+}
+.how-card.visible{opacity:1;transform:translateY(0)}
+.how-card:hover{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);transform:translateY(-4px)}
+.how-num{
+  font-family:var(--ff-head);font-size:13px;font-weight:800;
+  color:rgba(124,58,237,.5);margin-bottom:20px;letter-spacing:.1em;
+}
+.how-ico{font-size:32px;margin-bottom:16px}
+.how-title{font-family:var(--ff-head);font-size:18px;font-weight:700;color:var(--t1);margin-bottom:10px;letter-spacing:-.3px}
+.how-desc{font-size:14px;line-height:1.7;color:var(--t2)}
+
+/* ── FOOTER ── */
+footer{
+  padding:60px 20px 40px;
+  border-top:1px solid rgba(255,255,255,.05);
+  background:rgba(255,255,255,.02);
+  backdrop-filter:blur(40px);
+}
+.footer-inner{
+  max-width:1180px;margin:0 auto;
+  display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:48px;
+  margin-bottom:48px;
+}
+.footer-brand-name{
+  font-family:var(--ff-head);font-size:20px;font-weight:800;
+  color:var(--t1);margin-bottom:10px;
+  display:flex;align-items:center;gap:10px;
+}
+.footer-desc{font-size:14px;line-height:1.7;color:var(--t3);max-width:300px;margin-bottom:20px}
+.footer-socials{display:flex;gap:10px}
+.social-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  display:grid;place-items:center;
+  color:var(--t2);text-decoration:none;font-size:15px;
+  transition:all .2s;
+}
+.social-btn:hover{background:rgba(124,58,237,.15);border-color:rgba(124,58,237,.3);color:var(--t1);transform:translateY(-2px)}
+.footer-col h4{
+  font-family:var(--ff-head);font-size:13px;font-weight:700;
+  color:var(--t1);letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:18px;
+}
+.footer-col a{
+  display:block;font-size:14px;color:var(--t3);
+  text-decoration:none;margin-bottom:10px;
+  transition:color .2s;
+}
+.footer-col a:hover{color:var(--t1)}
+.footer-bottom{
+  max-width:1180px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:28px;border-top:1px solid rgba(255,255,255,.05);
+  font-size:13px;color:var(--t3);
+}
+.footer-bottom a{color:var(--t3);text-decoration:none;transition:color .2s}
+.footer-bottom a:hover{color:#a78bfa}
+.warn-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:100px;
+  background:rgba(245,158,11,.08);
+  border:1px solid rgba(245,158,11,.18);
+  font-size:11px;color:#fbbf24;font-weight:500;
+}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .nav-links,.nav-cta{display:none}
+  .mob-menu{display:block}
+  .mob-drawer{display:block}
+  .stats-glass{grid-template-columns:repeat(2,1fr)}
+  .stat-item:nth-child(2){border-right:none}
+  .stat-item:nth-child(3){border-top:1px solid rgba(255,255,255,.06)}
+  .card-grid{grid-template-columns:1fr}
+  .vcard.featured{grid-column:span 1}
+  .feat-layout{grid-template-columns:1fr}
+  .feat-visual{display:none}
+  .how-grid{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;gap:12px;text-align:center}
+}
+@media(max-width:500px){
+  .hero-title{letter-spacing:-1px}
+  .stats-glass{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- AURORA -->
+<div class="aurora" aria-hidden="true">
+  <div class="aurora-blob ab1"></div>
+  <div class="aurora-blob ab2"></div>
+  <div class="aurora-blob ab3"></div>
+  <div class="aurora-blob ab4"></div>
+</div>
+<div class="noise" aria-hidden="true"></div>
+
+<div class="pw">
+
+<!-- NAV -->
+<nav aria-label="Main navigation">
+  <div class="nav-pill">
+    <a href="#" class="nav-brand">
+      <div class="nav-logo">🛡️</div>
+      <span class="nav-name">Vuln Handbook</span>
+    </a>
+    <div class="nav-links">
+      <a href="#topics" class="nav-link">Topics</a>
+      <a href="#how" class="nav-link">How It Works</a>
+      <a href="https://github.com/iamshafayat/vuln-handbook" target="_blank" rel="noopener" class="nav-link">GitHub</a>
+    </div>
+    <a href="#topics" class="nav-cta">Start Learning →</a>
+    <button class="mob-menu" id="mobBtn" aria-label="Menu" aria-expanded="false">☰</button>
+  </div>
+</nav>
+
+<!-- MOBILE DRAWER -->
+<div class="mob-drawer" id="mobDrawer" aria-hidden="true">
+  <a href="#topics" class="mob-link">📚 Topics</a>
+  <a href="#how" class="mob-link">🗺️ How It Works</a>
+  <a href="https://github.com/iamshafayat/vuln-handbook" target="_blank" rel="noopener" class="mob-link">⭐ GitHub</a>
+  <a href="#topics" class="mob-cta mob-link">Start Learning →</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot">⚡</span>
+    Educational Security Resource
+  </div>
+  <h1 class="hero-title">
+    Learn Web<br><span>Vulnerabilities</span>
+  </h1>
+  <p class="hero-sub">
+    Hands-on interactive guides for understanding how modern web attacks work — and how to defend against them.
+  </p>
+  <div class="hero-actions">
+    <a href="#topics" class="btn-primary">
+      Browse Topics
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </a>
+    <a href="https://github.com/iamshafayat/vuln-handbook" target="_blank" rel="noopener" class="btn-ghost">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      View on GitHub
+    </a>
+  </div>
+  <div class="scroll-hint" aria-hidden="true">
+    <span>Scroll to explore</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stats-glass">
+    <div class="stat-item">
+      <div class="stat-num">8</div>
+      <div class="stat-lbl">Topics Planned</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">3</div>
+      <div class="stat-lbl">Interactive Labs</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">100%</div>
+      <div class="stat-lbl">Free & Open Source</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">∞</div>
+      <div class="stat-lbl">Always Growing</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPICS -->
+<section class="section" id="topics">
+  <div class="cx">
+    <div class="section-label">📚 Curriculum</div>
+    <h2 class="section-title">Vulnerability Topics</h2>
+    <p class="section-desc">Each module covers theory, attack mechanics, live demos, and defenses — all in one page.</p>
+
+    <div class="card-grid">
+
+      <!-- XSS — Featured -->
+      <div class="vcard featured active v-xss" onclick="location.href='./xss/'">
+        <div class="glow-top"></div>
+        <div class="card-inner feat-layout">
+          <div>
+            <div class="card-head" style="margin-bottom:16px">
+              <div>
+                <div class="section-label" style="margin-bottom:8px">OWASP A03 · Injection</div>
+                <h3 class="card-title" style="font-size:26px">Cross-Site Scripting<br>(XSS)</h3>
+              </div>
+              <span class="badge badge-live">✦ Live</span>
+            </div>
+            <p class="card-desc" style="max-width:440px">Client-side injection that lets attackers execute arbitrary scripts in victims' browsers. Covers Reflected, Stored, DOM-Based, Blind, and Self-XSS — plus 3 hands-on interactive labs.</p>
+            <div class="feat-labs">
+              <span class="lab-pill">⚗️ Lab 1 — Reflected</span>
+              <span class="lab-pill">⚗️ Lab 2 — Stored</span>
+              <span class="lab-pill">⚗️ Lab 3 — DOM</span>
+            </div>
+            <div style="margin-top:24px">
+              <a href="./xss/" class="card-link" style="font-size:15px">
+                Start Module
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="feat-visual">
+            <div class="feat-ring"></div>
+            <div class="feat-ring2"></div>
+            <div class="feat-core">⚔️</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SQLi -->
+      <div class="vcard v-sqli">
+        <div class="glow-top"></div>
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-icon-wrap">💉</div>
+            <span class="badge badge-soon">Coming Soon</span>
+          </div>
+          <h3 class="card-title">SQL Injection</h3>
+          <p class="card-desc">Manipulate database queries to extract, modify, or delete data. Union-based, blind, error-based, and second-order SQLi.</p>
+          <div class="card-tags">
+            <span class="tag">Injection</span>
+            <span class="tag">Server-Side</span>
+            <span class="tag">OWASP A03</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-dim">Not yet available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CSRF -->
+      <div class="vcard v-csrf">
+        <div class="glow-top"></div>
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-icon-wrap">🔄</div>
+            <span class="badge badge-soon">Coming Soon</span>
+          </div>
+          <h3 class="card-title">CSRF</h3>
+          <p class="card-desc">Force authenticated users to perform unintended actions. Token protection, SameSite cookies, and bypass techniques.</p>
+          <div class="card-tags">
+            <span class="tag">Session</span>
+            <span class="tag">Client-Side</span>
+            <span class="tag">OWASP A01</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-dim">Not yet available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SSRF -->
+      <div class="vcard v-ssrf">
+        <div class="glow-top"></div>
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-icon-wrap">🌐</div>
+            <span class="badge badge-soon">Coming Soon</span>
+          </div>
+          <h3 class="card-title">SSRF</h3>
+          <p class="card-desc">Trick servers into requesting internal resources. Cloud metadata endpoints, DNS rebinding, and port scanning.</p>
+          <div class="card-tags">
+            <span class="tag">Server-Side</span>
+            <span class="tag">Cloud</span>
+            <span class="tag">OWASP A10</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-dim">Not yet available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- IDOR -->
+      <div class="vcard v-idor">
+        <div class="glow-top"></div>
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-icon-wrap">🔑</div>
+            <span class="badge badge-soon">Coming Soon</span>
+          </div>
+          <h3 class="card-title">IDOR & Access Control</h3>
+          <p class="card-desc">Access other users' data via insecure object references. Horizontal & vertical privilege escalation.</p>
+          <div class="card-tags">
+            <span class="tag">Authorization</span>
+            <span class="tag">OWASP A01</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-dim">Not yet available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RCE -->
+      <div class="vcard v-rce">
+        <div class="glow-top"></div>
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-icon-wrap">💻</div>
+            <span class="badge badge-soon">Coming Soon</span>
+          </div>
+          <h3 class="card-title">Remote Code Execution</h3>
+          <p class="card-desc">Execute arbitrary code on the server. Command injection, insecure deserialization, template injection.</p>
+          <div class="card-tags">
+            <span class="tag">Injection</span>
+            <span class="tag">Critical</span>
+            <span class="tag">Server-Side</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-dim">Not yet available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LFI -->
+      <div class="vcard v-lfi">
+        <div class="glow-top"></div>
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-icon-wrap">📂</div>
+            <span class="badge badge-soon">Coming Soon</span>
+          </div>
+          <h3 class="card-title">File Inclusion (LFI/RFI)</h3>
+          <p class="card-desc">Include arbitrary files via path traversal, log poisoning, and PHP wrapper chains.</p>
+          <div class="card-tags">
+            <span class="tag">Server-Side</span>
+            <span class="tag">File System</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-dim">Not yet available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- XXE -->
+      <div class="vcard v-xxe">
+        <div class="glow-top"></div>
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-icon-wrap">📜</div>
+            <span class="badge badge-soon">Coming Soon</span>
+          </div>
+          <h3 class="card-title">XXE Injection</h3>
+          <p class="card-desc">Exploit XML parsers to read files, perform SSRF, and exfiltrate data. In-band and out-of-band techniques.</p>
+          <div class="card-tags">
+            <span class="tag">Injection</span>
+            <span class="tag">XML</span>
+            <span class="tag">Parser</span>
+          </div>
+          <div class="card-footer">
+            <span class="card-dim">Not yet available</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" id="how">
+  <div class="cx">
+    <div class="section-label">🗺️ Approach</div>
+    <h2 class="section-title">How Each Module Works</h2>
+    <p class="section-desc">Every vulnerability page is structured to take you from zero to confident.</p>
+
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">01</div>
+        <div class="how-ico">📖</div>
+        <h3 class="how-title">Theory First</h3>
+        <p class="how-desc">Clear, plain-English explanations of what the vulnerability is, why it exists, and how attackers discover it.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">02</div>
+        <div class="how-ico">⚗️</div>
+        <h3 class="how-title">Live Demos</h3>
+        <p class="how-desc">Interactive sandboxed labs where you try the attack yourself in a safe, controlled environment — no setup needed.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">03</div>
+        <div class="how-ico">🛡️</div>
+        <h3 class="how-title">Learn to Defend</h3>
+        <p class="how-desc">Practical mitigation techniques with real code examples — so you can write secure applications from day one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">
+        <span>🛡️</span> Vuln Handbook
+      </div>
+      <p class="footer-desc">Interactive security learning platform. Built for developers, students, and aspiring pentesters.</p>
+      <div style="margin-bottom:14px"><span class="warn-tag">⚠️ For educational purposes only</span></div>
+      <div class="footer-socials">
+        <a href="https://github.com/iamshafayat/vuln-handbook" target="_blank" rel="noopener" class="social-btn" title="GitHub">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        </a>
+        <a href="https://potdf.gitbook.io/" target="_blank" rel="noopener" class="social-btn" title="GitBook">📖</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="#topics">Topics</a>
+      <a href="./xss/">XSS Handbook</a>
+      <a href="https://potdf.gitbook.io/" target="_blank" rel="noopener">Full GitBook ↗</a>
+      <a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener">OWASP Top 10 ↗</a>
+    </div>
+    <div class="footer-col">
+      <h4>Community</h4>
+      <a href="https://github.com/iamshafayat/vuln-handbook" target="_blank" rel="noopener">GitHub Repo ↗</a>
+      <a href="https://github.com/iamshafayat/vuln-handbook/issues" target="_blank" rel="noopener">Report Issue ↗</a>
+      <a href="https://github.com/iamshafayat" target="_blank" rel="noopener">Author ↗</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 <a href="https://github.com/iamshafayat" target="_blank" rel="noopener">@iamshafayat</a> · Educational purposes only</span>
+    <span>Built with 🛡️ for security education</span>
+  </div>
+</footer>
+
+</div><!-- /pw -->
+
+<script>
+// Mobile nav
+const mobBtn = document.getElementById('mobBtn');
+const mobDrawer = document.getElementById('mobDrawer');
+
+mobBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const isOpen = mobDrawer.classList.toggle('open');
+  mobBtn.textContent = isOpen ? '✕' : '☰';
+  mobBtn.setAttribute('aria-expanded', isOpen);
+  mobDrawer.setAttribute('aria-hidden', !isOpen);
+});
+
+document.addEventListener('click', (e) => {
+  if (!mobDrawer.contains(e.target) && !mobBtn.contains(e.target)) {
+    mobDrawer.classList.remove('open');
+    mobBtn.textContent = '☰';
+    mobBtn.setAttribute('aria-expanded', 'false');
+  }
+});
+
+// Close drawer on link click
+mobDrawer.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    mobDrawer.classList.remove('open');
+    mobBtn.textContent = '☰';
+    mobBtn.setAttribute('aria-expanded', 'false');
+  });
+});
+
+// Scroll reveal
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      setTimeout(() => {
+        e.target.classList.add('visible');
+        e.target.style.transition = 'opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1)';
+      }, e.target.dataset.delay || 0);
+      obs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.07, rootMargin: '0px 0px -30px 0px' });
+
+document.querySelectorAll('.vcard, .how-card').forEach((el, i) => {
+  el.dataset.delay = i * 60;
+  obs.observe(el);
+});
+
+// Aurora parallax
+let mx = 0, my = 0, cx = 0, cy = 0;
+document.addEventListener('mousemove', (e) => {
+  mx = (e.clientX / innerWidth - .5) * 2;
+  my = (e.clientY / innerHeight - .5) * 2;
+}, { passive: true });
+
+function raf() {
+  cx += (mx - cx) * .018;
+  cy += (my - cy) * .018;
+  document.querySelectorAll('.aurora-blob').forEach((b, i) => {
+    const f = (i + 1) * 14;
+    b.style.transform = `translate(${cx * f}px, ${cy * f}px)`;
+  });
+  requestAnimationFrame(raf);
+}
+if (innerWidth > 768) raf();
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+</script>
+</body>
+</html>
