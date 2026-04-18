@@ -37,12 +37,8 @@ More vulnerabilities will be added over time. Contributions welcome!
 ## 🚀 Getting Started
 
 ### View Online
+**Link:** [https://iamshafayat.github.io/vuln-handbook/](https://iamshafayat.github.io/vuln-handbook/)
 
-This handbook is deployed via **GitHub Pages**:
-
-```
-https://iamshafayat.github.io/vuln-handbook/
-```
 
 ### Run Locally
 
