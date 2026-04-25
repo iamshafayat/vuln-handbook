@@ -1,6 +1,5 @@
 /* =========================================================
    IDOR Handbook v3 — script.js
-   Ultra-visual, 10 labs (new Lab 2: Vertical IDOR)
    ========================================================= */
 ;(function () {
   "use strict";
@@ -352,7 +351,7 @@
         ${opts.desc ? `<p class="result-desc">${opts.desc}</p>` : ""}
         ${http ? buildHttpVisual(http) : ""}
       </div>`;
-    el.scrollIntoView({ behavior:"smooth", block:"nearest" });
+    if (!opts.noScroll) el.scrollIntoView({ behavior:"smooth", block:"nearest" });
   }
 
   /* ═══════════════════════════════════════
@@ -652,12 +651,12 @@
       { title:"Step 4: Reset Bob's Password",statusCode:200,isVuln:true,desc:"Attacker uses stolen token to set new password.",http:{method:"POST",url:"/api/v1/auth/reset-password",headers:{"Content-Type":"application/json"},reqBody:{token:"eyJhbGciOiJIUzI1NiJ9.abc123.xyz",new_password:"H4cked!123"},statusCode:200,resBody:{success:true,message:"Password updated for user 1002"},isVuln:true,vulnFields:["new_password"],explanation:"Password reset with stolen token — step 4"}},
       { title:"Step 5: FULL ACCOUNT TAKEOVER!",statusCode:200,isVuln:true,desc:`<span style="color:var(--bad);font-weight:900">CRITICAL:</span> Attacker logs in as bob. Complete takeover! CVSS 9.8`,http:{method:"POST",url:"/api/v1/auth/login",headers:{"Content-Type":"application/json"},reqBody:{username:"bob",password:"H4cked!123"},statusCode:200,resBody:{token:"sess_bob_ATTACKER",user_id:1002,username:"bob",role:"employee",message:"Login successful"},isVuln:true,vulnFields:["token","user_id"],explanation:"FULL ACCOUNT TAKEOVER — 5-step IDOR chain"}}
     ];
-    function showStep(i) {
-      renderResult("lab10Result", results[i]);
+    function showStep(i, noScroll) {
+      renderResult("lab10Result", { ...results[i], noScroll: !!noScroll });
       btns.forEach((b, idx) => { b.classList.toggle("btn-brand", idx === i); b.disabled = false; });
     }
     btns.forEach((b, i) => on(b, "click", () => showStep(i)));
-    showStep(0);
+    showStep(0, true);
   }
 
   /* ═══════════════════════════════════════
