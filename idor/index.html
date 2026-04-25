@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IDOR Handbook — Ultra Visual Interactive Guide</title>
+  <meta name="description" content="The most comprehensive interactive handbook on IDOR vulnerabilities. 10 visual labs, real-world breaches, prevention, and professional reporting." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔓</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     HEADER (Updated GitBook URL)
+═══════════════════════════════════════════ -->
+<header class="topbar">
+  <div class="container topbar-inner">
+
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </div>
+      <div class="brand-text">
+        <span>IDOR Handbook</span>
+        <span>Ultra Visual Edition</span>
+      </div>
+    </div>
+
+    <div class="search">
+      <svg class="s-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Search handbook…  Ctrl+K" autocomplete="off" />
+      <span class="kbd">Ctrl K</span>
+    </div>
+
+    <div class="topbar-actions">
+      <a href="https://potdf.gitbook.io/bug-hunt-book/learning/insecure-direct-object-references-idor-handbook" target="_blank" rel="noopener" class="btn btn-brand">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        <span>Visit Full Handbook</span>
+      </a>
+      <button class="btn btn-ghost" id="themeBtn" aria-label="Toggle theme"></button>
+      <button class="btn btn-ghost" id="sidebarOpen" style="display:none" aria-label="Menu">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="progress"><div class="progress-bar"></div></div>
+</header>
+
+<!-- ════════════════════════════════════════════
+     SHELL (Sidebar + Main)
+═══════════════════════════════════════════ -->
+<div class="container shell">
+
+<!-- ── SIDEBAR (Updated with Lab 2) ── -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-inner">
+
+    <button class="btn btn-sm sidebar-close" id="sidebarClose">✕ Close</button>
+
+    <div class="search-mobile" style="display:none;margin-bottom:.6rem">
+      <input type="text" class="search-input" placeholder="Search…" style="width:100%;padding:.5rem .6rem;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--text);outline:none" />
+    </div>
+
+    <p class="nav-label">Guide Contents</p>
+    <nav class="toc">
+      <a href="#hero" data-target="hero"><span class="toc-icon">🏠</span> Home</a>
+      <a href="#fundamentals" data-target="fundamentals"><span class="toc-icon">📖</span> What is IDOR?</a>
+      <a href="#mechanics" data-target="mechanics"><span class="toc-icon">⚙️</span> How It Works</a>
+      <a href="#types" data-target="types"><span class="toc-icon">🔀</span> Types of IDOR</a>
+      <a href="#surfaces" data-target="surfaces"><span class="toc-icon">🎯</span> Attack Surfaces</a>
+      <a href="#realworld" data-target="realworld"><span class="toc-icon">🌍</span> Real-World Cases</a>
+      <a href="#database" data-target="database"><span class="toc-icon">🗄️</span> Lab Database</a>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Interactive Labs</div>
+        <a href="#lab1" data-target="lab1"><span class="toc-icon">🧪</span> Lab 1: Profile IDOR</a>
+        <a href="#lab2" data-target="lab2"><span class="toc-icon">🧪</span> Lab 2: Vertical IDOR</a> <!-- NEW -->
+        <a href="#lab3" data-target="lab3"><span class="toc-icon">🧪</span> Lab 3: Order IDOR</a>
+        <a href="#lab4" data-target="lab4"><span class="toc-icon">🧪</span> Lab 4: Message IDOR</a>
+        <a href="#lab5" data-target="lab5"><span class="toc-icon">🧪</span> Lab 5: Document IDOR</a>
+        <a href="#lab6" data-target="lab6"><span class="toc-icon">🧪</span> Lab 6: Write IDOR</a>
+        <a href="#lab7" data-target="lab7"><span class="toc-icon">🧪</span> Lab 7: Secure vs Insecure</a>
+        <a href="#lab8" data-target="lab8"><span class="toc-icon">🧪</span> Lab 8: Mass Enumeration</a>
+        <a href="#lab9" data-target="lab9"><span class="toc-icon">🧪</span> Lab 9: Delete IDOR</a>
+        <a href="#lab10" data-target="lab10"><span class="toc-icon">🧪</span> Lab 10: Account Takeover</a>
+      </div>
+
+      <div class="toc-group">
+        <div class="toc-group-label">Defense & Reference</div>
+        <a href="#prevention" data-target="prevention"><span class="toc-icon">🛡️</span> Prevention</a>
+        <a href="#tools" data-target="tools"><span class="toc-icon">🔧</span> Tools & Testing</a>
+        <a href="#apiidor" data-target="apiidor"><span class="toc-icon">🔌</span> IDOR in APIs</a>
+        <a href="#impact" data-target="impact"><span class="toc-icon">💥</span> Impact & Risk</a>
+        <a href="#chains" data-target="chains"><span class="toc-icon">🔗</span> Chain Attacks</a>
+        <a href="#report" data-target="report"><span class="toc-icon">📄</span> Report Template</a>
+        <a href="#glossary" data-target="glossary"><span class="toc-icon">📚</span> Glossary</a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="pill">v3.0</span>
+      <span class="pill">OWASP A01</span>
+      <span class="pill">CWE-639</span>
+      <span class="pill">10 Labs</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN CONTENT ── -->
+<main>
+
+<!-- ════════════════════════════════════════════
+     HERO (Updated GitBook URL)
+═══════════════════════════════════════════ -->
+<div class="hero anim-in" id="hero" data-section="hero">
+  <h1>🔓 The <span class="gradient">IDOR</span> Handbook</h1>
+  <p>The most comprehensive interactive guide to <strong>Insecure Direct Object Reference</strong> vulnerabilities. Master the concepts with <strong>10 ultra-visual labs</strong>, study real-world breaches, and learn battle-tested prevention techniques.</p>
+
+  <div class="hero-actions">
+    <a href="#lab1" class="btn btn-brand">🧪 Jump to Labs</a>
+    <a href="#prevention" class="btn">🛡️ Prevention Guide</a>
+    <a href="https://potdf.gitbook.io/bug-hunt-book/learning/insecure-direct-object-references-idor-handbook" target="_blank" rel="noopener" class="btn">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      Visit Full Handbook
+    </a>
+  </div>
+
+  <div class="hero-features">
+    <div class="hero-feat"><span class="hf-dot" style="background:var(--brand)"></span> 10 Interactive Labs</div>
+    <div class="hero-feat"><span class="hf-dot" style="background:var(--brand2)"></span> Visual HTTP Flows</div>
+    <div class="hero-feat"><span class="hf-dot" style="background:var(--good)"></span> Secure vs Insecure</div>
+    <div class="hero-feat"><span class="hf-dot" style="background:var(--warn)"></span> Real-World Breaches</div>
+    <div class="hero-feat"><span class="hf-dot" style="background:var(--bad)"></span> Chain Attack Demos</div>
+    <div class="hero-feat"><span class="hf-dot" style="background:var(--pink)"></span> Full Report Template</div>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats anim-in">
+  <div class="stat">
+    <div class="stat-label">OWASP Rank</div>
+    <div class="stat-val">#<span data-count="1">0</span></div>
+    <div class="stat-desc">Broken Access Control</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Bug Bounty Reports</div>
+    <div class="stat-val"><span data-count="25000" data-suffix="+">0</span></div>
+    <div class="stat-desc">Across major platforms</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Average Bounty</div>
+    <div class="stat-val"><span data-count="2500" data-prefix="$">0</span></div>
+    <div class="stat-desc">Per valid IDOR report</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Interactive Labs</div>
+    <div class="stat-val"><span data-count="10">0</span></div>
+    <div class="stat-desc">Hands-on exercises</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     FUNDAMENTALS
+═══════════════════════════════════════════ -->
+<div class="section anim-in" id="fundamentals" data-section="fundamentals">
+  <div class="section-head">
+    <h2>📖 What is IDOR?</h2>
+    <span class="tag brand">Fundamentals</span>
+  </div>
+  <div class="section-body">
+
+    <p><strong>Insecure Direct Object Reference (IDOR)</strong> is an access control vulnerability that occurs when an application uses <strong>user-supplied input</strong> to directly access objects — such as database records, files, or API resources — <strong>without verifying that the authenticated user is authorized</strong> to access that specific object.</p>
+
+    <div class="callout bad" style="margin-top:.7rem">
+      <div class="c-dot"></div>
+      <div>
+        <p class="c-title">The Core Problem in One Sentence</p>
+        <p class="c-text">The application checks <em>"Is someone logged in?"</em> (Authentication ✅) but <strong>never</strong> checks <em>"Is THIS person allowed to access THIS specific resource?"</em> (Authorization ❌)</p>
+      </div>
+    </div>
+
+    <!-- Hotel Analogy -->
+    <h3>🏨 The Hotel Analogy</h3>
+    <div class="flow cols-4 flow-connected" style="margin-top:.5rem">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <p class="step-title">🔑 Key Card</p>
+        <p class="step-desc">You check into a hotel and receive a key card. This is <strong>authentication</strong> — the hotel knows WHO you are.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <p class="step-title">🚪 Your Room</p>
+        <p class="step-desc">Your key card should ONLY open Room 301 — YOUR room. This is <strong>authorization</strong> — controlling WHAT you can access.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <p class="step-title">🔓 The Bug</p>
+        <p class="step-desc">You type "302" on the keypad and <strong>it opens Room 302!</strong> The system never verified your card was authorized for that room.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">4</div>
+        <p class="step-title">💥 Impact</p>
+        <p class="step-desc">You can now enter ANY room simply by guessing the number. Every guest's belongings, privacy, and safety are compromised.</p>
+      </div>
+    </div>
+
+    <!-- Auth vs Authz -->
+    <h3 style="margin-top:1.2rem">🔐 Authentication vs Authorization — The Critical Difference</h3>
+    <div class="split" style="margin-top:.5rem">
+      <div class="panel">
+        <div class="panel-h">
+          <span>🔑 Authentication (AuthN)</span>
+          <span class="tag info">WHO are you?</span>
+        </div>
+        <div class="panel-b">
+          <p style="font-weight:800;margin:0 0 .3rem;color:var(--text)">"Prove your identity"</p>
+          <ul style="color:var(--sub);margin:.3rem 0;line-height:1.9">
+            <li>Username & Password verification</li>
+            <li>Session tokens & cookies</li>
+            <li>JWT / OAuth 2.0 tokens</li>
+            <li>Multi-factor authentication (MFA)</li>
+            <li>Biometric verification</li>
+          </ul>
+          <div class="callout good" style="margin:.4rem 0 0;padding:.5rem .6rem">
+            <div class="c-dot"></div>
+            <div><p class="c-text" style="margin:0">✅ Verifies <strong>identity</strong> — establishes who the user is</p></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h">
+          <span>🛡️ Authorization (AuthZ)</span>
+          <span class="tag warn">WHAT can you do?</span>
+        </div>
+        <div class="panel-b">
+          <p style="font-weight:800;margin:0 0 .3rem;color:var(--text)">"Check your permissions"</p>
+          <ul style="color:var(--sub);margin:.3rem 0;line-height:1.9">
+            <li>Can you view <em>this specific</em> record?</li>
+            <li>Can you edit <em>this specific</em> file?</li>
+            <li>Can you delete <em>this specific</em> resource?</li>
+            <li>Are you the owner of this object?</li>
+            <li>Do you have the required role/permission?</li>
+          </ul>
+          <div class="callout bad" style="margin:.4rem 0 0;padding:.5rem .6rem">
+            <div class="c-dot"></div>
+            <div><p class="c-text" style="margin:0">❌ IDOR happens when this step is <strong>completely missing</strong></p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simple visual demo -->
+    <h3 style="margin-top:1.2rem">👁️ See the Vulnerability</h3>
+    <div class="split" style="margin-top:.5rem">
+      <div class="panel">
+        <div class="panel-h"><span>✅ Normal Request (Your Data)</span><span class="tag good">Safe</span></div>
+        <div class="panel-b">
+          <div class="http-line"><span class="http-method get">GET</span><span class="http-url">/api/users/<strong>1001</strong>/profile</span></div>
+          <p style="color:var(--sub);font-size:.88rem;margin:.3rem 0">Cookie: session=<em>alice_token</em></p>
+          <p style="margin:.3rem 0">→ Returns <strong>Alice's</strong> data (User 1001) ✅</p>
+          <p style="color:var(--good);font-weight:800;font-size:.88rem">Alice is accessing her OWN profile. This is fine.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>🔴 IDOR Attack (Other's Data)</span><span class="tag bad">Vulnerable!</span></div>
+        <div class="panel-b">
+          <div class="http-line"><span class="http-method get">GET</span><span class="http-url">/api/users/<strong style="color:var(--bad)">1002</strong>/profile</span></div>
+          <p style="color:var(--sub);font-size:.88rem;margin:.3rem 0">Cookie: session=<em>alice_token</em> (same session!)</p>
+          <p style="margin:.3rem 0">→ Returns <strong style="color:var(--bad)">Bob's</strong> data (User 1002) 🔴</p>
+          <p style="color:var(--bad);font-weight:800;font-size:.88rem">Alice just read Bob's SSN, salary, and private data!</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Framework Table -->
+    <h3 style="margin-top:1.2rem">📊 IDOR in Security Frameworks</h3>
+    <div class="table-wrap" style="margin-top:.4rem">
+    <table class="table">
+      <thead><tr><th>Framework</th><th>Classification</th><th>Identifier</th></tr></thead>
+      <tbody>
+        <tr><td>OWASP Top 10 (2021)</td><td><span class="tag bad">A01: Broken Access Control</span></td><td>#1 most critical</td></tr>
+        <tr><td>OWASP Top 10 (2017)</td><td>A5: Broken Access Control</td><td>—</td></tr>
+        <tr><td>OWASP API Top 10</td><td><span class="tag bad">API1: Broken Object Level Authorization</span></td><td>Also called BOLA</td></tr>
+        <tr><td>CWE</td><td>CWE-639: Authorization Bypass Through User-Controlled Key</td><td>Primary weakness</td></tr>
+        <tr><td>SANS Top 25</td><td>Improper Access Control</td><td>CWE-284 family</td></tr>
+        <tr><td>CVSS v3.1 Range</td><td>4.0 – 9.8</td><td>Medium to Critical</td></tr>
+        <tr><td>NIST SP 800-53</td><td>AC-3: Access Enforcement</td><td>Access Control family</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     HOW IT WORKS (MECHANICS)
+═══════════════════════════════════════════ -->
+<div class="section anim-in" id="mechanics" data-section="mechanics">
+  <div class="section-head">
+    <h2>⚙️ How IDOR Works — The Mechanics</h2>
+    <span class="tag warn">Deep Dive</span>
+  </div>
+  <div class="section-body">
+
+    <h3>The Vulnerable Request Flow</h3>
+    <div class="flow cols-5 flow-connected" style="margin-top:.5rem">
+      <div class="flow-step">
+        <div class="step-num">1</div>
+        <p class="step-title">🔑 Login</p>
+        <p class="step-desc">User authenticates and receives a session token. Server knows WHO they are.</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">2</div>
+        <p class="step-title">🌐 Navigate</p>
+        <p class="step-desc">User browses to a page/endpoint that contains a resource identifier (user ID, order ID, etc.)</p>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">3</div>
+        <p class="step-title">📤 Request</p>
+        <p class="step-desc">Browser sends request with the object reference:<br><code>GET /api/users/1002</code></p>
+      </div>
+      <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+        <div class="step-num" style="background:var(--bad)">!</div>
+        <p class="step-title">⚠️ No AuthZ Check</p>
+        <p class="step-desc">Server validates the session ✅ but <strong>never checks if user 1001 can access user 1002's data</strong> ❌</p>
+      </div>
+      <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+        <div class="step-num" style="background:var(--bad)">💥</div>
+        <p class="step-title">💥 Data Leaked</p>
+        <p class="step-desc">Server returns user 1002's complete profile including SSN, salary, medical info — to the wrong person!</p>
+      </div>
+    </div>
+
+    <!-- Server-side decision tree -->
+    <h3 style="margin-top:1.2rem">🖥️ What Happens Server-Side</h3>
+    <div class="split" style="margin-top:.5rem">
+      <div class="panel">
+        <div class="panel-h"><span>❌ Vulnerable Server Logic</span><span class="tag bad">Missing Step</span></div>
+        <div class="panel-b">
+          <div class="server-flow">
+            <div class="sf-row pass"><span class="sf-icon">1️⃣</span><span>Receive request: GET /api/users/1002</span></div>
+            <div class="sf-row pass"><span class="sf-icon">2️⃣</span><span>Validate session token → Valid ✅</span></div>
+            <div class="sf-row pass"><span class="sf-icon">3️⃣</span><span>Extract user_id from URL → 1002</span></div>
+            <div class="sf-row skip"><span class="sf-icon">❌</span><span><strong>Authorization check → SKIPPED!</strong></span></div>
+            <div class="sf-row fail"><span class="sf-icon">4️⃣</span><span>Query: SELECT * FROM users WHERE id=1002</span></div>
+            <div class="sf-row fail"><span class="sf-icon">5️⃣</span><span>Return full user data → 200 OK 💥</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>✅ Secure Server Logic</span><span class="tag good">Proper Check</span></div>
+        <div class="panel-b">
+          <div class="server-flow">
+            <div class="sf-row pass"><span class="sf-icon">1️⃣</span><span>Receive request: GET /api/users/1002</span></div>
+            <div class="sf-row pass"><span class="sf-icon">2️⃣</span><span>Validate session token → Valid ✅</span></div>
+            <div class="sf-row pass"><span class="sf-icon">3️⃣</span><span>Extract user_id from URL → 1002</span></div>
+            <div class="sf-row pass"><span class="sf-icon">4️⃣</span><span><strong>Check: session.user_id (1001) == 1002? → NO</strong></span></div>
+            <div class="sf-row pass"><span class="sf-icon">5️⃣</span><span><strong>Check: session.role == admin? → NO</strong></span></div>
+            <div class="sf-row pass"><span class="sf-icon">6️⃣</span><span>Return 403 Forbidden 🛡️</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vulnerable Code Examples -->
+    <h3 style="margin-top:1.2rem">💻 Vulnerable Code — Multi-Language Examples</h3>
+    <div class="accordion" style="margin-top:.5rem">
+
+      <div class="acc-item open">
+        <button class="acc-btn">
+          <span>🐍 Python Flask — Vulnerable</span>
+          <span class="acc-arrow">▼</span>
+        </button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <p class="sub" style="font-size:.88rem">No ownership check — any logged-in user can access any profile by changing the ID.</p>
+          <div class="code-wrap">
+            <button class="copy-btn">📋 Copy</button>
+<pre><code># ❌ VULNERABLE CODE — DO NOT USE IN PRODUCTION!
+@app.route('/api/users/&lt;int:user_id&gt;/profile')
+@login_required
+def get_profile(user_id):
+    # user_id comes directly from URL — attacker-controlled!
+    # No check: does session['user_id'] == user_id?
+    user = db.query(User).filter(User.id == user_id).first()
+    if user:
+        return jsonify({
+            'id':     user.id,
+            'name':   user.name,
+            'email':  user.email,
+            'ssn':    user.ssn,          # 🔴 Sensitive!
+            'salary': user.salary,       # 🔴 Sensitive!
+            'bank':   user.bank_account  # 🔴 Sensitive!
+        })
+    return jsonify({'error': 'Not found'}), 404</code></pre>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-btn">
+          <span>🟢 Node.js Express — Vulnerable</span>
+          <span class="acc-arrow">▼</span>
+        </button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <div class="code-wrap">
+            <button class="copy-btn">📋 Copy</button>
+<pre><code>// ❌ VULNERABLE CODE
+app.get('/api/orders/:orderId', authenticateToken, (req, res) => {
+    const orderId = req.params.orderId; // Attacker controls this!
+
+    // No check: req.user.id owns this order?
+    db.query('SELECT * FROM orders WHERE id = ?', [orderId],
+      (err, results) => {
+        if (results.length > 0) {
+            res.json(results[0]); // Returns ANY order!
+        } else {
+            res.status(404).json({ error: 'Not found' });
+        }
+    });
+});</code></pre>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-btn">
+          <span>☕ Java Spring Boot — Vulnerable</span>
+          <span class="acc-arrow">▼</span>
+        </button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <div class="code-wrap">
+            <button class="copy-btn">📋 Copy</button>
+<pre><code>// ❌ VULNERABLE CODE
+@GetMapping("/accounts/{accountId}")
+public ResponseEntity&lt;Account&gt; getAccount(
+        @PathVariable Long accountId,
+        @AuthenticationPrincipal UserDetails userDetails) {
+
+    // Fetches by ID without ownership check!
+    Account account = accountRepository.findById(accountId)
+        .orElseThrow(() -> new NotFoundException("Not found"));
+
+    // Returns even if it belongs to someone else!
+    return ResponseEntity.ok(account);
+}</code></pre>
+          </div>
+        </div></div>
+      </div>
+
+      <div class="acc-item">
+        <button class="acc-btn">
+          <span>🐘 PHP — Vulnerable</span>
+          <span class="acc-arrow">▼</span>
+        </button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <div class="code-wrap">
+            <button class="copy-btn">📋 Copy</button>
+<pre><code>&lt;?php
+// ❌ VULNERABLE CODE
+session_start();
+if (!isset($_SESSION['user_id'])) {
+    header('Location: /login'); exit;
+}
+
+$doc_id = $_GET['doc_id']; // Attacker controls this!
+
+// NO authorization check!
+$stmt = $pdo->prepare("SELECT * FROM documents WHERE id = ?");
+$stmt->execute([$doc_id]);
+$doc = $stmt->fetch();
+
+// Serves ANY user's document!
+header('Content-Type: application/pdf');
+readfile($doc['file_path']);
+?&gt;</code></pre>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- Identifier Types -->
+    <h3 style="margin-top:1.2rem">🔢 Identifier Types & Guessability</h3>
+    <div class="table-wrap" style="margin-top:.4rem">
+    <table class="table">
+      <thead><tr><th>ID Format</th><th>Example</th><th>Guessability</th><th>Risk Level</th></tr></thead>
+      <tbody>
+        <tr><td>Sequential Integer</td><td><code>id=1001, 1002, 1003</code></td><td>Trivial — just increment</td><td><span class="tag bad">🔴 Critical</span></td></tr>
+        <tr><td>Short Numeric</td><td><code>id=4521</code></td><td>Easy to brute-force (10K range)</td><td><span class="tag bad">🔴 High</span></td></tr>
+        <tr><td>Predictable String</td><td><code>user=john.doe</code></td><td>Guessable from username patterns</td><td><span class="tag warn">🟡 Medium</span></td></tr>
+        <tr><td>UUID v1 (Time-based)</td><td><code>550e8400-e29b-41d4-...</code></td><td>Partially predictable (timestamp)</td><td><span class="tag warn">🟡 Medium</span></td></tr>
+        <tr><td>UUID v4 (Random)</td><td><code>f47ac10b-58cc-4372-...</code></td><td>Hard to guess but can leak</td><td><span class="tag info">🔵 Lower*</span></td></tr>
+        <tr><td>Base64 Encoded</td><td><code>MTAwMg==</code> (= "1002")</td><td>Security by obscurity only</td><td><span class="tag bad">🔴 High</span></td></tr>
+        <tr><td>Hashed Value</td><td><code>a4b2c3d4e5f6...</code></td><td>Depends on algorithm</td><td><span class="tag warn">🟡 Medium</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="callout warn" style="margin-top:.5rem">
+      <div class="c-dot"></div>
+      <div>
+        <p class="c-title">⚠️ UUIDs Do NOT Fix IDOR!</p>
+        <p class="c-text">Using UUIDs makes IDs harder to <em>guess</em>, but if a UUID leaks through URLs, emails, logs, API list responses, or referrer headers, the IDOR is fully exploitable. <strong>Server-side authorization checks are the ONLY real fix.</strong> UUIDs are defense-in-depth, not a solution.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     TYPES
+═══════════════════════════════════════════ -->
+<div class="section anim-in" id="types" data-section="types">
+  <div class="section-head">
+    <h2>🔀 Types of IDOR Vulnerabilities</h2>
+    <span class="tag info">Classification</span>
+  </div>
+  <div class="section-body">
+
+    <!-- By Direction -->
+    <h3>By Direction (Who's Affected?)</h3>
+    <div class="grid" style="margin-top:.5rem">
+      <div class="card card-accent cyan col-6">
+        <h4>↔️ Horizontal IDOR <span class="tag bad" style="margin-left:.3rem">Most Common</span></h4>
+        <p><strong>Same privilege level.</strong> User A (regular user) accesses User B's (regular user) data. Both users have identical roles.</p>
+        <div class="code-wrap" style="margin-top:.4rem">
+<pre style="margin:0"><code># Alice (employee) → reads Bob's (employee) profile
+GET /api/users/1002/profile
+Authorization: Bearer alice_session_token
+# Returns Bob's SSN, salary, medical data!</code></pre>
+        </div>
+      </div>
+      <div class="card card-accent red col-6">
+        <h4>↕️ Vertical IDOR <span class="tag warn" style="margin-left:.3rem">Privilege Escalation</span></h4>
+        <p><strong>Different privilege level.</strong> Regular user accesses admin-level resources or elevates their own permissions.</p>
+        <div class="code-wrap" style="margin-top:.4rem">
+<pre style="margin:0"><code># Regular user → accesses admin endpoints
+GET /api/admin/users/all
+Authorization: Bearer regular_user_token
+# Returns ALL users' data including admin secrets!</code></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- By Operation -->
+    <h3 style="margin-top:1rem">By Operation (What Can the Attacker Do?)</h3>
+    <div class="grid" style="margin-top:.5rem">
+      <div class="card col-3 m-col-6">
+        <h4>👁️ Read (GET)</h4>
+        <p>View another user's private data — profile, orders, messages, documents.</p>
+        <div class="http-line" style="margin-top:.3rem"><span class="http-method get">GET</span><span class="http-url" style="font-size:.8rem">/api/users/1002/profile</span></div>
+        <span class="tag info" style="margin-top:.3rem">Information Disclosure</span>
+      </div>
+      <div class="card col-3 m-col-6">
+        <h4>✏️ Write (PUT/PATCH)</h4>
+        <p>Modify another user's data — change email, role, settings, password.</p>
+        <div class="http-line" style="margin-top:.3rem"><span class="http-method put">PUT</span><span class="http-url" style="font-size:.8rem">/api/users/1002/email</span></div>
+        <span class="tag warn" style="margin-top:.3rem">Data Modification</span>
+      </div>
+      <div class="card col-3 m-col-6">
+        <h4>🗑️ Delete (DELETE)</h4>
+        <p>Remove another user's resources — messages, files, accounts.</p>
+        <div class="http-line" style="margin-top:.3rem"><span class="http-method delete">DELETE</span><span class="http-url" style="font-size:.8rem">/api/users/1002</span></div>
+        <span class="tag bad" style="margin-top:.3rem">Data Destruction</span>
+      </div>
+      <div class="card col-3 m-col-6">
+        <h4>➕ Create (POST)</h4>
+        <p>Create resources in another user's context — inject content into their account.</p>
+        <div class="http-line" style="margin-top:.3rem"><span class="http-method post">POST</span><span class="http-url" style="font-size:.8rem">/api/users/1002/notes</span></div>
+        <span class="tag pink" style="margin-top:.3rem">Context Injection</span>
+      </div>
+    </div>
+
+    <!-- By Location -->
+    <h3 style="margin-top:1rem">By Parameter Location (Where's the ID?)</h3>
+    <div class="accordion" style="margin-top:.5rem">
+      <div class="acc-item open">
+        <button class="acc-btn"><span>🔗 URL Path — <code>/api/users/<strong>1002</strong>/profile</code></span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <p class="sub">The object ID is embedded directly in the URL path. <strong>Most common</strong> and easiest to spot. Simply change the number in the URL bar or intercept with Burp Suite.</p>
+          <div class="code-wrap"><pre style="margin:0"><code>GET /api/users/1001/profile → Your profile
+GET /api/users/1002/profile → Bob's profile (IDOR!)
+GET /api/users/1003/profile → Charlie's profile (IDOR!)
+GET /api/users/1004/profile → Diana's profile (IDOR!)
+GET /api/users/1005/profile → Admin's profile (IDOR!)</code></pre></div>
+        </div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-btn"><span>❓ Query Parameter — <code>?userId=<strong>1002</strong></code></span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <p class="sub">ID passed as a query string. Common in search endpoints, filters, exports, and legacy applications.</p>
+          <div class="code-wrap"><pre style="margin:0"><code>GET /api/profile?userId=1002
+GET /download?fileId=8829
+GET /api/export?user=1002&format=csv</code></pre></div>
+        </div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-btn"><span>📦 Request Body — <code>{"user_id": <strong>1002</strong>}</code></span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <p class="sub">ID inside POST/PUT request body (JSON, form data, XML). Harder to spot without intercepting traffic.</p>
+          <div class="code-wrap"><pre style="margin:0"><code>POST /api/transfer
+{"from_account": "1002", "to_account": "9999", "amount": 5000}
+// Attacker changes from_account to victim's ID!</code></pre></div>
+        </div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-btn"><span>📋 HTTP Header — <code>X-User-ID: <strong>1002</strong></code></span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <p class="sub">Custom headers carrying user identifiers. Common in microservice architectures where API gateways pass user context via headers.</p>
+        </div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-btn"><span>🍪 Cookie — <code>user_id=<strong>1002</strong></code></span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner">
+          <p class="sub">Object references stored in cookies. Trivially manipulated with browser dev tools, cookie editors, or Burp Suite.</p>
+        </div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     ATTACK SURFACES
+═══════════════════════════════════════════ -->
+<div class="section anim-in" id="surfaces" data-section="surfaces">
+  <div class="section-head">
+    <h2>🎯 Where to Find IDOR — Attack Surfaces</h2>
+    <span class="tag warn">Hunting Guide</span>
+  </div>
+  <div class="section-body">
+
+    <h3>Common Vulnerable Endpoints</h3>
+    <div class="grid" style="margin-top:.5rem">
+      <div class="card col-4 m-col-6"><h4>👤 User Management</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>GET    /api/users/{id}
+GET    /api/users/{id}/profile
+PUT    /api/users/{id}/settings
+DELETE /api/users/{id}
+GET    /api/users/{id}/notifications</code></pre></div></div>
+      <div class="card col-4 m-col-6"><h4>💳 Financial / Billing</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>GET    /api/invoices/{invoiceId}
+GET    /api/transactions/{txnId}
+POST   /api/refund/{orderId}
+GET    /api/payment-methods/{id}
+GET    /api/billing/{userId}/history</code></pre></div></div>
+      <div class="card col-4 m-col-6"><h4>📁 Documents / Files</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>GET    /api/documents/{docId}/download
+GET    /api/files/{fileId}
+DELETE /api/attachments/{id}
+GET    /api/reports/{reportId}
+GET    /api/exports/{exportId}</code></pre></div></div>
+      <div class="card col-4 m-col-6"><h4>💬 Messaging</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>GET    /api/messages/{messageId}
+GET    /api/conversations/{id}
+GET    /api/inbox/{userId}
+DELETE /api/messages/{messageId}
+GET    /api/threads/{threadId}</code></pre></div></div>
+      <div class="card col-4 m-col-6"><h4>🛒 E-Commerce</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>GET    /api/orders/{orderId}
+GET    /api/orders/{id}/tracking
+GET    /api/cart/{cartId}
+GET    /api/wishlist/{userId}
+GET    /api/returns/{returnId}</code></pre></div></div>
+      <div class="card col-4 m-col-6"><h4>🏥 Healthcare</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>GET    /api/patients/{patientId}/records
+GET    /api/prescriptions/{id}
+GET    /api/appointments/{id}
+GET    /api/lab-results/{resultId}
+GET    /api/insurance/{policyId}</code></pre></div></div>
+    </div>
+
+    <h3 style="margin-top:1rem">🕵️ Hidden Locations Often Missed by Testers</h3>
+    <div class="grid" style="margin-top:.5rem">
+      <div class="card col-4 m-col-6"><h4>🔄 Redirect URLs</h4><p class="sub" style="font-size:.85rem">POST /login → 302 Location: /dashboard?user=<strong>1002</strong></p></div>
+      <div class="card col-4 m-col-6"><h4>🔌 WebSocket Messages</h4><p class="sub" style="font-size:.85rem">{"channel": "user_<strong>1002</strong>_notifications"}</p></div>
+      <div class="card col-4 m-col-6"><h4>📊 GraphQL Queries</h4><p class="sub" style="font-size:.85rem">query { user(id: <strong>1002</strong>) { ssn salary } }</p></div>
+      <div class="card col-4 m-col-6"><h4>📤 File Upload Paths</h4><p class="sub" style="font-size:.85rem">name="userId" value="<strong>1002</strong>" in multipart</p></div>
+      <div class="card col-4 m-col-6"><h4>📥 Export / Reports</h4><p class="sub" style="font-size:.85rem">GET /export?userId=<strong>1002</strong>&format=csv</p></div>
+      <div class="card col-4 m-col-6"><h4>🔐 Password Reset</h4><p class="sub" style="font-size:.85rem">POST /reset {"user_id": <strong>1002</strong>}</p></div>
+      <div class="card col-4 m-col-6"><h4>🎫 Support Tickets</h4><p class="sub" style="font-size:.85rem">GET /api/tickets/<strong>TKT-4521</strong></p></div>
+      <div class="card col-4 m-col-6"><h4>🔔 Webhooks / Callbacks</h4><p class="sub" style="font-size:.85rem">POST /webhooks {"user_id": <strong>1002</strong>}</p></div>
+      <div class="card col-4 m-col-6"><h4>📱 Mobile API Endpoints</h4><p class="sub" style="font-size:.85rem">Often less tested than web endpoints</p></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     REAL WORLD CASES
+═══════════════════════════════════════════ -->
+<div class="section anim-in" id="realworld" data-section="realworld">
+  <div class="section-head">
+    <h2>🌍 Real-World Case Studies</h2>
+    <span class="tag bad">Breaches</span>
+  </div>
+  <div class="section-body">
+    <div class="grid" style="gap:.7rem">
+      <div class="card col-6 m-col-6">
+        <h4>📘 Facebook — Private Photos (2015)</h4>
+        <p>Any user could view ANY user's private photos by changing the photo ID in the Graph API. Affected billions of private images.</p>
+        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><span class="tag bad">Billions of photos</span><span class="tag info">Bounty: $12,500</span></div>
+      </div>
+      <div class="card col-6 m-col-6">
+        <h4>🚗 Uber — Trip Details Exposure</h4>
+        <p>Authenticated users could view any rider's trip history — pickup/dropoff GPS coordinates, driver details, fare amounts, route maps.</p>
+        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><span class="tag bad">Location Tracking</span><span class="tag warn">Privacy Violation</span></div>
+      </div>
+      <div class="card col-6 m-col-6">
+        <h4>🏛️ US Department of Defense</h4>
+        <p>Bug bounty hunter discovered IDOR exposing military personnel SSNs, addresses, service records via sequential integer IDs.</p>
+        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><span class="tag bad">National Security</span><span class="tag bad">SSN Exposure</span></div>
+      </div>
+      <div class="card col-6 m-col-6">
+        <h4>🛍️ Shopify — Merchant Revenue Data</h4>
+        <p>Shop A could access Shop B's financial reports, revenue numbers, and profit margins by modifying the report_id parameter.</p>
+        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><span class="tag warn">Financial Data</span><span class="tag info">Bounty: $15,000+</span></div>
+      </div>
+      <div class="card col-6 m-col-6">
+        <h4>🐛 HackerOne — Private Bug Reports</h4>
+        <p>IDOR on the bug bounty platform itself allowed reading private vulnerability reports from other companies' programs. Maximum irony.</p>
+        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><span class="tag pink">Maximum Irony</span><span class="tag warn">Sequential IDs</span></div>
+      </div>
+      <div class="card col-6 m-col-6">
+        <h4>🏦 Banking App — Fund Transfer IDOR</h4>
+        <p>Attacker changed source_account in transfer API requests, moving money FROM any customer's bank account to their own.</p>
+        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><span class="tag bad">CVSS 9.8</span><span class="tag bad">Direct Financial Loss</span></div>
+      </div>
+      <div class="card col-6 m-col-6">
+        <h4>🏥 Healthcare Platform — Patient Records</h4>
+        <p>Patient portal exposed complete medical histories through sequential patient IDs — diagnoses, prescriptions, insurance info, lab results.</p>
+        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><span class="tag bad">HIPAA Violation</span><span class="tag bad">Multi-million fine</span></div>
+      </div>
+      <div class="card col-6 m-col-6">
+        <h4>✈️ Airline Booking System — PNR IDOR</h4>
+        <p>Changing the PNR (booking reference) revealed other passengers' full names, passport numbers, flight itineraries, and payment details.</p>
+        <div style="margin-top:.4rem;display:flex;gap:.3rem;flex-wrap:wrap"><span class="tag bad">Passport Data</span><span class="tag warn">GDPR Impact</span></div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:.7rem">
+      <div class="c-dot"></div>
+      <div>
+        <p class="c-title">Bug Bounty Stats</p>
+        <p class="c-text">IDOR accounts for roughly <strong>15–20%</strong> of all bug bounty reports across platforms like HackerOne and Bugcrowd. It's one of the most commonly found AND most commonly rewarded vulnerability classes, with average bounties of <strong>$500–$5,000</strong> per valid report.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     DATABASE REFERENCE
+═══════════════════════════════════════════ -->
+<div class="section anim-in" id="database" data-section="database">
+  <div class="section-head">
+    <h2>🗄️ Lab Database Reference</h2>
+    <span class="tag info">Used by All 10 Labs</span>
+  </div>
+  <div class="section-body">
+
+    <p>The following simulated database is used by all interactive labs below. Reference these tables when exploring vulnerabilities.</p>
+
+    <div class="callout" style="margin-top:.5rem">
+      <div class="c-dot"></div>
+      <div>
+        <p class="c-title">💡 Lab Credentials</p>
+        <p class="c-text">Login as any user: <code>alice</code>, <code>bob</code>, <code>charlie</code>, <code>diana</code>, or <code>admin</code>. Passwords are not checked in the simulator — just select the username. Each user has a different role and owns different resources.</p>
+      </div>
+    </div>
+
+    <div class="callout warn" style="margin-top:.3rem">
+      <div class="c-dot"></div>
+      <div>
+        <p class="c-title">🎯 Challenge Yourself</p>
+        <p class="c-text">Login as <strong>alice</strong> (a regular employee) and try to access admin's credentials (Doc ID 104), charlie's confidential revenue message (Msg ID 3), or bob's medical records (Doc ID 102). Can you extract ALL data without being the owner?</p>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <h3 style="margin-top:.8rem">👤 Users Table</h3>
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Username</th><th>Name</th><th>Email</th><th>Role</th><th>Dept</th></tr></thead>
+      <tbody id="usersTableBody"></tbody>
+    </table>
+    </div>
+
+    <!-- Orders -->
+    <h3 style="margin-top:.8rem">📦 Orders Table</h3>
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Owner</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
+      <tbody id="ordersTableBody"></tbody>
+    </table>
+    </div>
+
+    <!-- Messages -->
+    <h3 style="margin-top:.8rem">💬 Messages Table</h3>
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Sender</th><th>Receiver</th><th>Subject</th><th>Time</th></tr></thead>
+      <tbody id="msgsTableBody"></tbody>
+    </table>
+    </div>
+
+    <!-- Documents -->
+    <h3 style="margin-top:.8rem">📁 Documents Table</h3>
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>ID</th><th>Owner</th><th>Filename</th><th>Classification</th><th>Type</th></tr></thead>
+      <tbody id="docsTableBody"></tbody>
+    </table>
+    </div>
+
+    <!-- Admin Endpoints -->
+    <h3 style="margin-top:.8rem">⚙️ Admin Endpoints Table (Lab 2)</h3>
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Method</th><th>Path</th><th>Description</th><th>Access</th></tr></thead>
+      <tbody id="adminTableBody"></tbody>
+    </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 1 — Horizontal Profile IDOR
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab1" data-section="lab1">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 1: Horizontal Profile IDOR</h3>
+      <p class="lab-desc">Login as one user and attempt to view another user's full profile — including SSN, salary, passport, medical conditions, and bank details.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Vulnerable</span>
+      <span class="tag info">Read-Based</span>
+      <span class="tag brand">Horizontal</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>TechCorp's internal HR portal lets employees view their own profiles via <code>GET /api/v1/users/{id}/profile</code>. The endpoint checks authentication (valid session token) but <strong>does NOT check</strong> whether the logged-in user owns the requested profile. An attacker can simply change the user ID in the URL to access anyone's sensitive data.</p>
+  </div>
+
+  <!-- Visual: What Horizontal Means -->
+  <div class="flow cols-3 flow-connected" style="margin-top:.6rem">
+    <div class="flow-step">
+      <div class="step-num">1</div>
+      <p class="step-title">👩 Alice Logs In</p>
+      <p class="step-desc">Alice (employee, ID: 1001) authenticates and gets session token. Server knows WHO she is.</p>
+    </div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+      <div class="step-num" style="background:var(--bad)">2</div>
+      <p class="step-title">🔀 Changes ID to 1002</p>
+      <p class="step-desc">Alice modifies the URL from <code>/users/1001</code> to <code>/users/1002</code>. Same privilege level — both are employees.</p>
+    </div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+      <div class="step-num" style="background:var(--bad)">3</div>
+      <p class="step-title">💥 Bob's Data Leaked</p>
+      <p class="step-desc">Server returns Bob's SSN, salary, medical info, bank details — without checking if Alice owns profile 1002.</p>
+    </div>
+  </div>
+
+  <form id="lab1Form" class="lab-form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="lab1Login">🔑 Login As (Your Identity)</label>
+        <select id="lab1Login">
+          <option value="alice">👩 alice — Employee, Engineering (ID: 1001)</option>
+          <option value="bob">👨 bob — Employee, Marketing (ID: 1002)</option>
+          <option value="charlie">👨‍💼 charlie — Manager, Finance (ID: 1003)</option>
+          <option value="diana">👩‍💼 diana — Employee, HR (ID: 1004)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab1Target">🎯 Target User ID (Who to Access)</label>
+        <input type="number" id="lab1Target" value="1002" min="1001" max="1005" />
+      </div>
+    </div>
+    <div class="lab-actions">
+      <button type="submit" class="btn btn-brand">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Send GET /api/v1/users/{id}/profile
+      </button>
+      <span class="sub" style="font-size:.8rem">Try: 1001 (alice), 1002 (bob), 1003 (charlie), 1004 (diana), 1005 (admin)</span>
+    </div>
+  </form>
+
+  <div class="lab-result" id="lab1Result">
+    <div class="lab-result-empty">📡 Send the request to see the result. Try accessing another user's profile by changing the ID!</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 2 — Vertical IDOR (NEW!)
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab2" data-section="lab2">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 2: Vertical IDOR — Accessing Admin Endpoints</h3>
+      <p class="lab-desc">A regular employee attempts to access admin-only API endpoints — system config, all user data, audit logs, revenue figures, and password reset functionality.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Critical</span>
+      <span class="tag warn">Vertical</span>
+      <span class="tag pink">Privilege Escalation</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>TechCorp has several admin-only API endpoints that should be restricted to users with the <strong>"admin" role</strong>. However, the API only checks if the user is <strong>authenticated</strong> (has a valid session token) — it <strong>never checks the user's role</strong>. This means any logged-in employee can access:</p>
+    <ul style="color:var(--sub);margin:.3rem 0;line-height:2">
+      <li><strong>/api/v1/admin/users</strong> — Full list of ALL users with SSNs and salaries</li>
+      <li><strong>/api/v1/admin/audit-log</strong> — System audit trail with IP addresses</li>
+      <li><strong>/api/v1/admin/system-config</strong> — Database passwords, AWS keys, JWT secrets</li>
+      <li><strong>/api/v1/admin/analytics/revenue</strong> — Company-wide financial data</li>
+      <li><strong>/api/v1/admin/users/{id}/reset-password</strong> — Force-reset ANY user's password</li>
+    </ul>
+  </div>
+
+  <!-- Visual: Horizontal vs Vertical -->
+  <div class="split" style="margin-top:.6rem">
+    <div class="panel">
+      <div class="panel-h"><span>↔️ Horizontal IDOR (Lab 1)</span><span class="tag info">Same Level</span></div>
+      <div class="panel-b">
+        <div class="server-flow">
+          <div class="sf-row pass"><span class="sf-icon">👩</span><span>Alice (employee)</span></div>
+          <div class="sf-row"><span class="sf-icon">→</span><span>Accesses Bob's (employee) data</span></div>
+          <div class="sf-row"><span class="sf-icon">📊</span><span>Same privilege level, different user</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><span>↕️ Vertical IDOR (Lab 2)</span><span class="tag bad">Higher Level</span></div>
+      <div class="panel-b">
+        <div class="server-flow">
+          <div class="sf-row pass"><span class="sf-icon">👩</span><span>Alice (employee)</span></div>
+          <div class="sf-row fail"><span class="sf-icon">⬆️</span><span>Accesses <strong>Admin-only</strong> endpoints</span></div>
+          <div class="sf-row fail"><span class="sf-icon">🔴</span><span>Different privilege level — escalation!</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual: Server Flow for Vertical IDOR -->
+  <div class="split" style="margin-top:.6rem">
+    <div class="panel">
+      <div class="panel-h"><span>❌ Vulnerable Admin Check</span><span class="tag bad">No Role Check</span></div>
+      <div class="panel-b">
+        <div class="server-flow">
+          <div class="sf-row pass"><span class="sf-icon">1️⃣</span><span>Receive: GET /api/v1/admin/users</span></div>
+          <div class="sf-row pass"><span class="sf-icon">2️⃣</span><span>Validate session → ✅ Valid token</span></div>
+          <div class="sf-row skip"><span class="sf-icon">❌</span><span><strong>Role check → SKIPPED!</strong></span></div>
+          <div class="sf-row fail"><span class="sf-icon">3️⃣</span><span>SELECT * FROM users → Returns ALL 💥</span></div>
+        </div>
+        <div class="code-wrap" style="margin-top:.4rem">
+<pre style="margin:0"><code># ❌ VULNERABLE — no role check!
+@app.route('/api/v1/admin/users')
+@login_required          # Only checks authentication
+def admin_get_users():
+    # Anyone with a valid session can access this!
+    return jsonify(db.query(User).all())</code></pre>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><span>✅ Secure Admin Check</span><span class="tag good">Role Verified</span></div>
+      <div class="panel-b">
+        <div class="server-flow">
+          <div class="sf-row pass"><span class="sf-icon">1️⃣</span><span>Receive: GET /api/v1/admin/users</span></div>
+          <div class="sf-row pass"><span class="sf-icon">2️⃣</span><span>Validate session → ✅ Valid token</span></div>
+          <div class="sf-row pass"><span class="sf-icon">3️⃣</span><span><strong>Role check: user.role == "admin"? → NO</strong></span></div>
+          <div class="sf-row pass"><span class="sf-icon">4️⃣</span><span>Return 403 Forbidden 🛡️</span></div>
+        </div>
+        <div class="code-wrap" style="margin-top:.4rem">
+<pre style="margin:0"><code># ✅ SECURE — checks role!
+@app.route('/api/v1/admin/users')
+@login_required
+@admin_required       # Checks session.role == "admin"
+def admin_get_users():
+    return jsonify(db.query(User).all())</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form id="lab2Form" class="lab-form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="lab2Login">🔑 Login As (Your Identity)</label>
+        <select id="lab2Login">
+          <option value="alice">👩 alice — employee (should NOT have admin access)</option>
+          <option value="bob">👨 bob — employee (should NOT have admin access)</option>
+          <option value="charlie">👨‍💼 charlie — manager (should NOT have admin access)</option>
+          <option value="diana">👩‍💼 diana — employee (should NOT have admin access)</option>
+          <option value="admin">🔐 admin — admin (SHOULD have admin access)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab2Endpoint">🎯 Admin Endpoint to Access</label>
+        <select id="lab2Endpoint">
+          <option value="/api/v1/admin/users">GET /admin/users — All Users + SSN + Salary</option>
+          <option value="/api/v1/admin/audit-log">GET /admin/audit-log — System Audit Trail</option>
+          <option value="/api/v1/admin/system-config">GET /admin/system-config — DB Passwords & API Keys 🔴</option>
+          <option value="/api/v1/admin/analytics/revenue">GET /admin/analytics/revenue — Company Financials</option>
+          <option value="/api/v1/admin/users/1002/reset-password">POST /admin/users/1002/reset-password — Reset Bob's Password 🔴</option>
+        </select>
+      </div>
+    </div>
+    <div class="lab-actions">
+      <button type="submit" class="btn btn-brand">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Send Request to Admin Endpoint
+      </button>
+      <span class="sub" style="font-size:.8rem">Login as alice (employee) → try accessing system-config or reset-password!</span>
+    </div>
+  </form>
+
+  <div class="lab-result" id="lab2Result">
+    <div class="lab-result-empty">📡 Select an admin endpoint and login as a non-admin user. Can a regular employee access admin secrets?</div>
+  </div>
+
+  <div class="callout bad" style="margin-top:.6rem">
+    <div class="c-dot"></div>
+    <div>
+      <p class="c-title">⚠️ Why Vertical IDOR is Often More Dangerous</p>
+      <p class="c-text">While horizontal IDOR leaks one user's data at a time, vertical IDOR gives an attacker <strong>admin-level access</strong> — meaning they can access ALL users' data, modify system configuration, reset any password, and potentially take over the entire application. The <code>/admin/system-config</code> endpoint above leaks database passwords and AWS keys — this is a <strong>full system compromise</strong>.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 3 — Order IDOR
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab3" data-section="lab3">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 3: Order Information IDOR</h3>
+      <p class="lab-desc">Access another user's order details — product info, pricing, full shipping address, payment card digits, and tracking numbers.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Vulnerable</span>
+      <span class="tag info">Read-Based</span>
+      <span class="tag warn">PII Leakage</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>TechCorp's e-commerce system allows users to check their order status at <code>GET /api/v1/orders/{orderId}</code>. The order IDs are sequential integers. An attacker can enumerate order IDs to access other customers' orders — revealing products purchased, amounts paid, shipping addresses, and partial credit card numbers.</p>
+  </div>
+
+  <div class="flow cols-4 flow-connected" style="margin-top:.5rem">
+    <div class="flow-step"><div class="step-num">1</div><p class="step-title">👩 Login</p><p class="step-desc">Alice logs in. Her orders are 5001 and 5002.</p></div>
+    <div class="flow-step"><div class="step-num">2</div><p class="step-title">📦 View Own Order</p><p class="step-desc">Alice accesses <code>/orders/5001</code> → her MacBook order. Normal.</p></div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">3</div><p class="step-title">🔀 Change ID</p><p class="step-desc">Alice changes URL to <code>/orders/5003</code> — Bob's Dell Monitor order.</p></div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">4</div><p class="step-title">💥 Data Leaked</p><p class="step-desc">Bob's shipping address, card ****1337, and tracking number exposed!</p></div>
+  </div>
+
+  <form id="lab3Form" class="lab-form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="lab3Login">🔑 Login As</label>
+        <select id="lab3Login">
+          <option value="alice">👩 alice — ID: 1001 (Orders: 5001, 5002)</option>
+          <option value="bob">👨 bob — ID: 1002 (Orders: 5003, 5004)</option>
+          <option value="charlie">👨‍💼 charlie — ID: 1003 (Order: 5005)</option>
+          <option value="diana">👩‍💼 diana — ID: 1004 (Order: 5006)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab3Order">🎯 Target Order ID</label>
+        <input type="number" id="lab3Order" value="5003" min="5001" max="5007" />
+      </div>
+    </div>
+    <div class="lab-actions">
+      <button type="submit" class="btn btn-brand">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Send GET /api/v1/orders/{id}
+      </button>
+      <span class="sub" style="font-size:.8rem">Alice's: 5001-5002 | Bob's: 5003-5004 | Charlie's: 5005 | Diana's: 5006 | Admin's: 5007</span>
+    </div>
+  </form>
+
+  <div class="lab-result" id="lab3Result">
+    <div class="lab-result-empty">📡 Try accessing an order that doesn't belong to you! Order 5007 is the admin's $18,999 security device.</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 4 — Private Message IDOR
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab4" data-section="lab4">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 4: Private Message IDOR</h3>
+      <p class="lab-desc">Read private messages between other users — including confidential financial data and system credentials.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Vulnerable</span>
+      <span class="tag bad">Confidential</span>
+      <span class="tag warn">Espionage Risk</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>TechCorp's internal messaging system uses sequential message IDs. The endpoint <code>GET /api/v1/messages/{msgId}</code> checks if the user is authenticated but doesn't verify whether they are the sender or receiver. An attacker can read any private conversation in the company.</p>
+  </div>
+
+  <!-- Highlight dangerous messages -->
+  <div class="grid" style="margin-top:.5rem">
+    <div class="card col-4 m-col-6">
+      <h4 style="font-size:.9rem">💬 Msg 1-2</h4>
+      <p style="font-size:.82rem">Casual team lunch conversation between Alice and Bob</p>
+      <span class="tag info" style="font-size:.7rem">Low sensitivity</span>
+    </div>
+    <div class="card col-4 m-col-6 card-accent red">
+      <h4 style="font-size:.9rem">💬 Msg 3-4</h4>
+      <p style="font-size:.82rem">CONFIDENTIAL Q4 revenue data between Charlie (Finance) and Admin</p>
+      <span class="tag bad" style="font-size:.7rem">Insider trading risk!</span>
+    </div>
+    <div class="card col-4 m-col-6 card-accent red">
+      <h4 style="font-size:.9rem">💬 Msg 6</h4>
+      <p style="font-size:.82rem">Admin's personal password vault — DB root, AWS keys, VPN credentials</p>
+      <span class="tag bad" style="font-size:.7rem">🚨 Full system compromise!</span>
+    </div>
+  </div>
+
+  <form id="lab4Form" class="lab-form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="lab4Login">🔑 Login As</label>
+        <select id="lab4Login">
+          <option value="alice">👩 alice — ID: 1001</option>
+          <option value="bob">👨 bob — ID: 1002</option>
+          <option value="diana">👩‍💼 diana — ID: 1004</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab4Msg">🎯 Target Message ID</label>
+        <input type="number" id="lab4Msg" value="3" min="1" max="6" />
+      </div>
+    </div>
+    <div class="lab-actions">
+      <button type="submit" class="btn btn-brand">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Send GET /api/v1/messages/{id}
+      </button>
+      <span class="sub" style="font-size:.8rem">🔥 Try <strong>3</strong> (Q4 revenue), <strong>4</strong> (insider directive), or <strong>6</strong> (system passwords!)</span>
+    </div>
+  </form>
+
+  <div class="lab-result" id="lab4Result">
+    <div class="lab-result-empty">📡 Read a private message you shouldn't have access to. Messages 3, 4, and 6 contain extremely sensitive data!</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 5 — Confidential Document IDOR
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab5" data-section="lab5">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 5: Confidential Document IDOR</h3>
+      <p class="lab-desc">Download another user's private files — tax returns, medical reports, salary spreadsheets, and master admin credentials.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Vulnerable</span>
+      <span class="tag bad">Top Secret</span>
+      <span class="tag pink">HIPAA / GDPR</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>TechCorp's document management system allows downloading files via <code>GET /api/v1/documents/{docId}</code>. Documents have different classification levels, but the API endpoint <strong>ignores classification</strong> and <strong>doesn't check document ownership</strong>.</p>
+  </div>
+
+  <!-- Document classification visual -->
+  <div class="grid" style="margin-top:.5rem">
+    <div class="card col-3 m-col-6" style="border-left:3px solid var(--info)">
+      <h4 style="font-size:.88rem">📄 Doc 101</h4>
+      <p style="font-size:.8rem">alice's tax return</p>
+      <span class="tag info" style="font-size:.68rem">Private</span>
+    </div>
+    <div class="card col-3 m-col-6" style="border-left:3px solid var(--warn)">
+      <h4 style="font-size:.88rem">📄 Doc 102</h4>
+      <p style="font-size:.8rem">bob's medical history</p>
+      <span class="tag warn" style="font-size:.68rem">Confidential</span>
+    </div>
+    <div class="card col-3 m-col-6" style="border-left:3px solid var(--bad)">
+      <h4 style="font-size:.88rem">📄 Doc 103</h4>
+      <p style="font-size:.8rem">ALL employee salaries</p>
+      <span class="tag bad" style="font-size:.68rem">Restricted</span>
+    </div>
+    <div class="card col-3 m-col-6" style="border-left:3px solid var(--bad)">
+      <h4 style="font-size:.88rem">📄 Doc 104</h4>
+      <p style="font-size:.8rem">Admin master credentials</p>
+      <span class="tag bad" style="font-size:.68rem">🚨 Top Secret</span>
+    </div>
+  </div>
+
+  <form id="lab5Form" class="lab-form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="lab5Login">🔑 Login As</label>
+        <select id="lab5Login">
+          <option value="alice">👩 alice — ID: 1001 (owns Doc 101)</option>
+          <option value="bob">👨 bob — ID: 1002 (owns Doc 102)</option>
+          <option value="diana">👩‍💼 diana — ID: 1004 (owns Doc 105)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab5Doc">🎯 Target Document ID</label>
+        <input type="number" id="lab5Doc" value="104" min="101" max="105" />
+      </div>
+    </div>
+    <div class="lab-actions">
+      <button type="submit" class="btn btn-brand">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Send GET /api/v1/documents/{id}
+      </button>
+      <span class="sub" style="font-size:.8rem">🔥 Try <strong>102</strong> (medical), <strong>103</strong> (ALL salaries), or <strong>104</strong> (admin passwords!)</span>
+    </div>
+  </form>
+
+  <div class="lab-result" id="lab5Result">
+    <div class="lab-result-empty">📡 Access confidential documents you shouldn't see. Doc 104 is 🔴 Top Secret — contains root passwords!</div>
+  </div>
+
+  <div class="callout warn" style="margin-top:.6rem">
+    <div class="c-dot"></div>
+    <div>
+      <p class="c-title">Regulatory Impact</p>
+      <p class="c-text"><strong>Doc 102</strong> (medical records) = <span style="color:var(--bad)">HIPAA violation</span> → fines up to $1.5M/year. <strong>Doc 101</strong> (tax return) = <span style="color:var(--bad)">GDPR/PII breach</span> → fines up to 4% of revenue. <strong>Doc 103</strong> (salary data) = employee lawsuit risk. <strong>Doc 104</strong> (admin creds) = full system compromise.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 6 — Write IDOR / Privilege Escalation
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab6" data-section="lab6">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 6: Write IDOR — Privilege Escalation</h3>
+      <p class="lab-desc">Modify another user's account data or escalate your own role from "employee" to "admin" — using a simple PUT request.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Critical</span>
+      <span class="tag warn">Write-Based</span>
+      <span class="tag pink">Priv Escalation</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>TechCorp's profile update endpoint <code>PUT /api/v1/users/{id}/profile</code> allows users to update their display name and email. However, the API also accepts a <strong>role</strong> field in the request body — and doesn't verify ownership OR role authorization. An attacker can:</p>
+    <ul style="color:var(--sub);margin:.3rem 0;line-height:2">
+      <li><strong>Self-promotion:</strong> Change own role to <strong>admin</strong> (vertical IDOR)</li>
+      <li><strong>Account takeover prep:</strong> Change another user's email to yours (horizontal IDOR)</li>
+      <li><strong>Sabotage:</strong> Demote an admin to a regular user</li>
+    </ul>
+  </div>
+
+  <!-- Visual: Write attack types -->
+  <div class="flow cols-3" style="margin-top:.5rem">
+    <div class="flow-step" style="border-color:rgba(245,158,11,.3)">
+      <div class="step-num" style="background:var(--warn)">A</div>
+      <p class="step-title">👑 Self-Promotion</p>
+      <p class="step-desc">PUT /users/<strong>1001</strong>/profile<br>{"role": "admin"}<br><span style="color:var(--warn)">Change YOUR own role</span></p>
+    </div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+      <div class="step-num" style="background:var(--bad)">B</div>
+      <p class="step-title">📧 Email Hijack</p>
+      <p class="step-desc">PUT /users/<strong>1002</strong>/profile<br>{"email": "attacker@evil.com"}<br><span style="color:var(--bad)">Change BOB's email</span></p>
+    </div>
+    <div class="flow-step" style="border-color:rgba(236,72,153,.3)">
+      <div class="step-num" style="background:var(--pink)">C</div>
+      <p class="step-title">💣 Sabotage</p>
+      <p class="step-desc">PUT /users/<strong>1005</strong>/profile<br>{"role": "employee"}<br><span style="color:var(--pink)">Demote the ADMIN</span></p>
+    </div>
+  </div>
+
+  <form id="lab6Form" class="lab-form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="lab6Login">🔑 Login As</label>
+        <select id="lab6Login">
+          <option value="alice">👩 alice — employee, ID: 1001</option>
+          <option value="bob">👨 bob — employee, ID: 1002</option>
+          <option value="diana">👩‍💼 diana — employee, ID: 1004</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab6Target">🎯 Target User ID to Modify</label>
+        <input type="number" id="lab6Target" value="1001" min="1001" max="1005" />
+      </div>
+    </div>
+    <div class="form-grid" style="margin-top:.4rem">
+      <div class="field">
+        <label for="lab6Role">New Role</label>
+        <select id="lab6Role">
+          <option value="admin">admin 👑</option>
+          <option value="manager">manager</option>
+          <option value="employee" selected>employee</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab6Email">New Email (optional)</label>
+        <input type="text" id="lab6Email" placeholder="attacker@evil.com" />
+      </div>
+    </div>
+    <div class="lab-actions">
+      <button type="submit" class="btn btn-brand">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Send PUT /api/v1/users/{id}/profile
+      </button>
+      <span class="sub" style="font-size:.8rem">Try: Set YOUR role to "admin", or change Bob's (1002) email!</span>
+    </div>
+  </form>
+
+  <div class="lab-result" id="lab6Result">
+    <div class="lab-result-empty">📡 Promote yourself to admin or hijack someone's account!</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 7 — Secure vs Insecure Comparison
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab7" data-section="lab7">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 7: Secure vs Insecure — Side-by-Side</h3>
+      <p class="lab-desc">See exactly how the same request behaves with and without proper authorization checks. Toggle between vulnerable and secure server code.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag good">Educational</span>
+      <span class="tag info">Compare</span>
+      <span class="tag teal">Best Practice</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>This lab lets you toggle between two server implementations of the same endpoint:</p>
+    <ul style="color:var(--sub);margin:.3rem 0;line-height:2">
+      <li><span class="tag bad" style="font-size:.72rem">Insecure</span> — Server uses <code>db.query(User).get(user_id)</code> with NO ownership check. Returns ALL fields including SSN and salary.</li>
+      <li><span class="tag good" style="font-size:.72rem">Secure</span> — Server verifies <code>session.user_id == requested_id</code>, removes sensitive fields, and returns 403 for unauthorized access.</li>
+    </ul>
+  </div>
+
+  <!-- Code Comparison -->
+  <div class="split" style="margin-top:.5rem">
+    <div class="panel">
+      <div class="panel-h"><span>❌ Insecure Code</span><span class="tag bad">Vulnerable</span></div>
+      <div class="panel-b"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code>@app.route('/api/v1/users/&lt;int:uid&gt;/profile')
+@login_required
+def get_profile(uid):
+    # ❌ No ownership check!
+    user = db.query(User).get(uid)
+    return jsonify(user.to_dict())
+    # Returns ALL fields including SSN, salary</code></pre>
+      </div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-h"><span>✅ Secure Code</span><span class="tag good">Fixed</span></div>
+      <div class="panel-b"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code>@app.route('/api/v1/users/&lt;int:uid&gt;/profile')
+@login_required
+def get_profile(uid):
+    # ✅ Check ownership!
+    if session['user_id'] != uid \
+       and session['role'] != 'admin':
+        return jsonify({'error':'Forbidden'}), 403
+    user = db.query(User).get(uid)
+    return jsonify(user.to_safe_dict())
+    # Returns ONLY non-sensitive fields</code></pre>
+      </div></div>
+    </div>
+  </div>
+
+  <form id="lab7Form" class="lab-form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="lab7Login">🔑 Login As</label>
+        <select id="lab7Login">
+          <option value="alice">👩 alice — employee, ID: 1001</option>
+          <option value="bob">👨 bob — employee, ID: 1002</option>
+          <option value="charlie">👨‍💼 charlie — manager, ID: 1003</option>
+          <option value="admin">🔐 admin — admin, ID: 1005</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab7Target">🎯 Target User ID</label>
+        <input type="number" id="lab7Target" value="1002" min="1001" max="1005" />
+      </div>
+    </div>
+    <div style="margin-top:.5rem">
+      <label style="font-weight:750;color:var(--sub);font-size:.82rem;display:block;margin-bottom:.25rem">Server Mode</label>
+      <div class="radio-group">
+        <label><input type="radio" name="lab7mode" value="insecure" checked /> <span class="tag bad">❌ Insecure (No AuthZ)</span></label>
+        <label><input type="radio" name="lab7mode" value="secure" /> <span class="tag good">✅ Secure (With AuthZ)</span></label>
+      </div>
+    </div>
+    <div class="lab-actions">
+      <button type="submit" class="btn btn-brand">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Send GET /api/v1/users/{id}/profile
+      </button>
+      <span class="sub" style="font-size:.8rem">Login as alice → target bob (1002) → switch between modes to see the difference!</span>
+    </div>
+  </form>
+
+  <div class="lab-result" id="lab7Result">
+    <div class="lab-result-empty">📡 Compare the behavior! Same request, different server implementations. Try both modes!</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 8 — Mass Enumeration Simulator
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab8" data-section="lab8">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 8: Mass Enumeration Attack Simulator</h3>
+      <p class="lab-desc">Watch a real-time automated enumeration attack that loops through all IDs and extracts every record from the database. This is what an attacker does in practice.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Advanced</span>
+      <span class="tag warn">Automated</span>
+      <span class="tag bad">Data Breach</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>An attacker writes a simple Python script (or uses Burp Intruder) to loop through sequential IDs, sending authenticated requests for each one. In minutes, they can extract the entire database. This lab simulates that attack in your browser — watch as records stream in real-time.</p>
+  </div>
+
+  <!-- Visual: How enumeration works -->
+  <div class="flow cols-4 flow-connected" style="margin-top:.5rem">
+    <div class="flow-step"><div class="step-num">1</div><p class="step-title">🔑 Login</p><p class="step-desc">Attacker authenticates with a single valid account</p></div>
+    <div class="flow-step"><div class="step-num">2</div><p class="step-title">🔄 Loop IDs</p><p class="step-desc">Script iterates through IDs: 1001, 1002, 1003…</p></div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">3</div><p class="step-title">📥 Extract</p><p class="step-desc">Each 200 OK response = another user's complete data</p></div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">4</div><p class="step-title">💾 Store</p><p class="step-desc">Millions of records extracted in minutes → mass data breach</p></div>
+  </div>
+
+  <div class="form-grid" style="margin-top:.6rem">
+    <div class="field">
+      <label for="lab8Login">🔑 Login As (Attacker)</label>
+      <select id="lab8Login">
+        <option value="alice">👩 alice — employee, ID: 1001</option>
+        <option value="bob">👨 bob — employee, ID: 1002</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="lab8Resource">🎯 Target Resource</label>
+      <select id="lab8Resource">
+        <option value="users">Users (IDs 1001–1005)</option>
+        <option value="orders">Orders (IDs 5001–5007)</option>
+        <option value="messages">Messages (IDs 1–6)</option>
+        <option value="documents">Documents (IDs 101–105)</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-grid" style="margin-top:.4rem">
+    <div class="field">
+      <label for="lab8Start">Start ID</label>
+      <input type="number" id="lab8Start" value="1001" />
+    </div>
+    <div class="field">
+      <label for="lab8End">End ID</label>
+      <input type="number" id="lab8End" value="1005" />
+    </div>
+    <div class="field">
+      <label for="lab8Delay">Request Delay (ms)</label>
+      <input type="number" id="lab8Delay" value="120" min="30" max="2000" />
+    </div>
+  </div>
+
+  <div class="lab-actions">
+    <button class="btn btn-brand" id="lab8Run">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      ▶ Run Enumeration
+    </button>
+    <button class="btn hidden" id="lab8Stop" style="border-color:rgba(239,68,68,.3);color:var(--bad)">⏹ Stop</button>
+    <span class="sub" id="lab8Summary"></span>
+  </div>
+
+  <!-- Progress bar -->
+  <div style="margin-top:.4rem;height:4px;border-radius:99px;background:var(--panel2);overflow:hidden">
+    <div id="lab8Prog" style="height:100%;width:0%;background:linear-gradient(90deg,var(--brand),var(--brand2));transition:width .12s"></div>
+  </div>
+
+  <div class="lab-result" style="margin-top:.4rem">
+    <div class="enum-output" id="lab8Output">
+      <p style="color:var(--dim);text-align:center;padding:.4rem">Terminal output will stream here in real-time…</p>
+    </div>
+  </div>
+
+  <div class="callout bad" style="margin-top:.5rem">
+    <div class="c-dot"></div>
+    <div>
+      <p class="c-title">⚠️ Why Mass Enumeration is Devastating</p>
+      <p class="c-text">In a real attack, an attacker loops through <strong>millions</strong> of IDs in minutes using parallel requests, extracting every user's SSN, salary, medical records, private messages, and credentials. IDOR + sequential IDs = <strong>mass data breach</strong>. Rate limiting alone isn't sufficient — you need proper authorization on every request.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 9 — Delete IDOR
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab9" data-section="lab9">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 9: Delete-Based IDOR — Destroying Evidence</h3>
+      <p class="lab-desc">Delete another user's private messages. In real scenarios, attackers use this to destroy evidence, tamper with audit logs, or cause denial-of-service.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Vulnerable</span>
+      <span class="tag bad">Destructive</span>
+      <span class="tag warn">DELETE Method</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario</h4>
+    <p>TechCorp's messaging API allows deleting messages at <code>DELETE /api/v1/messages/{msgId}</code>. The endpoint checks authentication but <strong>doesn't verify</strong> that the authenticated user is the sender or receiver. An attacker can delete ANY message in the system.</p>
+  </div>
+
+  <!-- Delete impact visual -->
+  <div class="flow cols-3" style="margin-top:.5rem">
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+      <div class="step-num" style="background:var(--bad)">1</div>
+      <p class="step-title">🗑️ Evidence Destruction</p>
+      <p class="step-desc">Delete audit logs, compliance records, or whistleblower reports that prove wrongdoing</p>
+    </div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+      <div class="step-num" style="background:var(--bad)">2</div>
+      <p class="step-title">💥 Denial of Service</p>
+      <p class="step-desc">Mass-delete another user's emails, files, or data — making their account unusable</p>
+    </div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+      <div class="step-num" style="background:var(--bad)">3</div>
+      <p class="step-title">🕵️ Cover Tracks</p>
+      <p class="step-desc">After stealing data via IDOR, delete the messages/logs that reference the stolen items</p>
+    </div>
+  </div>
+
+  <form id="lab9Form" class="lab-form">
+    <div class="form-grid">
+      <div class="field">
+        <label for="lab9Login">🔑 Login As</label>
+        <select id="lab9Login">
+          <option value="alice">👩 alice — ID: 1001</option>
+          <option value="bob">👨 bob — ID: 1002</option>
+          <option value="diana">👩‍💼 diana — ID: 1004</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="lab9Msg">🎯 Target Message ID to DELETE</label>
+        <input type="number" id="lab9Msg" value="3" min="1" max="6" />
+      </div>
+    </div>
+    <div class="lab-actions">
+      <button type="submit" class="btn btn-danger">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        Send DELETE /api/v1/messages/{id}
+      </button>
+      <span class="sub" style="font-size:.8rem">🔥 Try deleting message <strong>3</strong> (confidential Q4 revenue) or <strong>6</strong> (admin's password vault!)</span>
+    </div>
+  </form>
+
+  <div class="lab-result" id="lab9Result">
+    <div class="lab-result-empty">📡 Attempt to delete a message you don't own. What happens when evidence disappears?</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     LAB 10 — IDOR Chain: Account Takeover
+════════════════════════════════════════════════════════════ -->
+<div class="lab anim-in" id="lab10" data-section="lab10">
+  <div class="lab-header">
+    <div>
+      <h3 class="lab-title">🧪 Lab 10: IDOR Chain Attack — Full Account Takeover</h3>
+      <p class="lab-desc">Walk through a 5-step attack chain that starts with a simple profile IDOR and ends with complete account takeover. Each step exploits a different IDOR vulnerability.</p>
+    </div>
+    <div class="lab-tags">
+      <span class="tag bad">Critical</span>
+      <span class="tag bad">Chain Attack</span>
+      <span class="tag pink">Account Takeover</span>
+    </div>
+  </div>
+
+  <div class="lab-scenario">
+    <h4>📋 Scenario: Alice Takes Over Bob's Account</h4>
+    <p>Alice (attacker) wants full access to Bob's account. She chains 5 IDOR vulnerabilities together, each building on the previous one:</p>
+  </div>
+
+  <!-- Chain flow visualization -->
+  <div class="flow cols-5 flow-connected" style="margin-top:.6rem">
+    <div class="flow-step">
+      <div class="step-num">1</div>
+      <p class="step-title">📧 Read Email</p>
+      <p class="step-desc">IDOR on /users/1002 leaks bob@techcorp.com</p>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">2</div>
+      <p class="step-title">🔄 Trigger Reset</p>
+      <p class="step-desc">POST /forgot-password with Bob's email</p>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">3</div>
+      <p class="step-title">🎫 Steal Token</p>
+      <p class="step-desc">IDOR on /users/1002/reset-token</p>
+    </div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+      <div class="step-num" style="background:var(--bad)">4</div>
+      <p class="step-title">🔐 Change Pass</p>
+      <p class="step-desc">POST /reset-password with stolen token</p>
+    </div>
+    <div class="flow-step" style="border-color:rgba(239,68,68,.3)">
+      <div class="step-num" style="background:var(--bad)">5</div>
+      <p class="step-title">💀 Takeover!</p>
+      <p class="step-desc">Login as Bob with new password</p>
+    </div>
+  </div>
+
+  <!-- Server-side chain visualization -->
+  <div class="callout" style="margin-top:.6rem">
+    <div class="c-dot"></div>
+    <div>
+      <p class="c-title">🔗 Chain Logic</p>
+      <p class="c-text">Step 1 leaks the <strong>email</strong> → Step 2 uses that email to trigger a reset → Step 3 steals the <strong>token</strong> via another IDOR → Step 4 uses the token to change the <strong>password</strong> → Step 5 logs in with the new password. Each step alone is a vulnerability; together they achieve <strong>full account takeover (CVSS 9.8)</strong>.</p>
+    </div>
+  </div>
+
+  <!-- Step buttons -->
+  <div style="margin-top:.6rem;display:flex;gap:.35rem;flex-wrap:wrap">
+    <button class="lab10-step-btn btn btn-brand btn-sm">Step 1: Read Email</button>
+    <button class="lab10-step-btn btn btn-sm">Step 2: Trigger Reset</button>
+    <button class="lab10-step-btn btn btn-sm">Step 3: Steal Token</button>
+    <button class="lab10-step-btn btn btn-sm">Step 4: Change Password</button>
+    <button class="lab10-step-btn btn btn-sm">Step 5: Full Takeover</button>
+  </div>
+
+  <div class="lab-result" id="lab10Result">
+    <div class="lab-result-empty">📡 Click through each step above to watch the complete account takeover chain unfold!</div>
+  </div>
+
+  <div class="callout bad" style="margin-top:.6rem">
+    <div class="c-dot"></div>
+    <div>
+      <p class="c-title">🔴 This is How Real Account Takeovers Happen</p>
+      <p class="c-text">This exact pattern has been reported in hundreds of bug bounty programs. A single IDOR that leaks an email address can cascade into <strong>full account takeover</strong> when combined with other weak endpoints. This is why <strong>every endpoint needs authorization checks</strong> — not just the ones you think are "sensitive". CVSS for this chain: <strong>9.8 (Critical)</strong>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     PREVENTION & MITIGATION
+════════════════════════════════════════════════════════════ -->
+<div class="section anim-in" id="prevention" data-section="prevention">
+  <div class="section-head">
+    <h2>🛡️ Prevention &amp; Mitigation</h2>
+    <span class="tag good">Defense</span>
+  </div>
+  <div class="section-body">
+
+    <div class="callout good">
+      <div class="c-dot"></div>
+      <div>
+        <p class="c-title">The Golden Rule of IDOR Prevention</p>
+        <p class="c-text">NEVER trust user input for authorization decisions. ALWAYS verify on the <strong>server side</strong> that the authenticated user is authorized to access, modify, or delete the specific requested resource — on <strong>every single request</strong>.</p>
+      </div>
+    </div>
+
+    <!-- Fix 1 -->
+    <h3 style="margin-top:1rem">Fix 1: Server-Side Authorization Checks (Primary Fix)</h3>
+    <p class="sub">The most important fix. Every endpoint that handles a resource MUST verify ownership before processing.</p>
+    <div class="split" style="margin-top:.5rem">
+      <div class="panel">
+        <div class="panel-h"><span>❌ Vulnerable (Before)</span><span class="tag bad">No Check</span></div>
+        <div class="panel-b"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code># ❌ VULNERABLE
+@app.route('/api/users/&lt;int:uid&gt;/profile')
+@login_required
+def get_profile(uid):
+    user = db.query(User).get(uid)
+    return jsonify({
+        'ssn': user.ssn,       # 🔴 Leaked!
+        'salary': user.salary  # 🔴 Leaked!
+    })</code></pre>
+        </div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>✅ Secure (After)</span><span class="tag good">Ownership Check</span></div>
+        <div class="panel-b"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code># ✅ SECURE
+@app.route('/api/users/&lt;int:uid&gt;/profile')
+@login_required
+def get_profile(uid):
+    if session['user_id'] != uid \
+       and session['role'] != 'admin':
+        return jsonify({'error':'Forbidden'}), 403
+    user = db.query(User).get(uid)
+    return jsonify(user.to_safe_dict())</code></pre>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- Fix 2 -->
+    <h3 style="margin-top:1.2rem">Fix 2: Scope Database Queries to Current User</h3>
+    <div class="split" style="margin-top:.5rem">
+      <div class="panel">
+        <div class="panel-h"><span>❌ Vulnerable</span><span class="tag bad">No Scope</span></div>
+        <div class="panel-b"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code>// ❌ Returns ANY order
+db.query('SELECT * FROM orders WHERE id = ?',
+  [orderId]);</code></pre>
+        </div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><span>✅ Secure</span><span class="tag good">User Scoped</span></div>
+        <div class="panel-b"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code>// ✅ Only returns user's own orders
+db.query(
+  'SELECT * FROM orders WHERE id=? AND user_id=?',
+  [orderId, req.user.id]);</code></pre>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- Fix 3 -->
+    <h3 style="margin-top:1.2rem">Fix 3: Session-Based Queries (Eliminate User Input)</h3>
+    <div class="code-wrap" style="margin-top:.4rem"><button class="copy-btn">📋</button>
+<pre><code># ✅ BEST PRACTICE: No user-controlled ID needed!
+@app.route('/api/my-profile')
+@login_required
+def get_my_profile():
+    user_id = session['user_id']  # From SERVER session
+    user = db.query(User).get(user_id)
+    return jsonify(user.to_safe_dict())
+
+# Instead of: GET /api/users/1002/profile  ← attackable!
+# Use:        GET /api/my-profile           ← safe!</code></pre>
+    </div>
+
+    <!-- Fix 4 -->
+    <h3 style="margin-top:1.2rem">Fix 4: Indirect Object References</h3>
+    <div class="code-wrap" style="margin-top:.4rem"><button class="copy-btn">📋</button>
+<pre><code># Map random per-user tokens to real IDs
+# Instead of: GET /api/orders/5001        ← real DB ID
+# Use:        GET /api/orders/a8Kx9mPq2wL ← random token
+
+# Token "a8Kx9mPq2wL" maps to order 5001 ONLY for User A
+# If User B uses same token → resolves to NOTHING
+
+import secrets
+class IndirectRefMap:
+    def __init__(self):
+        self.maps = {}
+    def create(self, user_id, real_id):
+        token = secrets.token_urlsafe(12)
+        self.maps.setdefault(user_id, {})[token] = real_id
+        return token
+    def resolve(self, user_id, token):
+        return self.maps.get(user_id, {}).get(token)</code></pre>
+    </div>
+
+    <!-- Fix 5 -->
+    <h3 style="margin-top:1.2rem">Fix 5: Reusable Authorization Middleware</h3>
+    <div class="code-wrap" style="margin-top:.4rem"><button class="copy-btn">📋</button>
+<pre><code># ✅ Reusable decorator — apply to ANY endpoint
+def owns_resource(model, id_param='id', owner_field='user_id'):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            rid = kwargs.get(id_param)
+            resource = db.query(model).get(rid)
+            if not resource:
+                return jsonify({'error':'Not found'}), 404
+            if getattr(resource, owner_field) != session['user_id']:
+                if session.get('role') != 'admin':
+                    return jsonify({'error':'Forbidden'}), 403
+            kwargs['resource'] = resource
+            return f(*args, **kwargs)
+        return wrapped
+    return decorator
+
+# Usage — clean, consistent!
+@app.route('/api/orders/&lt;int:id&gt;')
+@login_required
+@owns_resource(Order)
+def get_order(id, resource=None):
+    return jsonify(resource.to_dict())</code></pre>
+    </div>
+
+    <!-- Fix 6 -->
+    <h3 style="margin-top:1.2rem">Fix 6: Database-Level Row Security</h3>
+    <div class="code-wrap" style="margin-top:.4rem"><button class="copy-btn">📋</button>
+<pre><code>-- PostgreSQL Row Level Security
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY user_orders ON orders
+    FOR ALL
+    USING (user_id = current_setting('app.current_user_id')::int);
+
+-- Even buggy app code can't bypass this!
+-- DB silently returns ZERO unauthorized rows 🛡️</code></pre>
+    </div>
+
+    <!-- Fix 7 — Framework Solutions -->
+    <h3 style="margin-top:1.2rem">Fix 7: Framework-Level Solutions</h3>
+    <div class="accordion" style="margin-top:.5rem">
+      <div class="acc-item">
+        <button class="acc-btn"><span>🐍 Django — Queryset Filtering</span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code>class OrderViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
+    # GET /api/orders/5003 → auto 404 if not yours!</code></pre>
+        </div></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-btn"><span>🐘 Laravel — Policies</span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code>class OrderPolicy {
+    public function view(User $user, Order $order) {
+        return $user->id === $order->user_id;
+    }
+}
+// Controller: $this->authorize('view', $order);</code></pre>
+        </div></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-btn"><span>☕ Spring — @PreAuthorize</span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code>@GetMapping("/orders/{id}")
+@PreAuthorize("@orderSec.isOwner(authentication, #id)")
+public Order getOrder(@PathVariable Long id) {
+    return orderRepository.findById(id).orElseThrow();
+}</code></pre>
+        </div></div></div>
+      </div>
+      <div class="acc-item">
+        <button class="acc-btn"><span>🟢 Express.js — Middleware</span><span class="acc-arrow">▼</span></button>
+        <div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><button class="copy-btn">📋</button>
+<pre style="margin:0"><code>async function ownsOrder(req, res, next) {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({error:'Not found'});
+  if (order.userId !== req.user.id && req.user.role !== 'admin')
+    return res.status(403).json({error:'Forbidden'});
+  req.resource = order; next();
+}
+app.get('/api/orders/:id', auth, ownsOrder, handler);</code></pre>
+        </div></div></div>
+      </div>
+    </div>
+
+    <!-- Checklist -->
+    <h3 style="margin-top:1.2rem">✅ Complete Prevention Checklist</h3>
+    <div class="grid" style="margin-top:.5rem">
+      <div class="card col-6 m-col-6"><h4>🔒 Server-Side Controls</h4><ul style="color:var(--sub);margin:.2rem 0 0;line-height:2;font-size:.88rem"><li>☐ Every endpoint has authorization checks</li><li>☐ Authorization checked on EVERY request</li><li>☐ Ownership verified against server-side session</li><li>☐ Queries scoped to authenticated user</li><li>☐ Framework-level access control policies</li><li>☐ Row-level security at database level</li><li>☐ Default-deny access control (whitelist)</li></ul></div>
+      <div class="card col-6 m-col-6"><h4>📥 Input &amp; Response</h4><ul style="color:var(--sub);margin:.2rem 0 0;line-height:2;font-size:.88rem"><li>☐ User-supplied IDs validated &amp; sanitized</li><li>☐ Indirect object references where possible</li><li>☐ Error responses don't reveal existence</li><li>☐ Sensitive fields removed from responses</li><li>☐ Return 404 (not 403) to prevent enum</li><li>☐ UUIDs as defense-in-depth (not sole fix)</li></ul></div>
+      <div class="card col-6 m-col-6"><h4>🧪 Testing &amp; QA</h4><ul style="color:var(--sub);margin:.2rem 0 0;line-height:2;font-size:.88rem"><li>☐ Automated IDOR tests in CI/CD</li><li>☐ Regular penetration testing</li><li>☐ Code review checklist includes authz</li><li>☐ Two-account testing for all features</li><li>☐ Autorize / AuthMatrix in QA cycle</li><li>☐ Regression tests for fixed IDORs</li></ul></div>
+      <div class="card col-6 m-col-6"><h4>📊 Monitoring &amp; Architecture</h4><ul style="color:var(--sub);margin:.2rem 0 0;line-height:2;font-size:.88rem"><li>☐ Failed authz attempts logged &amp; alerted</li><li>☐ Unusual access patterns detected</li><li>☐ Enumeration blocked via rate limiting</li><li>☐ Authorization logic centralized</li><li>☐ API gateway enforces access policies</li><li>☐ Microservices validate authz independently</li></ul></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     TOOLS & TESTING
+════════════════════════════════════════════════════════════ -->
+<div class="section anim-in" id="tools" data-section="tools">
+  <div class="section-head">
+    <h2>🔧 Tools &amp; Testing Methodology</h2>
+    <span class="tag info">Practical</span>
+  </div>
+  <div class="section-body">
+
+    <h3>Essential Tools</h3>
+    <div class="grid" style="margin-top:.5rem">
+      <div class="card col-4 m-col-6"><h4>🔶 Burp Suite</h4><p>Primary tool. Proxy → Repeater → Intruder → Comparer.</p><div style="margin-top:.3rem;display:flex;gap:.2rem;flex-wrap:wrap"><span class="tag info">Repeater</span><span class="tag info">Intruder</span><span class="tag info">Comparer</span></div></div>
+      <div class="card col-4 m-col-6"><h4>🔑 Autorize</h4><p>Burp extension. Auto-replays with low-priv session. 🔴 bypassed 🟢 enforced.</p><span class="tag good" style="margin-top:.3rem">Must-Have</span></div>
+      <div class="card col-4 m-col-6"><h4>🕷️ OWASP ZAP</h4><p>Free alternative. Access Control Testing add-on.</p><span class="tag info" style="margin-top:.3rem">Free &amp; Open Source</span></div>
+      <div class="card col-4 m-col-6"><h4>📮 Postman / Insomnia</h4><p>Manual API testing with multiple environments.</p></div>
+      <div class="card col-4 m-col-6"><h4>🐍 Python + Requests</h4><p>Custom scripts for automated enumeration.</p></div>
+      <div class="card col-4 m-col-6"><h4>🖥️ cURL / HTTPie</h4><p>Quick terminal-based spot-checks.</p></div>
+    </div>
+
+    <h3 style="margin-top:1rem">5-Phase Testing Methodology</h3>
+    <div class="flow cols-5 flow-connected" style="margin-top:.5rem">
+      <div class="flow-step"><div class="step-num">1</div><p class="step-title">🔍 Recon</p><p class="step-desc">Create 2+ accounts. Map endpoints. Note all ID parameters.</p></div>
+      <div class="flow-step"><div class="step-num">2</div><p class="step-title">🎯 Identify</p><p class="step-desc">What object? What CRUD op? Where's the ID? What data?</p></div>
+      <div class="flow-step"><div class="step-num">3</div><p class="step-title">💥 Exploit</p><p class="step-desc">User A's session → User B's IDs. All HTTP methods.</p></div>
+      <div class="flow-step"><div class="step-num">4</div><p class="step-title">✅ Validate</p><p class="step-desc">Confirm other's data. Verify impact. Check all methods.</p></div>
+      <div class="flow-step"><div class="step-num">5</div><p class="step-title">📝 Report</p><p class="step-desc">Clear title. Repro steps. HTTP evidence. Remediation.</p></div>
+    </div>
+
+    <h3 style="margin-top:1rem">Advanced Bypass Techniques</h3>
+    <div class="accordion" style="margin-top:.5rem">
+      <div class="acc-item"><button class="acc-btn"><span>🔄 HTTP Method Switching</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><pre style="margin:0"><code>GET   /api/users/1002  → 403 (blocked)
+POST  /api/users/1002  → 200 OK!  (IDOR!)
+PUT   /api/users/1002  → 200 OK!  (IDOR!)</code></pre></div></div></div></div>
+      <div class="acc-item"><button class="acc-btn"><span>🔢 ID Format Manipulation</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><pre style="margin:0"><code>Original:  /users/1002     Leading 0: /users/01002
+Float:     /users/1002.0   Null byte: /users/1002%00
+URL enc:   /users/%31%30%30%32
+Negative:  /users/-1       Array:     /users/[1002]</code></pre></div></div></div></div>
+      <div class="acc-item"><button class="acc-btn"><span>📦 Parameter Pollution</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><pre style="margin:0"><code>POST /api/update-profile
+{"name":"Attacker", "user_id": 1002}   ← injected!
+
+GET /api/users/1001/profile?user_id=1002</code></pre></div></div></div></div>
+      <div class="acc-item"><button class="acc-btn"><span>🔐 Base64/Hex Encoded IDs</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><pre style="margin:0"><code>echo -n "1002" | base64  → MTAwMg==
+echo -n "1003" | base64  → MTAwMw==
+# If endpoint uses MTAwMQ==, try MTAwMg==</code></pre></div></div></div></div>
+      <div class="acc-item"><button class="acc-btn"><span>🔗 Batch / Wildcard IDs</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner"><div class="code-wrap"><pre style="margin:0"><code>GET /api/users/*/profile
+GET /api/users/all
+POST /api/users/batch {"ids":[1001,1002,1003]}</code></pre></div></div></div></div>
+    </div>
+
+    <h3 style="margin-top:1rem">Response Analysis Guide</h3>
+    <div class="table-wrap" style="margin-top:.4rem">
+    <table class="table">
+      <thead><tr><th>Response</th><th>Meaning</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td><code>200</code> + other's data</td><td>Returned unauthorized data</td><td><span class="tag bad">🔴 IDOR!</span></td></tr>
+        <tr><td><code>200</code> + your data</td><td>Server rewrites ID</td><td><span class="tag warn">🟡 Partial fix</span></td></tr>
+        <tr><td><code>403</code> Forbidden</td><td>Authorization exists</td><td><span class="tag good">🟢 Enforced</span></td></tr>
+        <tr><td><code>404</code> Not Found</td><td>Could be authz</td><td><span class="tag good">🟢 May be secure</span></td></tr>
+        <tr><td><code>401</code> Unauthorized</td><td>Auth check only</td><td><span class="tag warn">🟡 Retest with session</span></td></tr>
+        <tr><td><code>500</code> Error</td><td>Server processing</td><td><span class="tag warn">🟡 Investigate</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     IDOR IN APIs
+════════════════════════════════════════════════════════════ -->
+<div class="section anim-in" id="apiidor" data-section="apiidor">
+  <div class="section-head">
+    <h2>🔌 IDOR in APIs (REST, GraphQL, WebSocket)</h2>
+    <span class="tag info">API Security</span>
+  </div>
+  <div class="section-body">
+
+    <div class="callout warn"><div class="c-dot"></div><div>
+      <p class="c-title">BOLA — API-Specific Term</p>
+      <p class="c-text">In OWASP API Security Top 10, IDOR = <strong>BOLA (Broken Object Level Authorization)</strong> — the <strong>#1 API vulnerability</strong>. BFLA = vertical IDOR.</p>
+    </div></div>
+
+    <div class="grid" style="margin-top:.6rem">
+      <div class="card col-4 m-col-6"><h4>🌐 REST</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>GET /api/v1/users/{userId}
+PUT /api/v1/users/{userId}/settings
+# Nested — check EVERY level:
+GET /orgs/{orgId}/teams/{teamId}/members/{id}</code></pre></div></div>
+      <div class="card col-4 m-col-6"><h4>◼️ GraphQL</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>query { user(id:"1002") { ssn salary } }
+# Batch IDOR:
+query {
+  a: user(id:"1001") { ssn }
+  b: user(id:"1002") { ssn }
+}</code></pre></div></div>
+      <div class="card col-4 m-col-6"><h4>🔌 WebSocket</h4><div class="code-wrap"><pre style="margin:.3rem 0 0"><code>ws.send(JSON.stringify({
+  action: "subscribe",
+  channel: "user_1002_notifs"
+}));
+// Receives another user's real-time data!</code></pre></div></div>
+    </div>
+
+    <h3 style="margin-top:1rem">Architecture Pitfalls</h3>
+    <div class="split" style="margin-top:.5rem">
+      <div class="panel"><div class="panel-h"><span>🏗️ Microservices</span><span class="tag warn">Pitfall</span></div><div class="panel-b">
+        <div class="server-flow">
+          <div class="sf-row pass"><span class="sf-icon">✅</span><span>API Gateway → Auth</span></div>
+          <div class="sf-row skip"><span class="sf-icon">❌</span><span>User Service → AuthZ missing</span></div>
+          <div class="sf-row skip"><span class="sf-icon">❌</span><span>Order Service → AuthZ missing</span></div>
+          <div class="sf-row fail"><span class="sf-icon">💥</span><span>Any service → IDOR!</span></div>
+        </div>
+        <p class="sub" style="font-size:.84rem;margin-top:.3rem">Each microservice MUST validate authz independently.</p>
+      </div></div>
+      <div class="panel"><div class="panel-h"><span>⚡ Serverless</span><span class="tag warn">Pitfall</span></div><div class="panel-b"><div class="code-wrap"><pre style="margin:0"><code># ❌ Vulnerable Lambda
+uid = event['pathParameters']['userId']
+return table.get_item(Key={'userId': uid})
+
+# ✅ Secure Lambda
+auth_user = event['requestContext'] \
+  ['authorizer']['claims']['sub']
+if auth_user != requested_user:
+    return {'statusCode': 403}</code></pre></div></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     IMPACT & RISK
+════════════════════════════════════════════════════════════ -->
+<div class="section anim-in" id="impact" data-section="impact">
+  <div class="section-head">
+    <h2>💥 Impact &amp; Risk Assessment</h2>
+    <span class="tag bad">Critical</span>
+  </div>
+  <div class="section-body">
+
+    <div class="grid" style="gap:.6rem">
+      <div class="card col-4 m-col-6"><h4>🔍 Confidentiality</h4><div class="table-wrap"><table class="table" style="margin-top:.2rem"><tbody>
+        <tr><td>PII</td><td><span class="tag warn">High</span></td></tr>
+        <tr><td>SSN / National ID</td><td><span class="tag bad">Critical</span></td></tr>
+        <tr><td>Financial data</td><td><span class="tag bad">Critical</span></td></tr>
+        <tr><td>Medical records</td><td><span class="tag bad">Critical</span></td></tr>
+        <tr><td>Credentials</td><td><span class="tag bad">Critical</span></td></tr>
+      </tbody></table></div></div>
+      <div class="card col-4 m-col-6"><h4>✏️ Integrity</h4><div class="table-wrap"><table class="table" style="margin-top:.2rem"><tbody>
+        <tr><td>Modify profile</td><td><span class="tag warn">High</span></td></tr>
+        <tr><td>Change password</td><td><span class="tag bad">Critical</span></td></tr>
+        <tr><td>Alter financials</td><td><span class="tag bad">Critical</span></td></tr>
+        <tr><td>Privilege escalation</td><td><span class="tag bad">Critical</span></td></tr>
+      </tbody></table></div></div>
+      <div class="card col-4 m-col-6"><h4>🗑️ Availability</h4><div class="table-wrap"><table class="table" style="margin-top:.2rem"><tbody>
+        <tr><td>Delete account</td><td><span class="tag bad">Critical</span></td></tr>
+        <tr><td>Delete user data</td><td><span class="tag warn">High</span></td></tr>
+        <tr><td>Lock out users</td><td><span class="tag warn">High</span></td></tr>
+        <tr><td>Mass destruction</td><td><span class="tag bad">Critical</span></td></tr>
+      </tbody></table></div></div>
+    </div>
+
+    <h3 style="margin-top:1rem">CVSS Scoring</h3>
+    <div class="table-wrap" style="margin-top:.4rem">
+    <table class="table">
+      <thead><tr><th>Scenario</th><th>CVSS</th><th>Severity</th></tr></thead>
+      <tbody>
+        <tr><td>Read-only profile (non-sensitive)</td><td>4.3</td><td><span class="tag warn">Medium</span></td></tr>
+        <tr><td>Read-only PII exposure</td><td>6.5</td><td><span class="tag warn">Medium</span></td></tr>
+        <tr><td>Read + Write IDOR</td><td>8.1</td><td><span class="tag bad">High</span></td></tr>
+        <tr><td>Full CRUD on any user's data</td><td>8.8</td><td><span class="tag bad">High</span></td></tr>
+        <tr><td>Account takeover chain</td><td>9.8</td><td><span class="tag bad">Critical</span></td></tr>
+        <tr><td>Unauthenticated IDOR</td><td>9.1</td><td><span class="tag bad">Critical</span></td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <h3 style="margin-top:1rem">💰 Business Impact</h3>
+    <div class="grid" style="margin-top:.5rem">
+      <div class="card col-3 m-col-6 card-accent red"><h4>💸 Financial</h4><ul style="color:var(--sub);margin:.2rem 0;font-size:.84rem;line-height:1.9"><li>GDPR: Up to €20M / 4%</li><li>HIPAA: Up to $1.5M/yr</li><li>PCI: $5K-$100K/mo</li><li>Lawsuits</li></ul></div>
+      <div class="card col-3 m-col-6 card-accent yellow"><h4>📉 Reputation</h4><ul style="color:var(--sub);margin:.2rem 0;font-size:.84rem;line-height:1.9"><li>Customer trust loss</li><li>Negative media</li><li>Stock decline</li><li>Customer churn</li></ul></div>
+      <div class="card col-3 m-col-6 card-accent"><h4>⚖️ Legal</h4><ul style="color:var(--sub);margin:.2rem 0;font-size:.84rem;line-height:1.9"><li>Breach notifications</li><li>Regulatory audits</li><li>Class-action suits</li><li>Exec liability</li></ul></div>
+      <div class="card col-3 m-col-6 card-accent cyan"><h4>🔧 Operations</h4><ul style="color:var(--sub);margin:.2rem 0;font-size:.84rem;line-height:1.9"><li>IR costs</li><li>System downtime</li><li>Security re-audits</li><li>Architecture rework</li></ul></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     CHAIN ATTACKS
+════════════════════════════════════════════════════════════ -->
+<div class="section anim-in" id="chains" data-section="chains">
+  <div class="section-head">
+    <h2>🔗 IDOR Chain Attacks</h2>
+    <span class="tag bad">Advanced</span>
+  </div>
+  <div class="section-body">
+    <p>IDOR vulnerabilities become devastating when chained together or with other vulnerability classes:</p>
+    <div class="accordion" style="margin-top:.6rem">
+      <div class="acc-item open"><button class="acc-btn"><span>🔑 IDOR → Account Takeover (5 Steps)</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner">
+        <div class="flow cols-5" style="margin-top:.2rem">
+          <div class="flow-step"><div class="step-num">1</div><p class="step-title">📧 Leak Email</p><p class="step-desc">Profile IDOR reveals victim's email</p></div>
+          <div class="flow-step"><div class="step-num">2</div><p class="step-title">🔄 Reset</p><p class="step-desc">Trigger reset for victim's email</p></div>
+          <div class="flow-step"><div class="step-num">3</div><p class="step-title">🎫 Steal Token</p><p class="step-desc">IDOR on reset-token endpoint</p></div>
+          <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">4</div><p class="step-title">🔐 New Pass</p><p class="step-desc">Use stolen token</p></div>
+          <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">5</div><p class="step-title">💀 Login</p><p class="step-desc">Full account control</p></div>
+        </div>
+        <p class="sub" style="margin-top:.4rem"><strong>CVSS 9.8</strong> — Demonstrated in Lab 10. Found in hundreds of real programs.</p>
+      </div></div></div>
+      <div class="acc-item"><button class="acc-btn"><span>👑 IDOR → Privilege Escalation → System Compromise</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner">
+        <div class="flow cols-4">
+          <div class="flow-step"><div class="step-num">1</div><p class="step-title">🔍 Find Admin</p><p class="step-desc">Enumerate users</p></div>
+          <div class="flow-step"><div class="step-num">2</div><p class="step-title">🔑 Get Keys</p><p class="step-desc">IDOR on admin's API keys</p></div>
+          <div class="flow-step"><div class="step-num">3</div><p class="step-title">👑 Admin</p><p class="step-desc">Use stolen keys</p></div>
+          <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">4</div><p class="step-title">🚪 Backdoor</p><p class="step-desc">Persistent access</p></div>
+        </div>
+      </div></div></div>
+      <div class="acc-item"><button class="acc-btn"><span>📊 IDOR → Mass Data Exfiltration</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner">
+        <div class="flow cols-4">
+          <div class="flow-step"><div class="step-num">1</div><p class="step-title">👥 Enum Users</p><p class="step-desc">Loop /users/1…100K</p></div>
+          <div class="flow-step"><div class="step-num">2</div><p class="step-title">📁 Enum Docs</p><p class="step-desc">Get each user's docs</p></div>
+          <div class="flow-step"><div class="step-num">3</div><p class="step-title">📥 Download</p><p class="step-desc">IDOR to get all files</p></div>
+          <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">4</div><p class="step-title">💣 Breach</p><p class="step-desc">Complete exfiltration</p></div>
+        </div>
+        <p class="sub" style="margin-top:.4rem">Demonstrated in Lab 8. Millions of records in minutes.</p>
+      </div></div></div>
+      <div class="acc-item"><button class="acc-btn"><span>💰 IDOR → Financial Fraud</span><span class="acc-arrow">▼</span></button><div class="acc-panel"><div class="acc-panel-inner">
+        <div class="flow cols-3">
+          <div class="flow-step"><div class="step-num">1</div><p class="step-title">🔍 Find Account</p><p class="step-desc">IDOR reveals victim's account #</p></div>
+          <div class="flow-step"><div class="step-num">2</div><p class="step-title">💸 Transfer</p><p class="step-desc">Change source_account in API</p></div>
+          <div class="flow-step" style="border-color:rgba(239,68,68,.3)"><div class="step-num" style="background:var(--bad)">3</div><p class="step-title">💰 Steal</p><p class="step-desc">Money moved to attacker</p></div>
+        </div>
+      </div></div></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     REPORT TEMPLATE
+════════════════════════════════════════════════════════════ -->
+<div class="section anim-in" id="report" data-section="report">
+  <div class="section-head">
+    <h2>📄 IDOR Report Template</h2>
+    <span class="tag info">Copy &amp; Use</span>
+  </div>
+  <div class="section-body">
+    <p>Professional template for reporting IDOR vulnerabilities in bug bounty programs or penetration tests:</p>
+    <div class="code-wrap" style="margin-top:.5rem"><button class="copy-btn">📋 Copy Template</button>
+<pre><code># IDOR Vulnerability Report
+
+## Title
+Insecure Direct Object Reference in [Endpoint]
+allows [Action] on other users' [Resource Type]
+
+## Severity
+[Critical / High / Medium / Low] — CVSS: X.X
+
+## Summary
+The endpoint `[METHOD] [URL]` does not verify that the
+authenticated user is authorized to access the requested
+[resource]. An attacker can [action] by modifying the
+`[parameter]` in the [URL path / query / body / header].
+
+## Steps to Reproduce
+1. Create two accounts: Attacker (A) + Victim (B)
+2. Login as User A → note session token
+3. Login as User B → note their [resource] ID: [value]
+4. As User A, send:
+   [Full HTTP Request with headers]
+5. Observe: User B's data returned without authorization
+
+## Proof of Concept
+[Paste full HTTP request + response]
+
+## Impact
+- Attacker can [read/modify/delete] ANY user's [resource]
+- Sensitive data exposed: [list fields]
+- Affected users: [estimated number]
+- Regulatory: [GDPR/HIPAA/PCI if applicable]
+- Chain potential: [describe if applicable]
+
+## Remediation
+1. Server-side authz: session.user_id == resource.owner_id
+2. Scoped queries: WHERE id=? AND user_id=?
+3. Return 404 (not 403) to prevent enumeration
+4. Consider indirect object references
+5. Add rate limiting for enumeration defense
+
+## References
+- OWASP A01:2021 Broken Access Control
+- CWE-639: AuthZ Bypass via User-Controlled Key
+- OWASP API Top 10: API1 BOLA</code></pre>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     GLOSSARY
+════════════════════════════════════════════════════════════ -->
+<div class="section anim-in" id="glossary" data-section="glossary">
+  <div class="section-head">
+    <h2>📚 Glossary</h2>
+    <span class="tag info">Reference</span>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td><strong>IDOR</strong></td><td>Insecure Direct Object Reference — accessing objects without authorization checks</td></tr>
+        <tr><td><strong>AuthN</strong></td><td>Authentication — verifying WHO the user is (identity)</td></tr>
+        <tr><td><strong>AuthZ</strong></td><td>Authorization — verifying WHAT the user can do (permissions)</td></tr>
+        <tr><td><strong>BOLA</strong></td><td>Broken Object Level Authorization — API term for horizontal IDOR (#1 API vuln)</td></tr>
+        <tr><td><strong>BFLA</strong></td><td>Broken Function Level Authorization — API term for vertical IDOR</td></tr>
+        <tr><td><strong>Horizontal</strong></td><td>Accessing another user's resources at the same privilege level</td></tr>
+        <tr><td><strong>Vertical</strong></td><td>Accessing resources belonging to a higher-privileged user (e.g., admin)</td></tr>
+        <tr><td><strong>Indirect Ref</strong></td><td>Random per-user token mapped to real ID server-side</td></tr>
+        <tr><td><strong>RLS</strong></td><td>Row-Level Security — database-enforced access control</td></tr>
+        <tr><td><strong>RBAC</strong></td><td>Role-Based Access Control — permissions by role</td></tr>
+        <tr><td><strong>ABAC</strong></td><td>Attribute-Based Access Control — permissions by attributes</td></tr>
+        <tr><td><strong>ATO</strong></td><td>Account Takeover — gaining full control of another user's account</td></tr>
+        <tr><td><strong>Mass Assignment</strong></td><td>API accepts fields user shouldn't control (e.g., role)</td></tr>
+        <tr><td><strong>UUID v4</strong></td><td>Random UUID — harder to guess but doesn't fix IDOR</td></tr>
+        <tr><td><strong>Autorize</strong></td><td>Burp Suite extension for automated authz bypass testing</td></tr>
+        <tr><td><strong>CWE-639</strong></td><td>Authorization Bypass Through User-Controlled Key</td></tr>
+        <tr><td><strong>CVSS</strong></td><td>Common Vulnerability Scoring System (0.0–10.0)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+
+</main>
+</div><!-- /shell -->
+
+
+<!-- ════════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-text">
+        <p>🔓 IDOR Handbook v3.0 — Ultra Visual Interactive Edition</p>
+        <p>Built for students, penetration testers, bug bounty hunters, and developers. 10 interactive labs, real-world breaches, prevention techniques, and professional reporting.</p>
+        <p style="margin-top:.3rem">⚠️ <strong>Educational purposes only.</strong> Only test systems you have explicit written authorization to test. Unauthorized access is illegal under CFAA (US), Computer Misuse Act (UK), and similar legislation worldwide.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://potdf.gitbook.io/bug-hunt-book/learning/insecure-direct-object-references-idor-handbook" target="_blank" rel="noopener" class="btn btn-brand">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Visit Full Handbook
+        </a>
+        <div style="display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.35rem">
+          <span class="pill">OWASP A01</span>
+          <span class="pill">CWE-639</span>
+          <span class="pill">BOLA</span>
+          <span class="pill">10 Labs</span>
+          <span class="pill">v3.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     MOBILE BOTTOM BAR
+════════════════════════════════════════════════════════════ -->
+<div class="mobile-bar">
+  <button class="btn" id="mobileMenu">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    Menu
+  </button>
+  <a href="#lab1" class="btn btn-brand">🧪 Labs</a>
+  <a href="#prevention" class="btn">🛡️ Defense</a>
+  <a href="https://potdf.gitbook.io/bug-hunt-book/learning/insecure-direct-object-references-idor-handbook" target="_blank" rel="noopener" class="btn">📖 Book</a>
+</div>
+
+
+<script src="script.js"></script>
+</body>
+</html>
