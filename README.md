@@ -24,9 +24,9 @@ This handbook is intended for use in classroom settings, security workshops, and
 | # | Vulnerability | Status |
 |---|---------------|--------|
 | 1 | [Cross-Site Scripting (XSS)](https://iamshafayat.github.io/vuln-handbook/xss/) | ✅ Available |
-| 2 | SQL Injection (SQLi) | 🔜 Coming Soon |
-| 3 | Cross-Site Request Forgery (CSRF) | 🔜 Coming Soon |
-| 4 | Insecure Direct Object Reference (IDOR) | 🔜 Coming Soon |
+| 2 | [Insecure Direct Object Reference (IDOR)](https://iamshafayat.github.io/vuln-handbook/idor/) | ✅ Available |
+| 3 | SQL Injection (SQLi) | 🔜 Coming Soon |
+| 4 | Cross-Site Request Forgery (CSRF) | 🔜 Coming Soon |
 | 5 | Command Injection | 🔜 Coming Soon |
 | 6 | Broken Authentication | 🔜 Coming Soon |
 
@@ -38,7 +38,6 @@ More vulnerabilities will be added over time. Contributions welcome!
 
 ### View Online
 **Link:** [https://iamshafayat.github.io/vuln-handbook/](https://iamshafayat.github.io/vuln-handbook/)
-
 
 ### Run Locally
 
