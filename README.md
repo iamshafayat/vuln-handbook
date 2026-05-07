@@ -25,10 +25,11 @@ This handbook is intended for use in classroom settings, security workshops, and
 |---|---------------|--------|
 | 1 | [Cross-Site Scripting (XSS)](https://iamshafayat.github.io/vuln-handbook/xss/) | ✅ Available |
 | 2 | [Insecure Direct Object Reference (IDOR)](https://iamshafayat.github.io/vuln-handbook/idor/) | ✅ Available |
-| 3 | SQL Injection (SQLi) | 🔜 Coming Soon |
-| 4 | Cross-Site Request Forgery (CSRF) | 🔜 Coming Soon |
-| 5 | Command Injection | 🔜 Coming Soon |
-| 6 | Broken Authentication | 🔜 Coming Soon |
+| 3 | [CMS Security (Wordpress)](https://iamshafayat.github.io/vuln-handbook/wp-security/) | ✅ Available |
+| 4 | SQL Injection (SQLi) | 🔜 Coming Soon |
+| 5 | Cross-Site Request Forgery (CSRF) | 🔜 Coming Soon |
+| 6 | Command Injection | 🔜 Coming Soon |
+| 7 | Broken Authentication | 🔜 Coming Soon |
 
 More vulnerabilities will be added over time. Contributions welcome!
 
