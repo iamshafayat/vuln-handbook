@@ -386,6 +386,8 @@ nav{
 .vcard.v-rce .glow-top{background:linear-gradient(90deg,transparent,rgba(239,68,68,.6),transparent)}
 .vcard.v-lfi .glow-top{background:linear-gradient(90deg,transparent,rgba(20,184,166,.6),transparent)}
 .vcard.v-xxe .glow-top{background:linear-gradient(90deg,transparent,rgba(168,85,247,.6),transparent)}
+.vcard.v-wp .glow-top{background:linear-gradient(90deg,transparent,rgba(33,147,176,.7),transparent)}
+.vcard.v-wp .glow-top{background:linear-gradient(90deg,transparent,rgba(33,117,186,.7),transparent)}
 
 .card-inner{position:relative;z-index:1}
 
@@ -667,7 +669,7 @@ footer{
 <div class="stats-strip">
   <div class="stats-glass">
     <div class="stat-item">
-      <div class="stat-num">8</div>
+      <div class="stat-num">9</div>
       <div class="stat-lbl">Topics Planned</div>
     </div>
     <div class="stat-item">
@@ -759,6 +761,30 @@ footer{
     </div><!-- /featured-row -->
 
     <div class="card-grid">
+
+      <!-- CMS Security (WordPress) -->
+      <div class="vcard v-wp active" onclick="location.href='./wp-security/'">
+        <div class="glow-top"></div>
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-icon-wrap">🔐</div>
+            <span class="badge badge-live">✶ Live</span>
+          </div>
+          <h3 class="card-title">CMS Security (WordPress)</h3>
+          <p class="card-desc">Enumerate plugins, exploit misconfigurations, brute-force credentials, and escalate privileges on WordPress installations. Covers WPScan, XML-RPC abuse, and theme/plugin CVEs.</p>
+          <div class="card-tags">
+            <span class="tag">CMS</span>
+            <span class="tag">WordPress</span>
+            <span class="tag">Enumeration</span>
+          </div>
+          <div class="card-footer">
+            <a href="./wp-security/" class="card-link">
+              Start Module
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+          </div>
+        </div>
+      </div>
 
       <!-- SQLi -->
       <div class="vcard v-sqli">
@@ -940,6 +966,7 @@ footer{
       <a href="#topics">Topics</a>
       <a href="./xss/">XSS Handbook</a>
       <a href="./idor/">IDOR Handbook</a>
+      <a href="./wp-security/">WP Security Handbook</a>
       <a href="https://potdf.gitbook.io/" target="_blank" rel="noopener">Full GitBook ↗</a>
       <a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener">OWASP Top 10 ↗</a>
     </div>
