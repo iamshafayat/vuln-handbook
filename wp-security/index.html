@@ -1,1822 +1,2554 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WordPress Security Handbook 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #060810;
-  --bg2: #0b0e1a;
-  --bg3: #111420;
-  --card: #0f1221;
-  --card2: #141829;
-  --border: #1e2440;
-  --border2: #252d4a;
-  --neon: #00ff88;
-  --neon2: #00d4ff;
-  --red: #ff3b5c;
-  --yellow: #ffb800;
-  --purple: #b06cff;
-  --text: #dde4f5;
-  --muted: #6b7799;
-  --muted2: #8a96bc;
-  --white: #f0f4ff;
-  --mono: 'Space Mono', monospace;
-  --display: 'Syne', sans-serif;
-  --body: 'Inter', sans-serif;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WordPress Security Handbook 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060810;
+      --bg2: #0b0e1a;
+      --bg3: #111420;
+      --card: #0f1221;
+      --card2: #141829;
+      --border: #1e2440;
+      --border2: #252d4a;
+      --neon: #00ff88;
+      --neon2: #00d4ff;
+      --red: #ff3b5c;
+      --yellow: #ffb800;
+      --purple: #b06cff;
+      --text: #dde4f5;
+      --muted: #6b7799;
+      --muted2: #8a96bc;
+      --white: #f0f4ff;
+      --mono: 'Space Mono', monospace;
+      --display: 'Syne', sans-serif;
+      --body: 'Inter', sans-serif;
+    }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--body);
-  overflow-x: hidden;
-  cursor: default;
-}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      overflow-x: hidden;
+      cursor: default;
+    }
 
-/* ─── SCROLLBAR ─── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
 
-/* ─── NOISE OVERLAY ─── */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.6;
-}
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
 
-/* ─── GRID BACKGROUND ─── */
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background-image:
-    linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
-  pointer-events: none;
-  z-index: 0;
-}
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 4px;
+    }
 
-/* ─── LAYOUT ─── */
-.layout {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  min-height: 100vh;
-  position: relative;
-  z-index: 1;
-}
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.6;
+    }
 
-/* ─── SIDEBAR ─── */
-.sidebar {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow-y: auto;
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
-  padding: 28px 0;
-  display: flex;
-  flex-direction: column;
-}
-.sidebar::-webkit-scrollbar { width: 3px; }
+    /* ─── GRID BACKGROUND ─── */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-.sidebar-logo {
-  padding: 0 24px 24px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 20px;
-}
-.sidebar-logo .logo-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, rgba(0,255,136,0.1), rgba(0,212,255,0.1));
-  border: 1px solid rgba(0,255,136,0.2);
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--neon);
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-}
-.sidebar-logo h2 {
-  font-family: var(--display);
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: var(--white);
-  line-height: 1.3;
-}
-.sidebar-logo p { font-size: 0.72rem; color: var(--muted); margin-top: 4px; }
+    /* ─── LAYOUT ─── */
+    .layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
 
-.nav-section-label {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  color: var(--muted);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 0 24px;
-  margin: 14px 0 6px;
-}
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 28px 0;
+      display: flex;
+      flex-direction: column;
+    }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 24px;
-  font-size: 0.82rem;
-  color: var(--muted2);
-  text-decoration: none;
-  transition: all 0.2s;
-  border-left: 2px solid transparent;
-  position: relative;
-}
-.nav-item:hover, .nav-item.active {
-  color: var(--white);
-  background: rgba(0,255,136,0.05);
-  border-left-color: var(--neon);
-}
-.nav-item .nav-icon { font-size: 0.9rem; width: 16px; text-align: center; flex-shrink: 0; }
-.nav-item .nav-badge {
-  margin-left: auto;
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  background: rgba(255,59,92,0.15);
-  color: var(--red);
-  padding: 1px 6px;
-  border-radius: 4px;
-}
-.nav-item .nav-badge.green { background: rgba(0,255,136,0.1); color: var(--neon); }
+    .sidebar::-webkit-scrollbar {
+      width: 3px;
+    }
 
-.sidebar-footer {
-  margin-top: auto;
-  padding: 20px 24px 0;
-  border-top: 1px solid var(--border);
-}
-.sidebar-footer p { font-size: 0.72rem; color: var(--muted); line-height: 1.7; }
-.sidebar-footer a { color: var(--neon2); text-decoration: none; }
+    .sidebar-logo {
+      padding: 0 24px 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
 
-/* ─── MAIN ─── */
-.main { padding: 0; }
+    .sidebar-logo .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 212, 255, 0.1));
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--neon);
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
 
-/* ─── HERO ─── */
-.hero {
-  padding: 72px 60px 60px;
-  position: relative;
-  overflow: hidden;
-  border-bottom: 1px solid var(--border);
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  top: -40px; right: -60px;
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(0,255,136,0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: -80px; left: 30%;
-  width: 400px; height: 400px;
-  background: radial-gradient(circle, rgba(0,212,255,0.04) 0%, transparent 70%);
-  pointer-events: none;
-}
-.hero-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0,255,136,0.08);
-  border: 1px solid rgba(0,255,136,0.2);
-  border-radius: 30px;
-  padding: 5px 14px;
-  font-family: var(--mono);
-  font-size: 0.7rem;
-  color: var(--neon);
-  letter-spacing: 1px;
-  margin-bottom: 22px;
-  animation: fadeInDown 0.6s ease both;
-}
-.hero-tag .dot {
-  width: 6px; height: 6px;
-  background: var(--neon);
-  border-radius: 50%;
-  animation: pulse 2s infinite;
-}
-@keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
-@keyframes fadeInDown { from{opacity:0;transform:translateY(-12px);} to{opacity:1;transform:none;} }
-@keyframes fadeInUp { from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:none;} }
-@keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+    .sidebar-logo h2 {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.3;
+    }
 
-.hero h1 {
-  font-family: var(--display);
-  font-size: 3.2rem;
-  font-weight: 800;
-  line-height: 1.1;
-  color: var(--white);
-  margin-bottom: 18px;
-  animation: fadeInUp 0.7s ease 0.1s both;
-}
-.hero h1 span {
-  background: linear-gradient(135deg, var(--neon), var(--neon2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.hero-desc {
-  font-size: 1rem;
-  color: var(--muted2);
-  max-width: 580px;
-  line-height: 1.7;
-  margin-bottom: 32px;
-  animation: fadeInUp 0.7s ease 0.2s both;
-}
-.hero-stats {
-  display: flex;
-  gap: 32px;
-  flex-wrap: wrap;
-  animation: fadeInUp 0.7s ease 0.3s both;
-}
-.stat { text-align: center; }
-.stat-num {
-  font-family: var(--mono);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--neon);
-  display: block;
-}
-.stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+    .sidebar-logo p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
 
-/* ─── CONTENT AREA ─── */
-.content { padding: 50px 60px; }
+    .nav-section-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0 24px;
+      margin: 14px 0 6px;
+    }
 
-/* ─── SECTION TITLE ─── */
-.section-anchor { display: block; padding-top: 40px; margin-top: -40px; }
-.section-head {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 28px;
-  padding-bottom: 18px;
-  border-bottom: 1px solid var(--border);
-}
-.section-num {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  color: var(--neon);
-  background: rgba(0,255,136,0.08);
-  border: 1px solid rgba(0,255,136,0.2);
-  border-radius: 6px;
-  padding: 4px 8px;
-  letter-spacing: 1px;
-}
-.section-head h2 {
-  font-family: var(--display);
-  font-size: 1.7rem;
-  font-weight: 800;
-  color: var(--white);
-}
-.section-icon-big { font-size: 1.6rem; }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 24px;
+      font-size: 0.82rem;
+      color: var(--muted2);
+      text-decoration: none;
+      transition: all 0.2s;
+      border-left: 2px solid transparent;
+      position: relative;
+    }
 
-/* ─── DIVIDER ─── */
-.divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border2), transparent);
-  margin: 50px 0;
-}
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--white);
+      background: rgba(0, 255, 136, 0.05);
+      border-left-color: var(--neon);
+    }
 
-/* ─── CARDS ─── */
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .nav-item .nav-icon {
+      font-size: 0.9rem;
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
 
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 22px;
-  position: relative;
-  overflow: hidden;
-  transition: border-color 0.2s, transform 0.2s;
-}
-.card:hover { border-color: var(--border2); transform: translateY(-2px); }
-.card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--neon), var(--neon2));
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.card:hover::before { opacity: 1; }
+    .nav-item .nav-badge {
+      margin-left: auto;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      background: rgba(255, 59, 92, 0.15);
+      color: var(--red);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
 
-.card-label {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  color: var(--neon);
-}
-.card h3 { font-family: var(--display); font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 10px; }
-.card p { font-size: 0.84rem; color: var(--muted2); line-height: 1.7; }
+    .nav-item .nav-badge.green {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--neon);
+    }
 
-/* ─── ATTACK CARDS ─── */
-.attack-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
-  margin-bottom: 16px;
-  transition: border-color 0.2s;
-}
-.attack-card:hover { border-color: var(--border2); }
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 20px 24px 0;
+      border-top: 1px solid var(--border);
+    }
 
-.attack-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px 22px;
-  cursor: pointer;
-  user-select: none;
-}
-.attack-sev {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 20px;
-  letter-spacing: 0.5px;
-  flex-shrink: 0;
-}
-.sev-critical { background: rgba(255,59,92,0.15); color: var(--red); border: 1px solid rgba(255,59,92,0.3); }
-.sev-high { background: rgba(255,184,0,0.12); color: var(--yellow); border: 1px solid rgba(255,184,0,0.3); }
-.sev-medium { background: rgba(176,108,255,0.12); color: var(--purple); border: 1px solid rgba(176,108,255,0.3); }
-.sev-low { background: rgba(0,212,255,0.1); color: var(--neon2); border: 1px solid rgba(0,212,255,0.25); }
+    .sidebar-footer p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
 
-.attack-title-wrap { flex: 1; }
-.attack-title { font-family: var(--display); font-size: 1.05rem; font-weight: 700; color: var(--white); }
-.attack-subtitle { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-.attack-toggle { color: var(--muted); font-size: 0.9rem; transition: transform 0.25s; }
-.attack-toggle.open { transform: rotate(180deg); }
+    .sidebar-footer a {
+      color: var(--neon2);
+      text-decoration: none;
+    }
 
-.attack-body {
-  border-top: 1px solid var(--border);
-  padding: 22px;
-  display: none;
-  animation: fadeIn 0.2s ease;
-}
-.attack-body.open { display: block; }
+    /* ─── MAIN ─── */
+    .main {
+      padding: 0;
+    }
 
-.attack-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    /* ─── HERO ─── */
+    .hero {
+      padding: 72px 60px 60px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
 
-.attack-info-box {
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 16px;
-}
-.attack-info-box h4 {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  color: var(--muted);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.attack-info-box p { font-size: 0.83rem; color: var(--muted2); line-height: 1.65; }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -60px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(0, 255, 136, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
 
-.proof-box {
-  background: #080b14;
-  border: 1px solid rgba(255,59,92,0.2);
-  border-left: 3px solid var(--red);
-  border-radius: 0 10px 10px 0;
-  padding: 12px 16px;
-  margin-top: 12px;
-}
-.proof-box h4 {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  color: var(--red);
-  letter-spacing: 1px;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-.proof-box a {
-  font-size: 0.8rem;
-  color: var(--neon2);
-  text-decoration: none;
-  display: block;
-  margin-bottom: 3px;
-  transition: color 0.15s;
-}
-.proof-box a:hover { color: var(--white); text-decoration: underline; }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: 30%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 212, 255, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
 
-.fix-box {
-  background: rgba(0,255,136,0.04);
-  border: 1px solid rgba(0,255,136,0.15);
-  border-left: 3px solid var(--neon);
-  border-radius: 0 10px 10px 0;
-  padding: 12px 16px;
-  margin-top: 12px;
-}
-.fix-box h4 {
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  color: var(--neon);
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-.fix-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  margin-bottom: 5px;
-  font-size: 0.82rem;
-  color: var(--muted2);
-}
-.fix-item::before { content: '→'; color: var(--neon); flex-shrink: 0; }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 30px;
+      padding: 5px 14px;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--neon);
+      letter-spacing: 1px;
+      margin-bottom: 22px;
+      animation: fadeInDown 0.6s ease both;
+    }
 
-/* ─── CODE BLOCK ─── */
-.code-block {
-  background: #04060f;
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 12px 0;
-  font-family: var(--mono);
-}
-.code-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border);
-}
-.code-lang {
-  font-size: 0.65rem;
-  color: var(--muted);
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.code-dots { display: flex; gap: 5px; }
-.code-dots span { width: 8px; height: 8px; border-radius: 50%; }
-.code-dots span:nth-child(1) { background: #ff5f57; }
-.code-dots span:nth-child(2) { background: #ffbe2e; }
-.code-dots span:nth-child(3) { background: #28c941; }
-.code-body {
-  padding: 14px 16px;
-  font-size: 0.78rem;
-  line-height: 1.8;
-  color: #c9d8ff;
-  overflow-x: auto;
-  white-space: pre;
-}
-.code-body .cm { color: #5a6a8a; }
-.code-body .kw { color: #ff79c6; }
-.code-body .str { color: #f1fa8c; }
-.code-body .fn { color: #50fa7b; }
-.code-body .var { color: #8be9fd; }
-.code-body .num { color: #bd93f9; }
-.code-body .at { color: var(--red); }
+    .hero-tag .dot {
+      width: 6px;
+      height: 6px;
+      background: var(--neon);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
 
-/* ─── PLUGIN CARDS ─── */
-.plugin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.plugin-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
-  transition: all 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.plugin-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-.plugin-top { display: flex; align-items: center; gap: 12px; }
-.plugin-emoji {
-  width: 44px; height: 44px;
-  background: var(--card2);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  display: grid; place-items: center;
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-.plugin-name { font-family: var(--display); font-weight: 700; font-size: 0.95rem; color: var(--white); }
-.plugin-type { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-.plugin-desc { font-size: 0.82rem; color: var(--muted2); line-height: 1.6; }
-.plugin-tags { display: flex; gap: 6px; flex-wrap: wrap; }
-.tag {
-  font-family: var(--mono);
-  font-size: 0.62rem;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-weight: 700;
-}
-.tag-free { background: rgba(0,255,136,0.08); color: var(--neon); border: 1px solid rgba(0,255,136,0.2); }
-.tag-paid { background: rgba(255,184,0,0.08); color: var(--yellow); border: 1px solid rgba(255,184,0,0.2); }
-.tag-waf { background: rgba(0,212,255,0.08); color: var(--neon2); border: 1px solid rgba(0,212,255,0.2); }
-.tag-malware { background: rgba(255,59,92,0.08); color: var(--red); border: 1px solid rgba(255,59,92,0.2); }
-.tag-backup { background: rgba(176,108,255,0.08); color: var(--purple); border: 1px solid rgba(176,108,255,0.2); }
-.plugin-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.75rem;
-  color: var(--neon2);
-  text-decoration: none;
-  margin-top: 4px;
-  transition: color 0.15s;
-}
-.plugin-link:hover { color: var(--white); }
+    @keyframes pulse {
 
-/* ─── TOOLS ─── */
-.tool-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px 20px;
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-bottom: 10px;
-  transition: all 0.2s;
-}
-.tool-card:hover { border-color: var(--border2); }
-.tool-icon {
-  width: 40px; height: 40px;
-  background: var(--card2);
-  border: 1px solid var(--border2);
-  border-radius: 10px;
-  display: grid; place-items: center;
-  font-size: 1.1rem;
-  flex-shrink: 0;
-}
-.tool-name { font-family: var(--display); font-size: 0.92rem; font-weight: 700; color: var(--white); }
-.tool-desc { font-size: 0.8rem; color: var(--muted2); margin: 3px 0 6px; line-height: 1.5; }
-.tool-link { font-size: 0.75rem; color: var(--neon2); text-decoration: none; }
-.tool-link:hover { text-decoration: underline; }
+      0%,
+      100% {
+        opacity: 1;
+      }
 
-/* ─── CHECKLIST ─── */
-.checklist {
-  list-style: none;
-  padding: 0;
-}
-.check-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.85rem;
-}
-.check-item:last-child { border-bottom: none; }
-.check-icon {
-  width: 18px; height: 18px;
-  background: rgba(0,255,136,0.1);
-  border: 1px solid rgba(0,255,136,0.25);
-  border-radius: 4px;
-  display: grid; place-items: center;
-  font-size: 0.7rem;
-  flex-shrink: 0;
-  margin-top: 1px;
-  color: var(--neon);
-}
-.check-text { color: var(--text); flex: 1; line-height: 1.5; }
-.check-text code {
-  font-family: var(--mono);
-  font-size: 0.75rem;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  padding: 1px 6px;
-  border-radius: 4px;
-  color: var(--neon2);
-}
-.check-priority {
-  font-family: var(--mono);
-  font-size: 0.6rem;
-  padding: 1px 6px;
-  border-radius: 10px;
-  flex-shrink: 0;
-  align-self: center;
-}
-.pr-must { background: rgba(255,59,92,0.1); color: var(--red); }
-.pr-high { background: rgba(255,184,0,0.1); color: var(--yellow); }
-.pr-med { background: rgba(0,212,255,0.1); color: var(--neon2); }
+      50% {
+        opacity: 0.3;
+      }
+    }
 
-/* ─── TIP BOX ─── */
-.tip-box {
-  background: linear-gradient(135deg, rgba(0,212,255,0.04), rgba(0,255,136,0.04));
-  border: 1px solid rgba(0,212,255,0.15);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin: 16px 0;
-  font-size: 0.84rem;
-  color: var(--muted2);
-  line-height: 1.65;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.tip-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
-.tip-box strong { color: var(--neon2); }
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-12px);
+      }
 
-.warn-box {
-  background: rgba(255,59,92,0.04);
-  border: 1px solid rgba(255,59,92,0.15);
-  border-radius: 12px;
-  padding: 16px 20px;
-  margin: 16px 0;
-  font-size: 0.84rem;
-  color: var(--muted2);
-  line-height: 1.65;
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-.warn-box strong { color: var(--red); }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
 
-/* ─── REFERENCE TABLE ─── */
-.ref-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.82rem;
-  margin: 12px 0;
-}
-.ref-table th {
-  text-align: left;
-  padding: 10px 14px;
-  background: var(--card2);
-  color: var(--muted);
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  border-bottom: 1px solid var(--border);
-}
-.ref-table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border);
-  color: var(--muted2);
-  vertical-align: top;
-}
-.ref-table tr:last-child td { border-bottom: none; }
-.ref-table tr:hover td { background: rgba(255,255,255,0.01); }
-.ref-table a { color: var(--neon2); text-decoration: none; }
-.ref-table a:hover { text-decoration: underline; }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
 
-/* ─── QUICK REF BADGE ─── */
-.badge {
-  display: inline-block;
-  font-family: var(--mono);
-  font-size: 0.65rem;
-  padding: 2px 7px;
-  border-radius: 4px;
-}
-.badge-red { background: rgba(255,59,92,0.12); color: var(--red); }
-.badge-green { background: rgba(0,255,136,0.1); color: var(--neon); }
-.badge-blue { background: rgba(0,212,255,0.1); color: var(--neon2); }
-.badge-yellow { background: rgba(255,184,0,0.1); color: var(--yellow); }
-.badge-purple { background: rgba(176,108,255,0.1); color: var(--purple); }
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
 
-/* ─── PRINT ─── */
-@media print {
-  .sidebar { display: none; }
-  .layout { grid-template-columns: 1fr; }
-  body::before, body::after { display: none; }
-  .hero { padding: 24px; }
-  .content { padding: 24px; }
-  .attack-body { display: block !important; }
-}
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
 
-/* ─── RESPONSIVE ─── */
-@media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  .sidebar { display: none; }
-  .hero { padding: 36px 28px; }
-  .content { padding: 28px; }
-  .hero h1 { font-size: 2.2rem; }
-  .grid2, .grid3, .attack-grid, .plugin-grid { grid-template-columns: 1fr; }
-}
-</style>
+      to {
+        opacity: 1;
+      }
+    }
+
+    .hero h1 {
+      font-family: var(--display);
+      font-size: 3.2rem;
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--white);
+      margin-bottom: 18px;
+      animation: fadeInUp 0.7s ease 0.1s both;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--neon), var(--neon2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+      color: var(--muted2);
+      max-width: 580px;
+      line-height: 1.7;
+      margin-bottom: 32px;
+      animation: fadeInUp 0.7s ease 0.2s both;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      animation: fadeInUp 0.7s ease 0.3s both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: var(--mono);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--neon);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ─── CONTENT AREA ─── */
+    .content {
+      padding: 50px 60px;
+    }
+
+    /* ─── SECTION TITLE ─── */
+    .section-anchor {
+      display: block;
+      padding-top: 40px;
+      margin-top: -40px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-num {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--neon);
+      background: rgba(0, 255, 136, 0.08);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 6px;
+      padding: 4px 8px;
+      letter-spacing: 1px;
+    }
+
+    .section-head h2 {
+      font-family: var(--display);
+      font-size: 1.7rem;
+      font-weight: 800;
+      color: var(--white);
+    }
+
+    .section-icon-big {
+      font-size: 1.6rem;
+    }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2), transparent);
+      margin: 50px 0;
+    }
+
+    /* ─── CARDS ─── */
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--neon), var(--neon2));
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      color: var(--neon);
+    }
+
+    .card h3 {
+      font-family: var(--display);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 0.84rem;
+      color: var(--muted2);
+      line-height: 1.7;
+    }
+
+    /* ─── ATTACK CARDS ─── */
+    .attack-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .attack-card:hover {
+      border-color: var(--border2);
+    }
+
+    .attack-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .attack-sev {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+
+    .sev-critical {
+      background: rgba(255, 59, 92, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(255, 59, 92, 0.3);
+    }
+
+    .sev-high {
+      background: rgba(255, 184, 0, 0.12);
+      color: var(--yellow);
+      border: 1px solid rgba(255, 184, 0, 0.3);
+    }
+
+    .sev-medium {
+      background: rgba(176, 108, 255, 0.12);
+      color: var(--purple);
+      border: 1px solid rgba(176, 108, 255, 0.3);
+    }
+
+    .sev-low {
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--neon2);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+    }
+
+    .attack-title-wrap {
+      flex: 1;
+    }
+
+    .attack-title {
+      font-family: var(--display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .attack-subtitle {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .attack-toggle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      transition: transform 0.25s;
+    }
+
+    .attack-toggle.open {
+      transform: rotate(180deg);
+    }
+
+    .attack-body {
+      border-top: 1px solid var(--border);
+      padding: 22px;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .attack-body.open {
+      display: block;
+    }
+
+    .attack-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .attack-info-box {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .attack-info-box h4 {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .attack-info-box p {
+      font-size: 0.83rem;
+      color: var(--muted2);
+      line-height: 1.65;
+    }
+
+    .proof-box {
+      background: #080b14;
+      border: 1px solid rgba(255, 59, 92, 0.2);
+      border-left: 3px solid var(--red);
+      border-radius: 0 10px 10px 0;
+      padding: 12px 16px;
+      margin-top: 12px;
+    }
+
+    .proof-box h4 {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--red);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .proof-box a {
+      font-size: 0.8rem;
+      color: var(--neon2);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 3px;
+      transition: color 0.15s;
+    }
+
+    .proof-box a:hover {
+      color: var(--white);
+      text-decoration: underline;
+    }
+
+    .fix-box {
+      background: rgba(0, 255, 136, 0.04);
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      border-left: 3px solid var(--neon);
+      border-radius: 0 10px 10px 0;
+      padding: 12px 16px;
+      margin-top: 12px;
+    }
+
+    .fix-box h4 {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--neon);
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .fix-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 5px;
+      font-size: 0.82rem;
+      color: var(--muted2);
+    }
+
+    .fix-item::before {
+      content: '→';
+      color: var(--neon);
+      flex-shrink: 0;
+    }
+
+    /* ─── CODE BLOCK ─── */
+    .code-block {
+      background: #04060f;
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 12px 0;
+      font-family: var(--mono);
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-lang {
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .code-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .code-dots span {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .code-dots span:nth-child(1) {
+      background: #ff5f57;
+    }
+
+    .code-dots span:nth-child(2) {
+      background: #ffbe2e;
+    }
+
+    .code-dots span:nth-child(3) {
+      background: #28c941;
+    }
+
+    .code-body {
+      padding: 14px 16px;
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: #c9d8ff;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .code-body .cm {
+      color: #5a6a8a;
+    }
+
+    .code-body .kw {
+      color: #ff79c6;
+    }
+
+    .code-body .str {
+      color: #f1fa8c;
+    }
+
+    .code-body .fn {
+      color: #50fa7b;
+    }
+
+    .code-body .var {
+      color: #8be9fd;
+    }
+
+    .code-body .num {
+      color: #bd93f9;
+    }
+
+    .code-body .at {
+      color: var(--red);
+    }
+
+    /* ─── PLUGIN CARDS ─── */
+    .plugin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .plugin-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .plugin-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+    }
+
+    .plugin-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .plugin-emoji {
+      width: 44px;
+      height: 44px;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .plugin-name {
+      font-family: var(--display);
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--white);
+    }
+
+    .plugin-type {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .plugin-desc {
+      font-size: 0.82rem;
+      color: var(--muted2);
+      line-height: 1.6;
+    }
+
+    .plugin-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .tag-free {
+      background: rgba(0, 255, 136, 0.08);
+      color: var(--neon);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
+
+    .tag-paid {
+      background: rgba(255, 184, 0, 0.08);
+      color: var(--yellow);
+      border: 1px solid rgba(255, 184, 0, 0.2);
+    }
+
+    .tag-waf {
+      background: rgba(0, 212, 255, 0.08);
+      color: var(--neon2);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+    }
+
+    .tag-malware {
+      background: rgba(255, 59, 92, 0.08);
+      color: var(--red);
+      border: 1px solid rgba(255, 59, 92, 0.2);
+    }
+
+    .tag-backup {
+      background: rgba(176, 108, 255, 0.08);
+      color: var(--purple);
+      border: 1px solid rgba(176, 108, 255, 0.2);
+    }
+
+    .plugin-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.75rem;
+      color: var(--neon2);
+      text-decoration: none;
+      margin-top: 4px;
+      transition: color 0.15s;
+    }
+
+    .plugin-link:hover {
+      color: var(--white);
+    }
+
+    /* ─── TOOLS ─── */
+    .tool-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+
+    .tool-card:hover {
+      border-color: var(--border2);
+    }
+
+    .tool-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--card2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .tool-name {
+      font-family: var(--display);
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    .tool-desc {
+      font-size: 0.8rem;
+      color: var(--muted2);
+      margin: 3px 0 6px;
+      line-height: 1.5;
+    }
+
+    .tool-link {
+      font-size: 0.75rem;
+      color: var(--neon2);
+      text-decoration: none;
+    }
+
+    .tool-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ─── CHECKLIST ─── */
+    .checklist {
+      list-style: none;
+      padding: 0;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .check-item:last-child {
+      border-bottom: none;
+    }
+
+    .check-icon {
+      width: 18px;
+      height: 18px;
+      background: rgba(0, 255, 136, 0.1);
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+      color: var(--neon);
+    }
+
+    .check-text {
+      color: var(--text);
+      flex: 1;
+      line-height: 1.5;
+    }
+
+    .check-text code {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 1px 6px;
+      border-radius: 4px;
+      color: var(--neon2);
+    }
+
+    .check-priority {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      padding: 1px 6px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    .pr-must {
+      background: rgba(255, 59, 92, 0.1);
+      color: var(--red);
+    }
+
+    .pr-high {
+      background: rgba(255, 184, 0, 0.1);
+      color: var(--yellow);
+    }
+
+    .pr-med {
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--neon2);
+    }
+
+    /* ─── TIP BOX ─── */
+    .tip-box {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.04), rgba(0, 255, 136, 0.04));
+      border: 1px solid rgba(0, 212, 255, 0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 0.84rem;
+      color: var(--muted2);
+      line-height: 1.65;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .tip-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .tip-box strong {
+      color: var(--neon2);
+    }
+
+    .warn-box {
+      background: rgba(255, 59, 92, 0.04);
+      border: 1px solid rgba(255, 59, 92, 0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      font-size: 0.84rem;
+      color: var(--muted2);
+      line-height: 1.65;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .warn-box strong {
+      color: var(--red);
+    }
+
+    /* ─── REFERENCE TABLE ─── */
+    .ref-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+      margin: 12px 0;
+    }
+
+    .ref-table th {
+      text-align: left;
+      padding: 10px 14px;
+      background: var(--card2);
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ref-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted2);
+      vertical-align: top;
+    }
+
+    .ref-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .ref-table tr:hover td {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .ref-table a {
+      color: var(--neon2);
+      text-decoration: none;
+    }
+
+    .ref-table a:hover {
+      text-decoration: underline;
+    }
+
+    /* ─── QUICK REF BADGE ─── */
+    .badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .badge-red {
+      background: rgba(255, 59, 92, 0.12);
+      color: var(--red);
+    }
+
+    .badge-green {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--neon);
+    }
+
+    .badge-blue {
+      background: rgba(0, 212, 255, 0.1);
+      color: var(--neon2);
+    }
+
+    .badge-yellow {
+      background: rgba(255, 184, 0, 0.1);
+      color: var(--yellow);
+    }
+
+    .badge-purple {
+      background: rgba(176, 108, 255, 0.1);
+      color: var(--purple);
+    }
+
+    /* ─── PRINT ─── */
+    @media print {
+      .sidebar {
+        display: none;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      body::before,
+      body::after {
+        display: none;
+      }
+
+      .hero {
+        padding: 24px;
+      }
+
+      .content {
+        padding: 24px;
+      }
+
+      .attack-body {
+        display: block !important;
+      }
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .hero {
+        padding: 36px 28px;
+      }
+
+      .content {
+        padding: 28px;
+      }
+
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+
+      .grid2,
+      .grid3,
+      .attack-grid,
+      .plugin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="layout">
-<!-- ─── SIDEBAR ─── -->
-<aside class="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-badge"><span>●</span> WP-SEC-6</div>
-    <h2>WordPress Security Handbook</h2>
-    <p>Student Edition — Complete Reference</p>
-  </div>
-
-  <span class="nav-section-label">Overview</span>
-  <a class="nav-item active" href="#intro"><span class="nav-icon">🏠</span> Introduction</a>
-  <a class="nav-item" href="#stats"><span class="nav-icon">📊</span> Why WordPress?</a>
-
-  <span class="nav-section-label">Attack Types</span>
-  <a class="nav-item" href="#attacks"><span class="nav-icon">💀</span> All Attack Types <span class="nav-badge">9</span></a>
-  <a class="nav-item" href="#brute"><span class="nav-icon">🔑</span> Brute Force</a>
-  <a class="nav-item" href="#sqli"><span class="nav-icon">💉</span> SQL Injection</a>
-  <a class="nav-item" href="#xss"><span class="nav-icon">🕷️</span> XSS</a>
-  <a class="nav-item" href="#xmlrpc"><span class="nav-icon">📡</span> XML-RPC</a>
-  <a class="nav-item" href="#lfi"><span class="nav-icon">📁</span> File Inclusion</a>
-  <a class="nav-item" href="#malware"><span class="nav-icon">🦠</span> Malware / Backdoor</a>
-  <a class="nav-item" href="#priv"><span class="nav-icon">⬆️</span> Privilege Escalation</a>
-  <a class="nav-item" href="#csrf"><span class="nav-icon">🎭</span> CSRF</a>
-  <a class="nav-item" href="#exposure"><span class="nav-icon">🔓</span> Data Exposure</a>
-
-  <span class="nav-section-label">Hardening</span>
-  <a class="nav-item" href="#login-sec"><span class="nav-icon">🔐</span> Login Security</a>
-  <a class="nav-item" href="#server-sec"><span class="nav-icon">🖥️</span> Server & Files</a>
-  <a class="nav-item" href="#wpconfig"><span class="nav-icon">⚙️</span> wp-config.php</a>
-  <a class="nav-item" href="#htaccess"><span class="nav-icon">📋</span> .htaccess Rules</a>
-  <a class="nav-item" href="#headers"><span class="nav-icon">🌐</span> HTTP Headers</a>
-
-  <span class="nav-section-label">Tools & Plugins</span>
-  <a class="nav-item" href="#plugins"><span class="nav-icon">🔌</span> Security Plugins <span class="nav-badge green">6</span></a>
-  <a class="nav-item" href="#tools"><span class="nav-icon">🛠️</span> External Tools</a>
-  <a class="nav-item" href="#scanners"><span class="nav-icon">🔍</span> Online Scanners</a>
-
-  <span class="nav-section-label">Reference</span>
-  <a class="nav-item" href="#checklist"><span class="nav-icon">✅</span> Security Checklist</a>
-  <a class="nav-item" href="#resources"><span class="nav-icon">📚</span> Resources & Links</a>
-
-  <div class="sidebar-footer">
-    <p>CVE references: <a href="https://cve.mitre.org" target="_blank">cve.mitre.org</a><br>
-    WP Vulns: <a href="https://wpscan.com/vulnerability-list" target="_blank">wpscan.com</a><br>
-    OWASP: <a href="https://owasp.org/www-project-top-ten/" target="_blank">owasp.org/top-ten</a></p>
-  </div>
-</aside>
-
-<!-- ─── MAIN CONTENT ─── -->
-<main class="main">
-  <!-- HERO -->
-  <section class="hero" id="intro">
-    <!-- <div class="hero-tag"><span class="dot"></span> STUDENT HANDBOOK — 2026 EDITION</div> -->
-    <h1>WordPress<br><span>Security</span> Handbook</h1>
-    <p class="hero-desc">
-      A complete reference guide covering every attack vector, vulnerability, hardening technique, tool, and plugin you need to know to secure any WordPress site — with real-world CVE proof and working code.
-    </p>
-    <div class="hero-stats">
-      <div class="stat"><span class="stat-num">43%</span><div class="stat-label">of the internet runs WP</div></div>
-      <div class="stat"><span class="stat-num">90K+</span><div class="stat-label">sites hacked daily</div></div>
-      <div class="stat"><span class="stat-num">97%</span><div class="stat-label">attacks are automated</div></div>
-      <div class="stat"><span class="stat-num">9</span><div class="stat-label">attack types covered</div></div>
-    </div>
-  </section>
-
-  <div class="content">
-
-    <!-- ─── WHY WP ─── -->
-    <span class="section-anchor" id="stats"></span>
-    <div class="section-head">
-      <span class="section-num">01</span>
-      <span class="section-icon-big">📊</span>
-      <h2>Why WordPress Gets Attacked</h2>
-    </div>
-
-    <div class="grid3">
-      <div class="card">
-        <div class="card-label">Market Share</div>
-        <h3>Massive Target Surface</h3>
-        <p>WordPress powers over 43% of all websites. Attackers write one exploit and target millions of sites automatically.</p>
+  <div class="layout">
+    <!-- ─── SIDEBAR ─── -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-badge"><span>●</span> WP-SEC-6</div>
+        <h2>WordPress Security Handbook</h2>
+        <p>Student Edition — Complete Reference</p>
       </div>
-      <div class="card">
-        <div class="card-label">Ecosystem Risk</div>
-        <h3>60,000+ Plugins</h3>
-        <p>Anyone can publish plugins. Code quality varies widely. Vulnerable plugins/themes are the #1 entry point for attackers.</p>
+
+      <span class="nav-section-label">Overview</span>
+      <a class="nav-item active" href="#intro"><span class="nav-icon">🏠</span> Introduction</a>
+      <a class="nav-item" href="#stats"><span class="nav-icon">📊</span> Why WordPress?</a>
+
+      <span class="nav-section-label">Attack Types</span>
+      <a class="nav-item" href="#attacks"><span class="nav-icon">💀</span> All Attack Types <span
+          class="nav-badge">9</span></a>
+      <a class="nav-item" href="#brute"><span class="nav-icon">🔑</span> Brute Force</a>
+      <a class="nav-item" href="#sqli"><span class="nav-icon">💉</span> SQL Injection</a>
+      <a class="nav-item" href="#xss"><span class="nav-icon">🕷️</span> XSS</a>
+      <a class="nav-item" href="#xmlrpc"><span class="nav-icon">📡</span> XML-RPC</a>
+      <a class="nav-item" href="#lfi"><span class="nav-icon">📁</span> File Inclusion</a>
+      <a class="nav-item" href="#malware"><span class="nav-icon">🦠</span> Malware / Backdoor</a>
+      <a class="nav-item" href="#priv"><span class="nav-icon">⬆️</span> Privilege Escalation</a>
+      <a class="nav-item" href="#csrf"><span class="nav-icon">🎭</span> CSRF</a>
+      <a class="nav-item" href="#exposure"><span class="nav-icon">🔓</span> Data Exposure</a>
+
+      <span class="nav-section-label">Hardening</span>
+      <a class="nav-item" href="#login-sec"><span class="nav-icon">🔐</span> Login Security</a>
+      <a class="nav-item" href="#server-sec"><span class="nav-icon">🖥️</span> Server & Files</a>
+      <a class="nav-item" href="#wpconfig"><span class="nav-icon">⚙️</span> wp-config.php</a>
+      <a class="nav-item" href="#htaccess"><span class="nav-icon">📋</span> .htaccess Rules</a>
+      <a class="nav-item" href="#headers"><span class="nav-icon">🌐</span> HTTP Headers</a>
+
+      <span class="nav-section-label">Tools & Plugins</span>
+      <a class="nav-item" href="#plugins"><span class="nav-icon">🔌</span> Security Plugins <span
+          class="nav-badge green">6</span></a>
+      <a class="nav-item" href="#tools"><span class="nav-icon">🛠️</span> External Tools</a>
+      <a class="nav-item" href="#scanners"><span class="nav-icon">🔍</span> Online Scanners</a>
+
+      <span class="nav-section-label">Reference</span>
+      <a class="nav-item" href="#checklist"><span class="nav-icon">✅</span> Security Checklist</a>
+      <a class="nav-item" href="#resources"><span class="nav-icon">📚</span> Resources & Links</a>
+
+      <div class="sidebar-footer">
+        <p>CVE references: <a href="https://cve.mitre.org" target="_blank">cve.mitre.org</a><br>
+          WP Vulns: <a href="https://wpscan.com/vulnerability-list" target="_blank">wpscan.com</a><br>
+          OWASP: <a href="https://owasp.org/www-project-top-ten/" target="_blank">owasp.org/top-ten</a></p>
       </div>
-      <div class="card">
-        <div class="card-label">User Behavior</div>
-        <h3>Default Configs Left Unchanged</h3>
-        <p>Most sites ship with predictable usernames, login URLs, and debug settings. Bots scan for these automatically 24/7.</p>
-      </div>
-    </div>
+    </aside>
 
-    <div class="tip-box">
-      <span class="tip-icon">💡</span>
-      <div><strong>Security Mindset:</strong> The goal is NOT "100% secure" — it doesn't exist. The goal is to make your site harder to attack than the next one. Attackers move on when resistance is high. Defense in Depth means multiple layers — if one fails, the next catches it.</div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ─── ATTACKS ─── -->
-    <span class="section-anchor" id="attacks"></span>
-    <div class="section-head">
-      <span class="section-num">02</span>
-      <span class="section-icon-big">💀</span>
-      <h2>Attack Types & Vulnerabilities</h2>
-    </div>
-
-    <!-- BRUTE FORCE -->
-    <span id="brute"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-critical">CRITICAL</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">🔑 Brute Force Attack</div>
-          <div class="attack-subtitle">Automated password guessing against wp-login.php</div>
-        </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>How It Works</h4>
-            <p>Automated bots send thousands of username/password combinations per minute against <code>/wp-login.php</code>. Since WordPress has no native rate limiting, the default install allows unlimited attempts. Botnets use leaked credential lists from breached databases (HaveIBeenPwned).</p>
+    <!-- ─── MAIN CONTENT ─── -->
+    <main class="main">
+      <!-- HERO -->
+      <section class="hero" id="intro">
+        <!-- <div class="hero-tag"><span class="dot"></span> STUDENT HANDBOOK — 2026 EDITION</div> -->
+        <h1>WordPress<br><span>Security</span> Handbook</h1>
+        <p class="hero-desc">
+          A complete reference guide covering every attack vector, vulnerability, hardening technique, tool, and plugin
+          you need to know to secure any WordPress site — with real-world CVE proof and working code.
+        </p>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num">43%</span>
+            <div class="stat-label">of the internet runs WP</div>
           </div>
-          <div class="attack-info-box">
-            <h4>Real Attack Scenario</h4>
-            <p>A bot finds your site, detects it's WordPress (via <code>/wp-content/</code> paths), checks <code>/?author=1</code> to get username "admin", then launches a dictionary attack using the <strong>RockYou</strong> wordlist (14M+ passwords). Login in minutes if password is weak.</p>
+          <div class="stat"><span class="stat-num">90K+</span>
+            <div class="stat-label">sites hacked daily</div>
+          </div>
+          <div class="stat"><span class="stat-num">97%</span>
+            <div class="stat-label">attacks are automated</div>
+          </div>
+          <div class="stat"><span class="stat-num">9</span>
+            <div class="stat-label">attack types covered</div>
           </div>
         </div>
-        <div class="proof-box">
-          <h4>⚠ Real-World Proof & CVE References</h4>
-          <a href="https://blog.sucuri.net/2013/04/the-wordpress-brute-force-attack-timeline.html" target="_blank">→ Sucuri: The WordPress Brute Force Attack Timeline</a>
-          <a href="https://www.wordfence.com/threat-intel/vulnerabilities/wordpress-plugins/reportattacks/wordpress-report-brute-force-attacks-and-login-protection-reportattacks-plugins-232-authenticated-admin-sql-injection" target="_blank">→ Wordfence: Large-Scale Brute Force Report 2023</a>
-          <a href="https://haveibeenpwned.com/" target="_blank">→ HaveIBeenPwned — Check if credentials are leaked</a>
-        </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">Change login URL from <code>/wp-login.php</code> to a custom slug (WPS Hide Login plugin)</div>
-          <div class="fix-item">Limit login attempts to 3–5 (Limit Login Attempts Reloaded plugin)</div>
-          <div class="fix-item">Enable Two-Factor Authentication (WP 2FA plugin)</div>
-          <div class="fix-item">Never use "admin" as username — check <code>/?author=1</code> to verify</div>
-          <div class="fix-item">Add CAPTCHA to login form (Cloudflare Turnstile is free)</div>
-          <div class="fix-item">IP whitelist wp-admin via .htaccess if accessing from fixed IP</div>
-        </div>
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">.htaccess — Block xmlrpc.php & Limit wp-admin Access</span><div class="code-dots"><span></span><span></span><span></span></div></div>
-          <div class="code-body"><span class="cm"># Block xmlrpc.php entirely</span>
-<span class="kw">&lt;Files</span> xmlrpc.php<span class="kw">&gt;</span>
-  Order Deny,Allow
-  Deny from all
-<span class="kw">&lt;/Files&gt;</span>
+      </section>
 
-<span class="cm"># Restrict wp-login.php to your IP</span>
-<span class="kw">&lt;Files</span> wp-login.php<span class="kw">&gt;</span>
-  Order Deny,Allow
-  Deny from all
-  Allow from <span class="num">YOUR.IP.ADDRESS.HERE</span>
-<span class="kw">&lt;/Files&gt;</span></div>
-        </div>
-      </div>
-    </div>
+      <div class="content">
 
-    <!-- SQL INJECTION -->
-    <span id="sqli"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-critical">CRITICAL</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">💉 SQL Injection (SQLi)</div>
-          <div class="attack-subtitle">Malicious SQL in forms/URLs to read or modify your database</div>
+        <!-- ─── WHY WP ─── -->
+        <span class="section-anchor" id="stats"></span>
+        <div class="section-head">
+          <span class="section-num">01</span>
+          <span class="section-icon-big">📊</span>
+          <h2>Why WordPress Gets Attacked</h2>
         </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>How It Works</h4>
-            <p>When user input is passed directly into a database query without sanitization, an attacker injects SQL code. For example, a search field accepting <code>' OR 1=1 --</code> could dump the entire users table including password hashes.</p>
+
+        <div class="grid3">
+          <div class="card">
+            <div class="card-label">Market Share</div>
+            <h3>Massive Target Surface</h3>
+            <p>WordPress powers over 43% of all websites. Attackers write one exploit and target millions of sites
+              automatically.</p>
           </div>
-          <div class="attack-info-box">
-            <h4>Impact</h4>
-            <p>Attacker can: extract all users & passwords, read wp_options (site config), create new admin accounts, delete data, potentially read server files via <code>LOAD_FILE()</code>, and write PHP shells via <code>INTO OUTFILE</code>.</p>
+          <div class="card">
+            <div class="card-label">Ecosystem Risk</div>
+            <h3>60,000+ Plugins</h3>
+            <p>Anyone can publish plugins. Code quality varies widely. Vulnerable plugins/themes are the #1 entry point
+              for attackers.</p>
+          </div>
+          <div class="card">
+            <div class="card-label">User Behavior</div>
+            <h3>Default Configs Left Unchanged</h3>
+            <p>Most sites ship with predictable usernames, login URLs, and debug settings. Bots scan for these
+              automatically 24/7.</p>
           </div>
         </div>
-        <div class="proof-box">
-          <h4>⚠ CVE Proof — Real Vulnerabilities</h4>
-          <a href="https://www.invicti.com/web-application-vulnerabilities/wordpress-plugin-backup-migration-cve-2023-6553-vulnerability-cve-2023-6553" target="_blank">→ CVE-2023-6553 — Backup Migration Plugin SQLi (50K+ sites)</a>
-          <a href="https://wpscan.com/plugin/woocommerce/" target="_blank">→ WPScan: WooCommerce SQLi Vulnerabilities</a>
-          <a href="https://nvd.nist.gov/vuln/search#/nvd/home?keyword=wordpress%20sql%20injection&resultType=records" target="_blank">→ NVD: All WordPress SQLi CVEs (NIST)</a>
-        </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">Always use <code>$wpdb->prepare()</code> for database queries</div>
-          <div class="fix-item">Use <code>sanitize_text_field()</code> and <code>intval()</code> on all user input</div>
-          <div class="fix-item">Keep all plugins/themes updated — most SQLi come from third-party code</div>
-          <div class="fix-item">Use a WAF (Wordfence or Cloudflare) to block SQLi patterns</div>
-          <div class="fix-item">Change database table prefix from default <code>wp_</code></div>
-        </div>
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">PHP — Vulnerable vs Safe Code</span><div class="code-dots"><span></span><span></span><span></span></div></div>
-          <div class="code-body"><span class="cm">// ❌ VULNERABLE — NEVER DO THIS</span>
-<span class="var">$id</span> = <span class="var">$_GET</span>[<span class="str">'id'</span>];
-<span class="var">$result</span> = <span class="var">$wpdb</span>-><span class="fn">query</span>(<span class="str">"SELECT * FROM wp_posts WHERE ID = $id"</span>);
 
-<span class="cm">// ✅ SAFE — Use $wpdb->prepare()</span>
-<span class="var">$id</span> = <span class="fn">intval</span>( <span class="var">$_GET</span>[<span class="str">'id'</span>] );
-<span class="var">$result</span> = <span class="var">$wpdb</span>-><span class="fn">get_row</span>(
-  <span class="var">$wpdb</span>-><span class="fn">prepare</span>( <span class="str">"SELECT * FROM wp_posts WHERE ID = %d"</span>, <span class="var">$id</span> )
-);</div>
+        <div class="tip-box">
+          <span class="tip-icon">💡</span>
+          <div><strong>Security Mindset:</strong> The goal is NOT "100% secure" — it doesn't exist. The goal is to make
+            your site harder to attack than the next one. Attackers move on when resistance is high. Defense in Depth
+            means multiple layers — if one fails, the next catches it.</div>
         </div>
-      </div>
-    </div>
 
-    <!-- XSS -->
-    <span id="xss"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-critical">CRITICAL</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">🕷️ Cross-Site Scripting (XSS)</div>
-          <div class="attack-subtitle">Injecting JavaScript that runs in victims' browsers</div>
+        <div class="divider"></div>
+
+        <!-- ─── ATTACKS ─── -->
+        <span class="section-anchor" id="attacks"></span>
+        <div class="section-head">
+          <span class="section-num">02</span>
+          <span class="section-icon-big">💀</span>
+          <h2>Attack Types & Vulnerabilities</h2>
         </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>Types of XSS</h4>
-            <p><strong>Stored XSS:</strong> Script saved in DB (comments, posts) — executes for every visitor.<br><strong>Reflected XSS:</strong> Script in URL parameter, sent back in response.<br><strong>DOM XSS:</strong> Client-side JavaScript reads attacker-controlled data.</p>
+
+        <!-- BRUTE FORCE -->
+        <span id="brute"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-critical">CRITICAL</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">🔑 Brute Force Attack</div>
+              <div class="attack-subtitle">Automated password guessing against wp-login.php</div>
+            </div>
+            <span class="attack-toggle">▾</span>
           </div>
-          <div class="attack-info-box">
-            <h4>Impact</h4>
-            <p>Steal admin session cookies, redirect users to phishing pages, inject crypto miners, deface site, capture keystrokes (password stealing), install malware on visitor machines, create fake admin accounts.</p>
-          </div>
-        </div>
-        <div class="proof-box">
-          <h4>⚠ CVE Proof — Real Vulnerabilities</h4>
-          <a href="https://nvd.nist.gov/vuln/detail/CVE-2023-1119" target="_blank">→ CVE-2023-1119 — WPBakery Page Builder XSS (600K+ sites)</a>
-          <a href="https://www.wordfence.com/blog/2021/03/cross-site-scripting-vulnerabilities-in-elementor-impact-over-7-million-sites/" target="_blank">→ Wordfence: Elementor XSS affecting 1M+ sites (2023)</a>
-          <a href="https://nvd.nist.gov/vuln/search#/nvd/home?keyword=WordPress%20XSS%20&resultType=records" target="_blank">→ NVD: All WordPress XSS CVEs</a>
-        </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">Always escape output: <code>esc_html()</code>, <code>esc_attr()</code>, <code>esc_url()</code></div>
-          <div class="fix-item">Sanitize input: <code>sanitize_text_field()</code>, <code>wp_kses_post()</code></div>
-          <div class="fix-item">Set <code>Content-Security-Policy</code> HTTP header</div>
-          <div class="fix-item">Use <code>HttpOnly</code> and <code>Secure</code> flags on cookies</div>
-          <div class="fix-item">Enable Wordfence XSS protection rules</div>
-        </div>
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">PHP — WordPress Escaping Functions</span><div class="code-dots"><span></span><span></span><span></span></div></div>
-          <div class="code-body"><span class="cm">// ❌ VULNERABLE</span>
-<span class="kw">echo</span> <span class="var">$_GET</span>[<span class="str">'search'</span>];
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>How It Works</h4>
+                <p>Automated bots send thousands of username/password combinations per minute against
+                  <code>/wp-login.php</code>. Since WordPress has no native rate limiting, the default install allows
+                  unlimited attempts. Botnets use leaked credential lists from breached databases (HaveIBeenPwned).</p>
+              </div>
+              <div class="attack-info-box">
+                <h4>Real Attack Scenario</h4>
+                <p>A bot finds your site, detects it's WordPress (via <code>/wp-content/</code> paths), checks
+                  <code>/?author=1</code> to get username "admin", then launches a dictionary attack using the
+                  <strong>RockYou</strong> wordlist (14M+ passwords). Login in minutes if password is weak.</p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ Real-World Proof & CVE References</h4>
+              <a href="https://blog.sucuri.net/2013/04/the-wordpress-brute-force-attack-timeline.html" target="_blank">→
+                Sucuri: The WordPress Brute Force Attack Timeline</a>
+              <a href="https://www.wordfence.com/threat-intel/vulnerabilities/wordpress-plugins/reportattacks/wordpress-report-brute-force-attacks-and-login-protection-reportattacks-plugins-232-authenticated-admin-sql-injection"
+                target="_blank">→ Wordfence: Large-Scale Brute Force Report 2023</a>
+              <a href="https://haveibeenpwned.com/" target="_blank">→ HaveIBeenPwned — Check if credentials are
+                leaked</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">Change login URL from <code>/wp-login.php</code> to a custom slug (WPS Hide Login
+                plugin)</div>
+              <div class="fix-item">Limit login attempts to 3–5 (Limit Login Attempts Reloaded plugin)</div>
+              <div class="fix-item">Enable Two-Factor Authentication (WP 2FA plugin)</div>
+              <div class="fix-item">Never use "admin" as username — check <code>/?author=1</code> to verify</div>
+              <div class="fix-item">Add CAPTCHA to login form (Cloudflare Turnstile is free)</div>
+              <div class="fix-item">IP whitelist wp-admin via .htaccess if accessing from fixed IP</div>
+            </div>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">.htaccess — Block xmlrpc.php & Limit wp-admin
+                  Access</span>
+                <div class="code-dots"><span></span><span></span><span></span></div>
+              </div>
+              <div class="code-body"><span class="cm"># Block xmlrpc.php entirely</span>
+                <span class="kw">&lt;Files</span> xmlrpc.php<span class="kw">&gt;</span>
+                Order Deny,Allow
+                Deny from all
+                <span class="kw">&lt;/Files&gt;</span>
 
-<span class="cm">// ✅ SAFE — escape before output</span>
-<span class="kw">echo</span> <span class="fn">esc_html</span>( <span class="var">$_GET</span>[<span class="str">'search'</span>] );       <span class="cm">// for HTML content</span>
-<span class="kw">echo</span> <span class="fn">esc_attr</span>( <span class="var">$value</span> );               <span class="cm">// for HTML attributes</span>
-<span class="kw">echo</span> <span class="fn">esc_url</span>( <span class="var">$url</span> );                  <span class="cm">// for URLs</span>
-<span class="kw">echo</span> <span class="fn">wp_kses_post</span>( <span class="var">$content</span> );         <span class="cm">// for rich HTML</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- XML-RPC -->
-    <span id="xmlrpc"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-high">HIGH</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">📡 XML-RPC Exploit</div>
-          <div class="attack-subtitle">Using xmlrpc.php for amplified brute force & DDoS</div>
-        </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>How It Works</h4>
-            <p>WordPress's <code>xmlrpc.php</code> allows bulk login attempts via the <code>system.multicall</code> method — 100+ username/password combinations in a single HTTP request. This bypasses most rate-limiting protections and amplifies brute force attacks 100x.</p>
-          </div>
-          <div class="attack-info-box">
-            <h4>Impact</h4>
-            <p>Brute force at scale (100 attempts per request), DDoS amplification (pingback.ping method), content posting without proper auth, server resource exhaustion. Often used in botnets targeting WordPress installations.</p>
+                <span class="cm"># Restrict wp-login.php to your IP</span>
+                <span class="kw">&lt;Files</span> wp-login.php<span class="kw">&gt;</span>
+                Order Deny,Allow
+                Deny from all
+                Allow from <span class="num">YOUR.IP.ADDRESS.HERE</span>
+                <span class="kw">&lt;/Files&gt;</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="proof-box">
-          <h4>⚠ Proof & References</h4>
-          <a href="https://blog.sucuri.net/2015/10/brute-force-amplification-attacks-against-wordpress-xmlrpc.html" target="_blank">→ Sucuri: XML-RPC Brute Force Amplification Attack</a>
-          <a href="https://www.acunetix.com/blog/web-security-zone/wordpress-pingback-vulnerability/" target="_blank">→ Acunetix: WordPress Pingback DDoS via XML-RPC</a>
-        </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">Disable xmlrpc.php completely if not needed (Wordfence can do this)</div>
-          <div class="fix-item">Use .htaccess to block access to xmlrpc.php (code above)</div>
-          <div class="fix-item">If Jetpack is used, selectively allow only Jetpack IPs</div>
-          <div class="fix-item">Use "Disable XML-RPC" plugin for a one-click solution</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- FILE INCLUSION -->
-    <span id="lfi"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-high">HIGH</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">📁 File Inclusion (LFI / RFI)</div>
-          <div class="attack-subtitle">Reading server files or executing remote code via vulnerable plugins</div>
-        </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>LFI (Local File Inclusion)</h4>
-            <p>Attacker manipulates a file path parameter to read sensitive files: <code>/etc/passwd</code>, <code>wp-config.php</code>, log files. Can lead to credential theft or further exploitation.</p>
+        <!-- SQL INJECTION -->
+        <span id="sqli"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-critical">CRITICAL</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">💉 SQL Injection (SQLi)</div>
+              <div class="attack-subtitle">Malicious SQL in forms/URLs to read or modify your database</div>
+            </div>
+            <span class="attack-toggle">▾</span>
           </div>
-          <div class="attack-info-box">
-            <h4>RFI (Remote File Inclusion)</h4>
-            <p>When <code>allow_url_include</code> is enabled, attacker includes a remote PHP file hosted on their server. This executes arbitrary code on your server — full compromise. PHP shell uploaded, site owned.</p>
-          </div>
-        </div>
-        <div class="proof-box">
-          <h4>⚠ CVE Proof</h4>
-          <a href="https://www.sentinelone.com/vulnerability-database/cve-2022-1386/" target="_blank">→ CVE-2022-1386 — Fusion Builder LFI (100K+ sites)</a>
-          <a href="https://nvd.nist.gov/vuln/search#/nvd/home?keyword=WordPress%20File%20Inclusion&resultType=records" target="_blank">→ NVD: WordPress File Inclusion CVEs</a>
-        </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">Set <code>allow_url_include = Off</code> and <code>allow_url_fopen = Off</code> in php.ini</div>
-          <div class="fix-item">Keep all plugins and themes updated</div>
-          <div class="fix-item">Validate and sanitize all file path inputs in custom code</div>
-          <div class="fix-item">Use a WAF (Wordfence) to detect LFI/RFI patterns in requests</div>
-        </div>
-      </div>
-    </div>
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>How It Works</h4>
+                <p>When user input is passed directly into a database query without sanitization, an attacker injects
+                  SQL code. For example, a search field accepting <code>' OR 1=1 --</code> could dump the entire users
+                  table including password hashes.</p>
+              </div>
+              <div class="attack-info-box">
+                <h4>Impact</h4>
+                <p>Attacker can: extract all users & passwords, read wp_options (site config), create new admin
+                  accounts, delete data, potentially read server files via <code>LOAD_FILE()</code>, and write PHP
+                  shells via <code>INTO OUTFILE</code>.</p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ CVE Proof — Real Vulnerabilities</h4>
+              <a href="https://www.invicti.com/web-application-vulnerabilities/wordpress-plugin-backup-migration-cve-2023-6553-vulnerability-cve-2023-6553"
+                target="_blank">→ CVE-2023-6553 — Backup Migration Plugin SQLi (50K+ sites)</a>
+              <a href="https://wpscan.com/plugin/woocommerce/" target="_blank">→ WPScan: WooCommerce SQLi
+                Vulnerabilities</a>
+              <a href="https://nvd.nist.gov/vuln/search#/nvd/home?keyword=wordpress%20sql%20injection&resultType=records"
+                target="_blank">→ NVD: All WordPress SQLi CVEs (NIST)</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">Always use <code>$wpdb->prepare()</code> for database queries</div>
+              <div class="fix-item">Use <code>sanitize_text_field()</code> and <code>intval()</code> on all user input
+              </div>
+              <div class="fix-item">Keep all plugins/themes updated — most SQLi come from third-party code</div>
+              <div class="fix-item">Use a WAF (Wordfence or Cloudflare) to block SQLi patterns</div>
+              <div class="fix-item">Change database table prefix from default <code>wp_</code></div>
+            </div>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">PHP — Vulnerable vs Safe Code</span>
+                <div class="code-dots"><span></span><span></span><span></span></div>
+              </div>
+              <div class="code-body"><span class="cm">// ❌ VULNERABLE — NEVER DO THIS</span>
+                <span class="var">$id</span> = <span class="var">$_GET</span>[<span class="str">'id'</span>];
+                <span class="var">$result</span> = <span class="var">$wpdb</span>-><span class="fn">query</span>(<span
+                  class="str">"SELECT * FROM wp_posts WHERE ID = $id"</span>);
 
-    <!-- MALWARE / BACKDOOR -->
-    <span id="malware"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-critical">CRITICAL</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">🦠 Malware & Backdoor Injection</div>
-          <div class="attack-subtitle">Hidden PHP shells in nulled themes/plugins — #1 cause of WP hacks</div>
-        </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>How It Happens</h4>
-            <p>Nulled (pirated) themes/plugins contain hidden PHP code. When installed, it creates backdoor files, sends credentials to attacker's server, injects spam links into your content, runs SEO spam, and maintains persistent access even after password changes.</p>
-          </div>
-          <div class="attack-info-box">
-            <h4>Common Malware Types</h4>
-            <p><strong>Backdoors:</strong> Allow re-entry after cleanup.<br><strong>SEO Spam:</strong> Inject hidden casino/pharma links.<br><strong>Redirects:</strong> Send visitors to malware sites.<br><strong>Cryptominers:</strong> Use visitor CPU for crypto.<br><strong>Phishing pages:</strong> Fake login pages on your domain.</p>
+                <span class="cm">// ✅ SAFE — Use $wpdb->prepare()</span>
+                <span class="var">$id</span> = <span class="fn">intval</span>( <span class="var">$_GET</span>[<span
+                  class="str">'id'</span>] );
+                <span class="var">$result</span> = <span class="var">$wpdb</span>-><span class="fn">get_row</span>(
+                <span class="var">$wpdb</span>-><span class="fn">prepare</span>( <span class="str">"SELECT * FROM
+                  wp_posts WHERE ID = %d"</span>, <span class="var">$id</span> )
+                );
+              </div>
+            </div>
           </div>
         </div>
-        <div class="proof-box">
-          <h4>⚠ Proof & Stats</h4>
-          <a href="https://technocrackers.com/wordpress-plugin-hack-2026-30-plugins-infected-with-backdoor-malware/" target="_blank">→ WordPress Plugin Hack 2026</a>
-          <a href="https://www.wordfence.com/wordpress-malware-scanners/#:~:text=What%20Is%20Malware%20in%20WordPress?,-A%20sample%20of&text=Malware%20stands%20for%20%E2%80%9Cmalicious%20software,installed%20upon%20updating%20the%20plugin." target="_blank">→ Wordfence: Malware Found in Nulled Plugins Research</a>
-        </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">NEVER install nulled/cracked themes or plugins — ever</div>
-          <div class="fix-item">Buy from official sources: wordpress.org or ThemeForest/CodeCanyon</div>
-          <div class="fix-item">Scan every plugin zip with VirusTotal before installing</div>
-          <div class="fix-item">Run weekly malware scans with Wordfence or Sucuri</div>
-          <div class="fix-item">Monitor file changes — Wordfence alerts on new/modified files</div>
-          <div class="fix-item">If hacked: restore from backup, scan, change ALL passwords, update everything</div>
-        </div>
-      </div>
-    </div>
 
-    <!-- PRIVILEGE ESCALATION -->
-    <span id="priv"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-high">HIGH</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">⬆️ Privilege Escalation</div>
-          <div class="attack-subtitle">From Subscriber to Admin without credentials</div>
-        </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>How It Works</h4>
-            <p>A logged-in user with low privileges (Subscriber) exploits a broken access control flaw in a plugin to modify their own role to Administrator. Common with plugins that allow profile updates without proper capability checks.</p>
+        <!-- XSS -->
+        <span id="xss"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-critical">CRITICAL</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">🕷️ Cross-Site Scripting (XSS)</div>
+              <div class="attack-subtitle">Injecting JavaScript that runs in victims' browsers</div>
+            </div>
+            <span class="attack-toggle">▾</span>
           </div>
-          <div class="attack-info-box">
-            <h4>IDOR Example</h4>
-            <p>Plugin has an endpoint <code>admin-ajax.php?action=update_profile&role=administrator</code> with no server-side permission check. Any logged-in user can POST this to make themselves admin. This is called IDOR (Insecure Direct Object Reference).</p>
-          </div>
-        </div>
-        <div class="proof-box">
-          <h4>⚠ CVE Proof</h4>
-          <a href="https://wpscan.com/vulnerability/af54762b-29c9-4529-8ebd-f4ba7fde2c95/1" target="_blank">→ CVE-2021-34621 — ProfilePress Privilege Escalation (400K sites)</a>
-          <a href="https://www.wordfence.com/blog/2026/01/100000-wordpress-sites-affected-by-privilege-escalation-vulnerability-in-advanced-custom-fields-extended-wordpress-plugin/" target="_blank">→ Wordfence: ProfilePress Priv Escalation Deep Dive</a>
-        </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">Always check capabilities before sensitive actions: <code>current_user_can('manage_options')</code></div>
-          <div class="fix-item">Use <code>check_ajax_referer()</code> in all AJAX handlers</div>
-          <div class="fix-item">Never allow user-supplied role changes without strict server-side validation</div>
-          <div class="fix-item">Keep all plugins updated — priv escalation patches release frequently</div>
-          <div class="fix-item">Audit user roles regularly — remove unnecessary admin accounts</div>
-        </div>
-      </div>
-    </div>
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>Types of XSS</h4>
+                <p><strong>Stored XSS:</strong> Script saved in DB (comments, posts) — executes for every
+                  visitor.<br><strong>Reflected XSS:</strong> Script in URL parameter, sent back in
+                  response.<br><strong>DOM XSS:</strong> Client-side JavaScript reads attacker-controlled data.</p>
+              </div>
+              <div class="attack-info-box">
+                <h4>Impact</h4>
+                <p>Steal admin session cookies, redirect users to phishing pages, inject crypto miners, deface site,
+                  capture keystrokes (password stealing), install malware on visitor machines, create fake admin
+                  accounts.</p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ CVE Proof — Real Vulnerabilities</h4>
+              <a href="https://nvd.nist.gov/vuln/detail/CVE-2023-1119" target="_blank">→ CVE-2023-1119 — WPBakery Page
+                Builder XSS (600K+ sites)</a>
+              <a href="https://www.wordfence.com/blog/2021/03/cross-site-scripting-vulnerabilities-in-elementor-impact-over-7-million-sites/"
+                target="_blank">→ Wordfence: Elementor XSS affecting 1M+ sites (2023)</a>
+              <a href="https://nvd.nist.gov/vuln/search#/nvd/home?keyword=WordPress%20XSS%20&resultType=records"
+                target="_blank">→ NVD: All WordPress XSS CVEs</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">Always escape output: <code>esc_html()</code>, <code>esc_attr()</code>,
+                <code>esc_url()</code></div>
+              <div class="fix-item">Sanitize input: <code>sanitize_text_field()</code>, <code>wp_kses_post()</code>
+              </div>
+              <div class="fix-item">Set <code>Content-Security-Policy</code> HTTP header</div>
+              <div class="fix-item">Use <code>HttpOnly</code> and <code>Secure</code> flags on cookies</div>
+              <div class="fix-item">Enable Wordfence XSS protection rules</div>
+            </div>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">PHP — WordPress Escaping Functions</span>
+                <div class="code-dots"><span></span><span></span><span></span></div>
+              </div>
+              <div class="code-body"><span class="cm">// ❌ VULNERABLE</span>
+                <span class="kw">echo</span> <span class="var">$_GET</span>[<span class="str">'search'</span>];
 
-    <!-- CSRF -->
-    <span id="csrf"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-medium">MEDIUM</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">🎭 CSRF (Cross-Site Request Forgery)</div>
-          <div class="attack-subtitle">Tricking an admin into executing malicious actions</div>
-        </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>How It Works</h4>
-            <p>Attacker sends an admin a link that, when clicked, automatically performs an action (delete user, change settings, create post) using the admin's existing authenticated session. No credentials needed.</p>
-          </div>
-          <div class="attack-info-box">
-            <h4>WordPress Defense: Nonces</h4>
-            <p>WordPress uses nonces — time-limited tokens embedded in forms and URLs. Every sensitive action should verify a nonce. Without it, any external site can forge requests on behalf of authenticated users.</p>
+                <span class="cm">// ✅ SAFE — escape before output</span>
+                <span class="kw">echo</span> <span class="fn">esc_html</span>( <span class="var">$_GET</span>[<span
+                  class="str">'search'</span>] ); <span class="cm">// for HTML content</span>
+                <span class="kw">echo</span> <span class="fn">esc_attr</span>( <span class="var">$value</span> ); <span
+                  class="cm">// for HTML attributes</span>
+                <span class="kw">echo</span> <span class="fn">esc_url</span>( <span class="var">$url</span> ); <span
+                  class="cm">// for URLs</span>
+                <span class="kw">echo</span> <span class="fn">wp_kses_post</span>( <span class="var">$content</span> );
+                <span class="cm">// for rich HTML</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="proof-box">
-          <h4>⚠ References</h4>
-          <a href="https://owasp.org/www-community/attacks/csrf" target="_blank">→ OWASP: CSRF Attack Explained</a>
-          <a href="https://developer.wordpress.org/apis/security/nonces/" target="_blank">→ WordPress Developer Docs: Using Nonces</a>
-        </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">Generate nonces: <code>wp_create_nonce('my_action')</code></div>
-          <div class="fix-item">Verify nonces: <code>check_admin_referer('my_action')</code> or <code>check_ajax_referer()</code></div>
-          <div class="fix-item">Include nonce field in all forms: <code>wp_nonce_field('my_action', '_wpnonce')</code></div>
-        </div>
-        <div class="code-block">
-          <div class="code-header"><span class="code-lang">PHP — WordPress Nonce Implementation</span><div class="code-dots"><span></span><span></span><span></span></div></div>
-          <div class="code-body"><span class="cm">// In your form</span>
-<span class="kw">&lt;form</span> method=<span class="str">"post"</span><span class="kw">&gt;</span>
-  <span class="kw">&lt;?php</span> <span class="fn">wp_nonce_field</span>( <span class="str">'delete_post_action'</span>, <span class="str">'_wpnonce'</span> ); <span class="kw">?&gt;</span>
-  <span class="kw">&lt;button</span> type=<span class="str">"submit"</span><span class="kw">&gt;</span>Delete<span class="kw">&lt;/button&gt;</span>
-<span class="kw">&lt;/form&gt;</span>
 
-<span class="cm">// In your handler — verify before doing anything</span>
-<span class="kw">if</span> ( ! <span class="fn">check_admin_referer</span>( <span class="str">'delete_post_action'</span>, <span class="str">'_wpnonce'</span> ) ) {
-  <span class="fn">wp_die</span>( <span class="str">'Security check failed.'</span> );
-}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- DATA EXPOSURE -->
-    <span id="exposure"></span>
-    <div class="attack-card">
-      <div class="attack-header" onclick="toggleAttack(this)">
-        <span class="attack-sev sev-medium">MEDIUM</span>
-        <div class="attack-title-wrap">
-          <div class="attack-title">🔓 Sensitive Data Exposure</div>
-          <div class="attack-subtitle">Leaking credentials, debug info, and config files publicly</div>
-        </div>
-        <span class="attack-toggle">▾</span>
-      </div>
-      <div class="attack-body">
-        <div class="attack-grid">
-          <div class="attack-info-box">
-            <h4>Common Exposure Points</h4>
-            <p>• <code>wp-config.php</code> readable from browser<br>• <code>/wp-content/debug.log</code> publicly accessible<br>• <code>.env</code> file exposed<br>• Directory listing enabled (see all files)<br>• WordPress version in meta tags<br>• User enumeration via <code>/?author=1</code></p>
+        <!-- XML-RPC -->
+        <span id="xmlrpc"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-high">HIGH</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">📡 XML-RPC Exploit</div>
+              <div class="attack-subtitle">Using xmlrpc.php for amplified brute force & DDoS</div>
+            </div>
+            <span class="attack-toggle">▾</span>
           </div>
-          <div class="attack-info-box">
-            <h4>What Attackers Get</h4>
-            <p>Database hostname, name, username, and password from wp-config.php. API keys from .env. PHP errors with file paths from debug.log. Username discovery from author archives. All of this enables targeted, high-success attacks.</p>
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>How It Works</h4>
+                <p>WordPress's <code>xmlrpc.php</code> allows bulk login attempts via the <code>system.multicall</code>
+                  method — 100+ username/password combinations in a single HTTP request. This bypasses most
+                  rate-limiting protections and amplifies brute force attacks 100x.</p>
+              </div>
+              <div class="attack-info-box">
+                <h4>Impact</h4>
+                <p>Brute force at scale (100 attempts per request), DDoS amplification (pingback.ping method), content
+                  posting without proper auth, server resource exhaustion. Often used in botnets targeting WordPress
+                  installations.</p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ Proof & References</h4>
+              <a href="https://blog.sucuri.net/2015/10/brute-force-amplification-attacks-against-wordpress-xmlrpc.html"
+                target="_blank">→ Sucuri: XML-RPC Brute Force Amplification Attack</a>
+              <a href="https://www.acunetix.com/blog/web-security-zone/wordpress-pingback-vulnerability/"
+                target="_blank">→ Acunetix: WordPress Pingback DDoS via XML-RPC</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">Disable xmlrpc.php completely if not needed (Wordfence can do this)</div>
+              <div class="fix-item">Use .htaccess to block access to xmlrpc.php (code above)</div>
+              <div class="fix-item">If Jetpack is used, selectively allow only Jetpack IPs</div>
+              <div class="fix-item">Use "Disable XML-RPC" plugin for a one-click solution</div>
+            </div>
           </div>
         </div>
-        <div class="proof-box">
-          <h4>⚠ References</h4>
-          <a href="https://owasp.org/Top10/A02_2021-Cryptographic_Failures/" target="_blank">→ OWASP Top 10 — A02: Cryptographic Failures & Data Exposure</a>
+
+        <!-- FILE INCLUSION -->
+        <span id="lfi"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-high">HIGH</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">📁 File Inclusion (LFI / RFI)</div>
+              <div class="attack-subtitle">Reading server files or executing remote code via vulnerable plugins</div>
+            </div>
+            <span class="attack-toggle">▾</span>
+          </div>
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>LFI (Local File Inclusion)</h4>
+                <p>Attacker manipulates a file path parameter to read sensitive files: <code>/etc/passwd</code>,
+                  <code>wp-config.php</code>, log files. Can lead to credential theft or further exploitation.</p>
+              </div>
+              <div class="attack-info-box">
+                <h4>RFI (Remote File Inclusion)</h4>
+                <p>When <code>allow_url_include</code> is enabled, attacker includes a remote PHP file hosted on their
+                  server. This executes arbitrary code on your server — full compromise. PHP shell uploaded, site owned.
+                </p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ CVE Proof</h4>
+              <a href="https://www.sentinelone.com/vulnerability-database/cve-2022-1386/" target="_blank">→
+                CVE-2022-1386 — Fusion Builder LFI (100K+ sites)</a>
+              <a href="https://nvd.nist.gov/vuln/search#/nvd/home?keyword=WordPress%20File%20Inclusion&resultType=records"
+                target="_blank">→ NVD: WordPress File Inclusion CVEs</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">Set <code>allow_url_include = Off</code> and <code>allow_url_fopen = Off</code> in
+                php.ini</div>
+              <div class="fix-item">Keep all plugins and themes updated</div>
+              <div class="fix-item">Validate and sanitize all file path inputs in custom code</div>
+              <div class="fix-item">Use a WAF (Wordfence) to detect LFI/RFI patterns in requests</div>
+            </div>
+          </div>
         </div>
-        <div class="fix-box">
-          <h4>✓ How to Fix / Prevent</h4>
-          <div class="fix-item">Move wp-config.php one level above webroot (WordPress supports this)</div>
-          <div class="fix-item">Set file permissions: <code>chmod 400 wp-config.php</code></div>
-          <div class="fix-item">Set <code>WP_DEBUG</code> to false and <code>WP_DEBUG_LOG</code> to false in production</div>
-          <div class="fix-item">Disable directory browsing: add <code>Options -Indexes</code> to .htaccess</div>
-          <div class="fix-item">Remove WP version from header: add to functions.php: <code>remove_action('wp_head', 'wp_generator')</code></div>
-          <div class="fix-item">Block <code>/?author=</code> enumeration via Wordfence or .htaccess</div>
+
+        <!-- MALWARE / BACKDOOR -->
+        <span id="malware"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-critical">CRITICAL</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">🦠 Malware & Backdoor Injection</div>
+              <div class="attack-subtitle">Hidden PHP shells in nulled themes/plugins — #1 cause of WP hacks</div>
+            </div>
+            <span class="attack-toggle">▾</span>
+          </div>
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>How It Happens</h4>
+                <p>Nulled (pirated) themes/plugins contain hidden PHP code. When installed, it creates backdoor files,
+                  sends credentials to attacker's server, injects spam links into your content, runs SEO spam, and
+                  maintains persistent access even after password changes.</p>
+              </div>
+              <div class="attack-info-box">
+                <h4>Common Malware Types</h4>
+                <p><strong>Backdoors:</strong> Allow re-entry after cleanup.<br><strong>SEO Spam:</strong> Inject hidden
+                  casino/pharma links.<br><strong>Redirects:</strong> Send visitors to malware
+                  sites.<br><strong>Cryptominers:</strong> Use visitor CPU for crypto.<br><strong>Phishing
+                    pages:</strong> Fake login pages on your domain.</p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ Proof & Stats</h4>
+              <a href="https://technocrackers.com/wordpress-plugin-hack-2026-30-plugins-infected-with-backdoor-malware/"
+                target="_blank">→ WordPress Plugin Hack 2026</a>
+              <a href="https://www.wordfence.com/wordpress-malware-scanners/#:~:text=What%20Is%20Malware%20in%20WordPress?,-A%20sample%20of&text=Malware%20stands%20for%20%E2%80%9Cmalicious%20software,installed%20upon%20updating%20the%20plugin."
+                target="_blank">→ Wordfence: Malware Found in Nulled Plugins Research</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">NEVER install nulled/cracked themes or plugins — ever</div>
+              <div class="fix-item">Buy from official sources: wordpress.org or ThemeForest/CodeCanyon</div>
+              <div class="fix-item">Scan every plugin zip with VirusTotal before installing</div>
+              <div class="fix-item">Run weekly malware scans with Wordfence or Sucuri</div>
+              <div class="fix-item">Monitor file changes — Wordfence alerts on new/modified files</div>
+              <div class="fix-item">If hacked: restore from backup, scan, change ALL passwords, update everything</div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <div class="divider"></div>
+        <!-- PRIVILEGE ESCALATION -->
+        <span id="priv"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-high">HIGH</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">⬆️ Privilege Escalation</div>
+              <div class="attack-subtitle">From Subscriber to Admin without credentials</div>
+            </div>
+            <span class="attack-toggle">▾</span>
+          </div>
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>How It Works</h4>
+                <p>A logged-in user with low privileges (Subscriber) exploits a broken access control flaw in a plugin
+                  to modify their own role to Administrator. Common with plugins that allow profile updates without
+                  proper capability checks.</p>
+              </div>
+              <div class="attack-info-box">
+                <h4>IDOR Example</h4>
+                <p>Plugin has an endpoint <code>admin-ajax.php?action=update_profile&role=administrator</code> with no
+                  server-side permission check. Any logged-in user can POST this to make themselves admin. This is
+                  called IDOR (Insecure Direct Object Reference).</p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ CVE Proof</h4>
+              <a href="https://wpscan.com/vulnerability/af54762b-29c9-4529-8ebd-f4ba7fde2c95/1" target="_blank">→
+                CVE-2021-34621 — ProfilePress Privilege Escalation (400K sites)</a>
+              <a href="https://www.wordfence.com/blog/2026/01/100000-wordpress-sites-affected-by-privilege-escalation-vulnerability-in-advanced-custom-fields-extended-wordpress-plugin/"
+                target="_blank">→ Wordfence: ProfilePress Priv Escalation Deep Dive</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">Always check capabilities before sensitive actions:
+                <code>current_user_can('manage_options')</code></div>
+              <div class="fix-item">Use <code>check_ajax_referer()</code> in all AJAX handlers</div>
+              <div class="fix-item">Never allow user-supplied role changes without strict server-side validation</div>
+              <div class="fix-item">Keep all plugins updated — priv escalation patches release frequently</div>
+              <div class="fix-item">Audit user roles regularly — remove unnecessary admin accounts</div>
+            </div>
+          </div>
+        </div>
 
-    <!-- ─── HARDENING ─── -->
-    <span class="section-anchor" id="login-sec"></span>
-    <div class="section-head">
-      <span class="section-num">03</span>
-      <span class="section-icon-big">🔒</span>
-      <h2>Security Hardening</h2>
-    </div>
+        <!-- CSRF -->
+        <span id="csrf"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-medium">MEDIUM</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">🎭 CSRF (Cross-Site Request Forgery)</div>
+              <div class="attack-subtitle">Tricking an admin into executing malicious actions</div>
+            </div>
+            <span class="attack-toggle">▾</span>
+          </div>
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>How It Works</h4>
+                <p>Attacker sends an admin a link that, when clicked, automatically performs an action (delete user,
+                  change settings, create post) using the admin's existing authenticated session. No credentials needed.
+                </p>
+              </div>
+              <div class="attack-info-box">
+                <h4>WordPress Defense: Nonces</h4>
+                <p>WordPress uses nonces — time-limited tokens embedded in forms and URLs. Every sensitive action should
+                  verify a nonce. Without it, any external site can forge requests on behalf of authenticated users.</p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ References</h4>
+              <a href="https://owasp.org/www-community/attacks/csrf" target="_blank">→ OWASP: CSRF Attack Explained</a>
+              <a href="https://developer.wordpress.org/apis/security/nonces/" target="_blank">→ WordPress Developer
+                Docs: Using Nonces</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">Generate nonces: <code>wp_create_nonce('my_action')</code></div>
+              <div class="fix-item">Verify nonces: <code>check_admin_referer('my_action')</code> or
+                <code>check_ajax_referer()</code></div>
+              <div class="fix-item">Include nonce field in all forms:
+                <code>wp_nonce_field('my_action', '_wpnonce')</code></div>
+            </div>
+            <div class="code-block">
+              <div class="code-header"><span class="code-lang">PHP — WordPress Nonce Implementation</span>
+                <div class="code-dots"><span></span><span></span><span></span></div>
+              </div>
+              <div class="code-body"><span class="cm">// In your form</span>
+                <span class="kw">&lt;form</span> method=<span class="str">"post"</span><span class="kw">&gt;</span>
+                <span class="kw">&lt;?php</span> <span class="fn">wp_nonce_field</span>( <span
+                  class="str">'delete_post_action'</span>, <span class="str">'_wpnonce'</span> ); <span
+                  class="kw">?&gt;</span>
+                <span class="kw">&lt;button</span> type=<span class="str">"submit"</span><span
+                  class="kw">&gt;</span>Delete<span class="kw">&lt;/button&gt;</span>
+                <span class="kw">&lt;/form&gt;</span>
 
-    <!-- LOGIN SECURITY -->
-    <div class="card" style="margin-bottom:16px;">
-      <div class="card-label">Login Security</div>
-      <h3>🔐 Securing the Login System</h3>
-      <ul class="checklist" style="margin-top:10px;">
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Change login URL using WPS Hide Login plugin — <code>/wp-login.php</code> gets thousands of bot hits daily</span><span class="check-priority pr-must">MUST</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Enable Two-Factor Authentication (2FA) for all admin and editor accounts</span><span class="check-priority pr-must">MUST</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Install "Limit Login Attempts Reloaded" — lock out after 3–5 failed attempts</span><span class="check-priority pr-must">MUST</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Never use <code>admin</code> as username — verify by visiting <code>/?author=1</code> on your site</span><span class="check-priority pr-must">MUST</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Use a password manager to generate 20+ char unique passwords for admin accounts</span><span class="check-priority pr-high">HIGH</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Add Cloudflare Turnstile CAPTCHA (free) to login form</span><span class="check-priority pr-high">HIGH</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">If on fixed IP — whitelist your IP for wp-admin access via .htaccess</span><span class="check-priority pr-med">MEDIUM</span></li>
-      </ul>
-    </div>
+                <span class="cm">// In your handler — verify before doing anything</span>
+                <span class="kw">if</span> ( ! <span class="fn">check_admin_referer</span>( <span
+                  class="str">'delete_post_action'</span>, <span class="str">'_wpnonce'</span> ) ) {
+                <span class="fn">wp_die</span>( <span class="str">'Security check failed.'</span> );
+                }
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <!-- SERVER & FILES -->
-    <span id="server-sec"></span>
-    <div class="card" style="margin-bottom:16px;">
-      <div class="card-label">Server & File Security</div>
-      <h3>🖥️ File Permissions & Server Settings</h3>
-      <ul class="checklist" style="margin-top:10px;">
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Set wp-config.php permission to <code>400</code> or <code>440</code> — no world-readable access</span><span class="check-priority pr-must">MUST</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Folders: <code>755</code>, Files: <code>644</code>, wp-config.php: <code>400</code></span><span class="check-priority pr-must">MUST</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Disable directory listing with <code>Options -Indexes</code> in .htaccess</span><span class="check-priority pr-must">MUST</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Disable xmlrpc.php if not using Jetpack or WP mobile app</span><span class="check-priority pr-must">MUST</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Set PHP <code>display_errors = Off</code> and <code>log_errors = On</code> in production</span><span class="check-priority pr-high">HIGH</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Keep PHP version updated — use PHP 8.1+ minimum. PHP 7.x is end-of-life</span><span class="check-priority pr-high">HIGH</span></li>
-        <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Enable HTTPS/SSL everywhere — force redirect HTTP → HTTPS</span><span class="check-priority pr-must">MUST</span></li>
-      </ul>
-    </div>
+        <!-- DATA EXPOSURE -->
+        <span id="exposure"></span>
+        <div class="attack-card">
+          <div class="attack-header" onclick="toggleAttack(this)">
+            <span class="attack-sev sev-medium">MEDIUM</span>
+            <div class="attack-title-wrap">
+              <div class="attack-title">🔓 Sensitive Data Exposure</div>
+              <div class="attack-subtitle">Leaking credentials, debug info, and config files publicly</div>
+            </div>
+            <span class="attack-toggle">▾</span>
+          </div>
+          <div class="attack-body">
+            <div class="attack-grid">
+              <div class="attack-info-box">
+                <h4>Common Exposure Points</h4>
+                <p>• <code>wp-config.php</code> readable from browser<br>• <code>/wp-content/debug.log</code> publicly
+                  accessible<br>• <code>.env</code> file exposed<br>• Directory listing enabled (see all files)<br>•
+                  WordPress version in meta tags<br>• User enumeration via <code>/?author=1</code></p>
+              </div>
+              <div class="attack-info-box">
+                <h4>What Attackers Get</h4>
+                <p>Database hostname, name, username, and password from wp-config.php. API keys from .env. PHP errors
+                  with file paths from debug.log. Username discovery from author archives. All of this enables targeted,
+                  high-success attacks.</p>
+              </div>
+            </div>
+            <div class="proof-box">
+              <h4>⚠ References</h4>
+              <a href="https://owasp.org/Top10/A02_2021-Cryptographic_Failures/" target="_blank">→ OWASP Top 10 — A02:
+                Cryptographic Failures & Data Exposure</a>
+            </div>
+            <div class="fix-box">
+              <h4>✓ How to Fix / Prevent</h4>
+              <div class="fix-item">Move wp-config.php one level above webroot (WordPress supports this)</div>
+              <div class="fix-item">Set file permissions: <code>chmod 400 wp-config.php</code></div>
+              <div class="fix-item">Set <code>WP_DEBUG</code> to false and <code>WP_DEBUG_LOG</code> to false in
+                production</div>
+              <div class="fix-item">Disable directory browsing: add <code>Options -Indexes</code> to .htaccess</div>
+              <div class="fix-item">Remove WP version from header: add to functions.php:
+                <code>remove_action('wp_head', 'wp_generator')</code></div>
+              <div class="fix-item">Block <code>/?author=</code> enumeration via Wordfence or .htaccess</div>
+            </div>
+          </div>
+        </div>
 
-    <!-- WP-CONFIG -->
-    <span id="wpconfig"></span>
-    <div style="margin-bottom:16px;">
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">wp-config.php — Security Constants (Add These)</span><div class="code-dots"><span></span><span></span><span></span></div></div>
-        <div class="code-body"><span class="cm">/* ══════════════════════════════════════
-   WORDPRESS SECURITY CONSTANTS
-   Add these to wp-config.php
-══════════════════════════════════════ */</span>
+        <div class="divider"></div>
 
-<span class="cm">// Disable file editing from Dashboard → Appearance → Editor</span>
-<span class="fn">define</span>( <span class="str">'DISALLOW_FILE_EDIT'</span>, <span class="kw">true</span> );
+        <!-- ─── HARDENING ─── -->
+        <span class="section-anchor" id="login-sec"></span>
+        <div class="section-head">
+          <span class="section-num">03</span>
+          <span class="section-icon-big">🔒</span>
+          <h2>Security Hardening</h2>
+        </div>
 
-<span class="cm">// Disable plugin/theme install & update from dashboard</span>
-<span class="fn">define</span>( <span class="str">'DISALLOW_FILE_MODS'</span>, <span class="kw">true</span> );  <span class="cm">// Remove if you need to update via dashboard</span>
+        <!-- LOGIN SECURITY -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-label">Login Security</div>
+          <h3>🔐 Securing the Login System</h3>
+          <ul class="checklist" style="margin-top:10px;">
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Change login URL using WPS
+                Hide Login plugin — <code>/wp-login.php</code> gets thousands of bot hits daily</span><span
+                class="check-priority pr-must">MUST</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Enable Two-Factor
+                Authentication (2FA) for all admin and editor accounts</span><span
+                class="check-priority pr-must">MUST</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Install "Limit Login
+                Attempts Reloaded" — lock out after 3–5 failed attempts</span><span
+                class="check-priority pr-must">MUST</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Never use
+                <code>admin</code> as username — verify by visiting <code>/?author=1</code> on your site</span><span
+                class="check-priority pr-must">MUST</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Use a password manager to
+                generate 20+ char unique passwords for admin accounts</span><span
+                class="check-priority pr-high">HIGH</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Add Cloudflare Turnstile
+                CAPTCHA (free) to login form</span><span class="check-priority pr-high">HIGH</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">If on fixed IP — whitelist
+                your IP for wp-admin access via .htaccess</span><span class="check-priority pr-med">MEDIUM</span></li>
+          </ul>
+        </div>
 
-<span class="cm">// Force SSL for all admin-area requests</span>
-<span class="fn">define</span>( <span class="str">'FORCE_SSL_ADMIN'</span>, <span class="kw">true</span> );
+        <!-- SERVER & FILES -->
+        <span id="server-sec"></span>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-label">Server & File Security</div>
+          <h3>🖥️ File Permissions & Server Settings</h3>
+          <ul class="checklist" style="margin-top:10px;">
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Set wp-config.php
+                permission to <code>400</code> or <code>440</code> — no world-readable access</span><span
+                class="check-priority pr-must">MUST</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Folders: <code>755</code>,
+                Files: <code>644</code>, wp-config.php: <code>400</code></span><span
+                class="check-priority pr-must">MUST</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Disable directory listing
+                with <code>Options -Indexes</code> in .htaccess</span><span class="check-priority pr-must">MUST</span>
+            </li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Disable xmlrpc.php if not
+                using Jetpack or WP mobile app</span><span class="check-priority pr-must">MUST</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Set PHP
+                <code>display_errors = Off</code> and <code>log_errors = On</code> in production</span><span
+                class="check-priority pr-high">HIGH</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Keep PHP version updated —
+                use PHP 8.1+ minimum. PHP 7.x is end-of-life</span><span class="check-priority pr-high">HIGH</span></li>
+            <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Enable HTTPS/SSL everywhere
+                — force redirect HTTP → HTTPS</span><span class="check-priority pr-must">MUST</span></li>
+          </ul>
+        </div>
 
-<span class="cm">// Disable debug output in production</span>
-<span class="fn">define</span>( <span class="str">'WP_DEBUG'</span>, <span class="kw">false</span> );
-<span class="fn">define</span>( <span class="str">'WP_DEBUG_LOG'</span>, <span class="kw">false</span> );
-<span class="fn">define</span>( <span class="str">'WP_DEBUG_DISPLAY'</span>, <span class="kw">false</span> );
+        <!-- WP-CONFIG -->
+        <span id="wpconfig"></span>
+        <div style="margin-bottom:16px;">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">wp-config.php — Security Constants (Add These)</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div class="code-body"><span class="cm">/* ══════════════════════════════════════
+                WORDPRESS SECURITY CONSTANTS
+                Add these to wp-config.php
+                ══════════════════════════════════════ */</span>
 
-<span class="cm">// Auto-update WordPress core (minor versions)</span>
-<span class="fn">define</span>( <span class="str">'WP_AUTO_UPDATE_CORE'</span>, <span class="kw">true</span> );
+              <span class="cm">// Disable file editing from Dashboard → Appearance → Editor</span>
+              <span class="fn">define</span>( <span class="str">'DISALLOW_FILE_EDIT'</span>, <span
+                class="kw">true</span> );
 
-<span class="cm">// Limit post revisions to save DB space</span>
-<span class="fn">define</span>( <span class="str">'WP_POST_REVISIONS'</span>, <span class="num">5</span> );
+              <span class="cm">// Disable plugin/theme install & update from dashboard</span>
+              <span class="fn">define</span>( <span class="str">'DISALLOW_FILE_MODS'</span>, <span
+                class="kw">true</span> ); <span class="cm">// Remove if you need to update via dashboard</span>
 
-<span class="cm">// Move wp-content outside webroot (optional, advanced)</span>
-<span class="cm">// define( 'WP_CONTENT_DIR', dirname(__FILE__) . '/wp-content' );</span>
+              <span class="cm">// Force SSL for all admin-area requests</span>
+              <span class="fn">define</span>( <span class="str">'FORCE_SSL_ADMIN'</span>, <span class="kw">true</span>
+              );
 
-<span class="cm">// IMPORTANT: Use fresh salts from https://api.wordpress.org/secret-key/1.1/salt/</span>
-<span class="fn">define</span>( <span class="str">'AUTH_KEY'</span>,         <span class="str">'put your unique phrase here'</span> );
-<span class="fn">define</span>( <span class="str">'SECURE_AUTH_KEY'</span>,  <span class="str">'put your unique phrase here'</span> );
-<span class="fn">define</span>( <span class="str">'LOGGED_IN_KEY'</span>,    <span class="str">'put your unique phrase here'</span> );
-<span class="fn">define</span>( <span class="str">'NONCE_KEY'</span>,        <span class="str">'put your unique phrase here'</span> );</div>
-      </div>
-    </div>
+              <span class="cm">// Disable debug output in production</span>
+              <span class="fn">define</span>( <span class="str">'WP_DEBUG'</span>, <span class="kw">false</span> );
+              <span class="fn">define</span>( <span class="str">'WP_DEBUG_LOG'</span>, <span class="kw">false</span> );
+              <span class="fn">define</span>( <span class="str">'WP_DEBUG_DISPLAY'</span>, <span class="kw">false</span>
+              );
 
-    <!-- HTACCESS -->
-    <span id="htaccess"></span>
-    <div style="margin-bottom:16px;">
-      <div class="code-block">
-        <div class="code-header"><span class="code-lang">.htaccess — Complete Security Rules</span><div class="code-dots"><span></span><span></span><span></span></div></div>
-        <div class="code-body"><span class="cm"># ══════════════════════════════════
-# WORDPRESS SECURITY .HTACCESS RULES
-# ══════════════════════════════════</span>
+              <span class="cm">// Auto-update WordPress core (minor versions)</span>
+              <span class="fn">define</span>( <span class="str">'WP_AUTO_UPDATE_CORE'</span>, <span
+                class="kw">true</span> );
 
-<span class="cm"># 1. Disable directory browsing</span>
-Options -Indexes
+              <span class="cm">// Limit post revisions to save DB space</span>
+              <span class="fn">define</span>( <span class="str">'WP_POST_REVISIONS'</span>, <span class="num">5</span>
+              );
 
-<span class="cm"># 2. Block access to sensitive files</span>
-<span class="kw">&lt;FilesMatch</span> <span class="str">"^(wp-config\.php|\.env|debug\.log|readme\.html|license\.txt|xmlrpc\.php)$"</span><span class="kw">&gt;</span>
-  Order Allow,Deny
-  Deny from all
-<span class="kw">&lt;/FilesMatch&gt;</span>
+              <span class="cm">// Move wp-content outside webroot (optional, advanced)</span>
+              <span class="cm">// define( 'WP_CONTENT_DIR', dirname(__FILE__) . '/wp-content' );</span>
 
-<span class="cm"># 3. Block access to .htaccess itself</span>
-<span class="kw">&lt;Files</span> .htaccess<span class="kw">&gt;</span>
-  Order Allow,Deny
-  Deny from all
-<span class="kw">&lt;/Files&gt;</span>
+              <span class="cm">// IMPORTANT: Use fresh salts from https://api.wordpress.org/secret-key/1.1/salt/</span>
+              <span class="fn">define</span>( <span class="str">'AUTH_KEY'</span>, <span class="str">'put your unique
+                phrase here'</span> );
+              <span class="fn">define</span>( <span class="str">'SECURE_AUTH_KEY'</span>, <span class="str">'put your
+                unique phrase here'</span> );
+              <span class="fn">define</span>( <span class="str">'LOGGED_IN_KEY'</span>, <span class="str">'put your
+                unique phrase here'</span> );
+              <span class="fn">define</span>( <span class="str">'NONCE_KEY'</span>, <span class="str">'put your unique
+                phrase here'</span> );
+            </div>
+          </div>
+        </div>
 
-<span class="cm"># 4. Prevent PHP execution in uploads folder</span>
-<span class="kw">&lt;Directory</span> <span class="str">"/var/www/html/wp-content/uploads"</span><span class="kw">&gt;</span>
-  <span class="kw">&lt;FilesMatch</span> <span class="str">"\.php$"</span><span class="kw">&gt;</span>
-    Order Deny,Allow
-    Deny from all
-  <span class="kw">&lt;/FilesMatch&gt;</span>
-<span class="kw">&lt;/Directory&gt;</span>
+        <!-- HTACCESS -->
+        <span id="htaccess"></span>
+        <div style="margin-bottom:16px;">
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">.htaccess — Complete Security Rules</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div class="code-body"><span class="cm"># ══════════════════════════════════
+                # WORDPRESS SECURITY .HTACCESS RULES
+                # ══════════════════════════════════</span>
 
-<span class="cm"># 5. Block author enumeration /?author=N</span>
-RewriteEngine On
-RewriteCond %{QUERY_STRING} ^author=\d
-RewriteRule ^ /? [L,R=301]
+              <span class="cm"># 1. Disable directory browsing</span>
+              Options -Indexes
 
-<span class="cm"># 6. Block common attack patterns in query strings</span>
-RewriteCond %{QUERY_STRING} (<span class="str">base64_encode|union|select|insert|drop|update|benchmark</span>) [NC]
-RewriteRule .* - [F]</div>
-      </div>
-    </div>
+              <span class="cm"># 2. Block access to sensitive files</span>
+              <span class="kw">&lt;FilesMatch</span> <span
+                class="str">"^(wp-config\.php|\.env|debug\.log|readme\.html|license\.txt|xmlrpc\.php)$"</span><span
+                class="kw">&gt;</span>
+              Order Allow,Deny
+              Deny from all
+              <span class="kw">&lt;/FilesMatch&gt;</span>
 
-    <!-- HTTP HEADERS -->
-    <span id="headers"></span>
-    <div class="card" style="margin-bottom:16px;">
-      <div class="card-label">HTTP Security Headers</div>
-      <h3>🌐 Essential Security Headers (via functions.php)</h3>
-      <div class="code-block" style="margin-top:12px;">
-        <div class="code-header"><span class="code-lang">PHP — Add to functions.php or via plugin</span><div class="code-dots"><span></span><span></span><span></span></div></div>
-        <div class="code-body"><span class="fn">add_action</span>( <span class="str">'send_headers'</span>, <span class="kw">function</span>() {
-  <span class="fn">header</span>( <span class="str">'X-Frame-Options: SAMEORIGIN'</span> );           <span class="cm">// Block clickjacking</span>
-  <span class="fn">header</span>( <span class="str">'X-Content-Type-Options: nosniff'</span> );       <span class="cm">// Block MIME sniffing</span>
-  <span class="fn">header</span>( <span class="str">'X-XSS-Protection: 1; mode=block'</span> );      <span class="cm">// Browser XSS filter</span>
-  <span class="fn">header</span>( <span class="str">'Referrer-Policy: strict-origin-when-cross-origin'</span> );
-  <span class="fn">header</span>( <span class="str">'Permissions-Policy: camera=(), microphone=(), geolocation=()'</span> );
-  <span class="fn">header</span>( <span class="str">"Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline';"</span> );
-  <span class="fn">header</span>( <span class="str">'Strict-Transport-Security: max-age=31536000; includeSubDomains'</span> );
-});</div>
-      </div>
-      <div class="tip-box" style="margin-top:12px;">
-        <span class="tip-icon">🔍</span>
-        <div>After adding headers, test your score at <a href="https://securityheaders.com" target="_blank" style="color:var(--neon2);">securityheaders.com</a>. Aim for <strong>Grade A or A+</strong>. You can also check with <a href="https://observatory.mozilla.org" target="_blank" style="color:var(--neon2);">Mozilla Observatory</a>.</div>
-      </div>
-    </div>
+              <span class="cm"># 3. Block access to .htaccess itself</span>
+              <span class="kw">&lt;Files</span> .htaccess<span class="kw">&gt;</span>
+              Order Allow,Deny
+              Deny from all
+              <span class="kw">&lt;/Files&gt;</span>
 
-    <div class="divider"></div>
+              <span class="cm"># 4. Prevent PHP execution in uploads folder</span>
+              <span class="kw">&lt;Directory</span> <span class="str">"/var/www/html/wp-content/uploads"</span><span
+                class="kw">&gt;</span>
+              <span class="kw">&lt;FilesMatch</span> <span class="str">"\.php$"</span><span class="kw">&gt;</span>
+              Order Deny,Allow
+              Deny from all
+              <span class="kw">&lt;/FilesMatch&gt;</span>
+              <span class="kw">&lt;/Directory&gt;</span>
 
-    <!-- ─── PLUGINS ─── -->
-    <span class="section-anchor" id="plugins"></span>
-    <div class="section-head">
-      <span class="section-num">04</span>
-      <span class="section-icon-big">🔌</span>
-      <h2>Security Plugins</h2>
-    </div>
+              <span class="cm"># 5. Block author enumeration /?author=N</span>
+              RewriteEngine On
+              RewriteCond %{QUERY_STRING} ^author=\d
+              RewriteRule ^ /? [L,R=301]
 
-    <div class="plugin-grid">
+              <span class="cm"># 6. Block common attack patterns in query strings</span>
+              RewriteCond %{QUERY_STRING} (<span
+                class="str">base64_encode|union|select|insert|drop|update|benchmark</span>) [NC]
+              RewriteRule .* - [F]
+            </div>
+          </div>
+        </div>
 
-      <div class="plugin-card">
-        <div class="plugin-top">
-          <div class="plugin-emoji">🛡️</div>
+        <!-- HTTP HEADERS -->
+        <span id="headers"></span>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-label">HTTP Security Headers</div>
+          <h3>🌐 Essential Security Headers (via functions.php)</h3>
+          <div class="code-block" style="margin-top:12px;">
+            <div class="code-header"><span class="code-lang">PHP — Add to functions.php or via plugin</span>
+              <div class="code-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div class="code-body"><span class="fn">add_action</span>( <span class="str">'send_headers'</span>, <span
+                class="kw">function</span>() {
+              <span class="fn">header</span>( <span class="str">'X-Frame-Options: SAMEORIGIN'</span> ); <span
+                class="cm">// Block clickjacking</span>
+              <span class="fn">header</span>( <span class="str">'X-Content-Type-Options: nosniff'</span> ); <span
+                class="cm">// Block MIME sniffing</span>
+              <span class="fn">header</span>( <span class="str">'X-XSS-Protection: 1; mode=block'</span> ); <span
+                class="cm">// Browser XSS filter</span>
+              <span class="fn">header</span>( <span class="str">'Referrer-Policy:
+                strict-origin-when-cross-origin'</span> );
+              <span class="fn">header</span>( <span class="str">'Permissions-Policy: camera=(), microphone=(),
+                geolocation=()'</span> );
+              <span class="fn">header</span>( <span class="str">"Content-Security-Policy: default-src 'self'; script-src
+                'self' 'unsafe-inline';"</span> );
+              <span class="fn">header</span>( <span class="str">'Strict-Transport-Security: max-age=31536000;
+                includeSubDomains'</span> );
+              });
+            </div>
+          </div>
+          <div class="tip-box" style="margin-top:12px;">
+            <span class="tip-icon">🔍</span>
+            <div>After adding headers, test your score at <a href="https://securityheaders.com" target="_blank"
+                style="color:var(--neon2);">securityheaders.com</a>. Aim for <strong>Grade A or A+</strong>. You can
+              also check with <a href="https://observatory.mozilla.org" target="_blank"
+                style="color:var(--neon2);">Mozilla Observatory</a>.</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ─── PLUGINS ─── -->
+        <span class="section-anchor" id="plugins"></span>
+        <div class="section-head">
+          <span class="section-num">04</span>
+          <span class="section-icon-big">🔌</span>
+          <h2>Security Plugins</h2>
+        </div>
+
+        <div class="plugin-grid">
+
+          <div class="plugin-card">
+            <div class="plugin-top">
+              <div class="plugin-emoji">🛡️</div>
+              <div>
+                <div class="plugin-name">Wordfence Security</div>
+                <div class="plugin-type">All-in-one Security Suite</div>
+              </div>
+            </div>
+            <div class="plugin-desc">The most comprehensive free WP security plugin. Includes an endpoint WAF, malware
+              scanner, real-time threat intelligence, login security with 2FA, and live traffic monitoring. 5M+ active
+              installs.</div>
+            <div class="plugin-tags">
+              <span class="tag tag-free">Free</span>
+              <span class="tag tag-paid">Premium $99/yr</span>
+              <span class="tag tag-waf">WAF</span>
+              <span class="tag tag-malware">Malware Scan</span>
+            </div>
+            <a class="plugin-link" href="https://wordpress.org/plugins/wordfence/" target="_blank">↗
+              wordpress.org/plugins/wordfence</a>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-top">
+              <div class="plugin-emoji">🔐</div>
+              <div>
+                <div class="plugin-name">Solid Security (iThemes)</div>
+                <div class="plugin-type">Security Hardening Suite</div>
+              </div>
+            </div>
+            <div class="plugin-desc">130+ security checks, brute force protection, file change detection, database
+              backups, two-factor authentication, reCAPTCHA, and security grades dashboard. Very beginner-friendly UI.
+            </div>
+            <div class="plugin-tags">
+              <span class="tag tag-free">Free</span>
+              <span class="tag tag-paid">Pro $99/yr</span>
+            </div>
+            <a class="plugin-link" href="https://wordpress.org/plugins/better-wp-security/" target="_blank">↗
+              wordpress.org/plugins/better-wp-security</a>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-top">
+              <div class="plugin-emoji">🔑</div>
+              <div>
+                <div class="plugin-name">WP 2FA</div>
+                <div class="plugin-type">Two-Factor Authentication</div>
+              </div>
+            </div>
+            <div class="plugin-desc">Adds 2FA to WordPress with support for Google Authenticator, Authy, email OTP, and
+              backup codes. Can enforce 2FA for specific user roles (e.g., require all admins to have 2FA enabled).
+            </div>
+            <div class="plugin-tags">
+              <span class="tag tag-free">Free</span>
+            </div>
+            <a class="plugin-link" href="https://wordpress.org/plugins/wp-2fa/" target="_blank">↗
+              wordpress.org/plugins/wp-2fa</a>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-top">
+              <div class="plugin-emoji">🚫</div>
+              <div>
+                <div class="plugin-name">Limit Login Attempts Reloaded</div>
+                <div class="plugin-type">Brute Force Protection</div>
+              </div>
+            </div>
+            <div class="plugin-desc">Limits failed login attempts and temporarily locks out IP addresses. Supports GDPR
+              mode, IP whitelist/blacklist, email alerts on lockouts. Lightweight and effective. 2M+ installs.</div>
+            <div class="plugin-tags">
+              <span class="tag tag-free">Free</span>
+              <span class="tag tag-paid">Pro $7.99/mo</span>
+            </div>
+            <a class="plugin-link" href="https://wordpress.org/plugins/limit-login-attempts-reloaded/" target="_blank">↗
+              wordpress.org/plugins/limit-login-attempts-reloaded</a>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-top">
+              <div class="plugin-emoji">📦</div>
+              <div>
+                <div class="plugin-name">UpdraftPlus</div>
+                <div class="plugin-type">Backup (Last Line of Defense)</div>
+              </div>
+            </div>
+            <div class="plugin-desc">Automated scheduled backups to Google Drive, Dropbox, S3, or email. Full site +
+              database backups. One-click restore. "Before backup, everything else is secondary." 3M+ installs.</div>
+            <div class="plugin-tags">
+              <span class="tag tag-backup">Backup</span>
+              <span class="tag tag-free">Free</span>
+              <span class="tag tag-paid">Premium $70/yr</span>
+            </div>
+            <a class="plugin-link" href="https://wordpress.org/plugins/updraftplus/" target="_blank">↗
+              wordpress.org/plugins/updraftplus</a>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-top">
+              <div class="plugin-emoji">🕵️</div>
+              <div>
+                <div class="plugin-name">Sucuri Security</div>
+                <div class="plugin-type">Audit, Monitoring & WAF</div>
+              </div>
+            </div>
+            <div class="plugin-desc">Security activity auditing, file integrity monitoring, malware scanning, post-hack
+              security actions, and optional cloud-based WAF (paid). Great for audit logs and detecting unauthorized
+              file changes.</div>
+            <div class="plugin-tags">
+              <span class="tag tag-free">Free</span>
+              <span class="tag tag-waf">Cloud WAF $199/yr</span>
+              <span class="tag tag-malware">Scanner</span>
+            </div>
+            <a class="plugin-link" href="https://wordpress.org/plugins/sucuri-scanner/" target="_blank">↗
+              wordpress.org/plugins/sucuri-scanner</a>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-top">
+              <div class="plugin-emoji">🏃</div>
+              <div>
+                <div class="plugin-name">WPS Hide Login</div>
+                <div class="plugin-type">Login URL Changer</div>
+              </div>
+            </div>
+            <div class="plugin-desc">Changes the default <code>/wp-login.php</code> URL to any custom slug. Lightweight
+              — no files modified, works via hook. Works with any theme. Returns 404 for old login URL. 1M+ installs.
+            </div>
+            <div class="plugin-tags">
+              <span class="tag tag-free">Free</span>
+            </div>
+            <a class="plugin-link" href="https://wordpress.org/plugins/wps-hide-login/" target="_blank">↗
+              wordpress.org/plugins/wps-hide-login</a>
+          </div>
+
+          <div class="plugin-card">
+            <div class="plugin-top">
+              <div class="plugin-emoji">🌩️</div>
+              <div>
+                <div class="plugin-name">Cloudflare (Free Plan)</div>
+                <div class="plugin-type">CDN + DDoS Protection + WAF</div>
+              </div>
+            </div>
+            <div class="plugin-desc">Free tier includes DDoS mitigation, bot protection, free SSL, Turnstile CAPTCHA
+              (better than reCAPTCHA), and basic WAF rules. Proxy your DNS through Cloudflare — hides your real server
+              IP.</div>
+            <div class="plugin-tags">
+              <span class="tag tag-free">Free Plan</span>
+              <span class="tag tag-waf">WAF</span>
+            </div>
+            <a class="plugin-link" href="https://www.cloudflare.com/plans/free/" target="_blank">↗
+              cloudflare.com/plans/free</a>
+          </div>
+
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ─── EXTERNAL TOOLS ─── -->
+        <span class="section-anchor" id="tools"></span>
+        <div class="section-head">
+          <span class="section-num">05</span>
+          <span class="section-icon-big">🛠️</span>
+          <h2>External Tools & Scanners</h2>
+        </div>
+
+        <!-- ONLINE SCANNERS -->
+        <span id="scanners"></span>
+        <p style="color:var(--muted2); font-size:0.88rem; margin-bottom:16px;">These tools are free and run directly
+          from your browser — no installation needed. Use them to audit any site.</p>
+
+        <div class="tool-card">
+          <div class="tool-icon">🔍</div>
           <div>
-            <div class="plugin-name">Wordfence Security</div>
-            <div class="plugin-type">All-in-one Security Suite</div>
+            <div class="tool-name">Sucuri SiteCheck</div>
+            <div class="tool-desc">Free online malware scanner. Checks for known malware, blacklisting, website errors,
+              and outdated software. Paste any URL, get instant results. Great for live class demos.</div>
+            <a class="tool-link" href="https://sitecheck.sucuri.net/" target="_blank">↗ sitecheck.sucuri.net</a>
           </div>
         </div>
-        <div class="plugin-desc">The most comprehensive free WP security plugin. Includes an endpoint WAF, malware scanner, real-time threat intelligence, login security with 2FA, and live traffic monitoring. 5M+ active installs.</div>
-        <div class="plugin-tags">
-          <span class="tag tag-free">Free</span>
-          <span class="tag tag-paid">Premium $99/yr</span>
-          <span class="tag tag-waf">WAF</span>
-          <span class="tag tag-malware">Malware Scan</span>
-        </div>
-        <a class="plugin-link" href="https://wordpress.org/plugins/wordfence/" target="_blank">↗ wordpress.org/plugins/wordfence</a>
-      </div>
 
-      <div class="plugin-card">
-        <div class="plugin-top">
-          <div class="plugin-emoji">🔐</div>
+        <div class="tool-card">
+          <div class="tool-icon">🌐</div>
           <div>
-            <div class="plugin-name">Solid Security (iThemes)</div>
-            <div class="plugin-type">Security Hardening Suite</div>
+            <div class="tool-name">SecurityHeaders.com</div>
+            <div class="tool-desc">Instantly grades your HTTP security headers (A+ to F). Shows exactly which headers
+              are missing and what they do. Perfect before/after demo — add headers in functions.php and watch grade
+              improve live.</div>
+            <a class="tool-link" href="https://securityheaders.com/" target="_blank">↗ securityheaders.com</a>
           </div>
         </div>
-        <div class="plugin-desc">130+ security checks, brute force protection, file change detection, database backups, two-factor authentication, reCAPTCHA, and security grades dashboard. Very beginner-friendly UI.</div>
-        <div class="plugin-tags">
-          <span class="tag tag-free">Free</span>
-          <span class="tag tag-paid">Pro $99/yr</span>
-        </div>
-        <a class="plugin-link" href="https://wordpress.org/plugins/better-wp-security/" target="_blank">↗ wordpress.org/plugins/better-wp-security</a>
-      </div>
 
-      <div class="plugin-card">
-        <div class="plugin-top">
-          <div class="plugin-emoji">🔑</div>
+        <div class="tool-card">
+          <div class="tool-icon">🔒</div>
           <div>
-            <div class="plugin-name">WP 2FA</div>
-            <div class="plugin-type">Two-Factor Authentication</div>
+            <div class="tool-name">SSL Labs by Qualys</div>
+            <div class="tool-desc">Deep analysis of your HTTPS/TLS configuration. Checks certificate validity, supported
+              cipher suites, protocol versions (TLS 1.2 vs 1.3), vulnerabilities like POODLE and BEAST. Grade A = good
+              config.</div>
+            <a class="tool-link" href="https://www.ssllabs.com/ssltest/" target="_blank">↗ ssllabs.com/ssltest</a>
           </div>
         </div>
-        <div class="plugin-desc">Adds 2FA to WordPress with support for Google Authenticator, Authy, email OTP, and backup codes. Can enforce 2FA for specific user roles (e.g., require all admins to have 2FA enabled).</div>
-        <div class="plugin-tags">
-          <span class="tag tag-free">Free</span>
-        </div>
-        <a class="plugin-link" href="https://wordpress.org/plugins/wp-2fa/" target="_blank">↗ wordpress.org/plugins/wp-2fa</a>
-      </div>
 
-      <div class="plugin-card">
-        <div class="plugin-top">
-          <div class="plugin-emoji">🚫</div>
+        <div class="tool-card">
+          <div class="tool-icon">🧪</div>
           <div>
-            <div class="plugin-name">Limit Login Attempts Reloaded</div>
-            <div class="plugin-type">Brute Force Protection</div>
+            <div class="tool-name">Mozilla Observatory</div>
+            <div class="tool-desc">Comprehensive security scan covering HTTP headers, cookies, CORS, CSP, and more.
+              Provides actionable recommendations. Free, no account needed. Excellent complement to SecurityHeaders.com.
+            </div>
+            <a class="tool-link" href="https://observatory.mozilla.org/" target="_blank">↗ observatory.mozilla.org</a>
           </div>
         </div>
-        <div class="plugin-desc">Limits failed login attempts and temporarily locks out IP addresses. Supports GDPR mode, IP whitelist/blacklist, email alerts on lockouts. Lightweight and effective. 2M+ installs.</div>
-        <div class="plugin-tags">
-          <span class="tag tag-free">Free</span>
-          <span class="tag tag-paid">Pro $7.99/mo</span>
-        </div>
-        <a class="plugin-link" href="https://wordpress.org/plugins/limit-login-attempts-reloaded/" target="_blank">↗ wordpress.org/plugins/limit-login-attempts-reloaded</a>
-      </div>
 
-      <div class="plugin-card">
-        <div class="plugin-top">
-          <div class="plugin-emoji">📦</div>
+        <div class="tool-card">
+          <div class="tool-icon">🦠</div>
           <div>
-            <div class="plugin-name">UpdraftPlus</div>
-            <div class="plugin-type">Backup (Last Line of Defense)</div>
+            <div class="tool-name">VirusTotal</div>
+            <div class="tool-desc">Scan any file (plugin zip, theme zip) against 70+ antivirus engines before
+              installing. Also scans URLs. Essential habit before installing any plugin — especially from non-official
+              sources.</div>
+            <a class="tool-link" href="https://www.virustotal.com/" target="_blank">↗ virustotal.com</a>
           </div>
         </div>
-        <div class="plugin-desc">Automated scheduled backups to Google Drive, Dropbox, S3, or email. Full site + database backups. One-click restore. "Before backup, everything else is secondary." 3M+ installs.</div>
-        <div class="plugin-tags">
-          <span class="tag tag-backup">Backup</span>
-          <span class="tag tag-free">Free</span>
-          <span class="tag tag-paid">Premium $70/yr</span>
-        </div>
-        <a class="plugin-link" href="https://wordpress.org/plugins/updraftplus/" target="_blank">↗ wordpress.org/plugins/updraftplus</a>
-      </div>
 
-      <div class="plugin-card">
-        <div class="plugin-top">
-          <div class="plugin-emoji">🕵️</div>
+        <div class="tool-card">
+          <div class="tool-icon">💧</div>
           <div>
-            <div class="plugin-name">Sucuri Security</div>
-            <div class="plugin-type">Audit, Monitoring & WAF</div>
+            <div class="tool-name">Have I Been Pwned</div>
+            <div class="tool-desc">Check if an email address or password has been exposed in known data breaches. Check
+              all your admin emails and client emails here. If compromised, change passwords immediately + enable 2FA.
+            </div>
+            <a class="tool-link" href="https://haveibeenpwned.com/" target="_blank">↗ haveibeenpwned.com</a>
           </div>
         </div>
-        <div class="plugin-desc">Security activity auditing, file integrity monitoring, malware scanning, post-hack security actions, and optional cloud-based WAF (paid). Great for audit logs and detecting unauthorized file changes.</div>
-        <div class="plugin-tags">
-          <span class="tag tag-free">Free</span>
-          <span class="tag tag-waf">Cloud WAF $199/yr</span>
-          <span class="tag tag-malware">Scanner</span>
-        </div>
-        <a class="plugin-link" href="https://wordpress.org/plugins/sucuri-scanner/" target="_blank">↗ wordpress.org/plugins/sucuri-scanner</a>
-      </div>
 
-      <div class="plugin-card">
-        <div class="plugin-top">
-          <div class="plugin-emoji">🏃</div>
+        <div class="tool-card">
+          <div class="tool-icon">📋</div>
           <div>
-            <div class="plugin-name">WPS Hide Login</div>
-            <div class="plugin-type">Login URL Changer</div>
+            <div class="tool-name">WPScan Vulnerability Database</div>
+            <div class="tool-desc">The most comprehensive database of WordPress-specific vulnerabilities — plugins,
+              themes, and core. Search any plugin name to see known CVEs, severity, affected versions, and patch status.
+            </div>
+            <a class="tool-link" href="https://wpscan.com/vulnerability-list/" target="_blank">↗
+              wpscan.com/vulnerability-list</a>
           </div>
         </div>
-        <div class="plugin-desc">Changes the default <code>/wp-login.php</code> URL to any custom slug. Lightweight — no files modified, works via hook. Works with any theme. Returns 404 for old login URL. 1M+ installs.</div>
-        <div class="plugin-tags">
-          <span class="tag tag-free">Free</span>
-        </div>
-        <a class="plugin-link" href="https://wordpress.org/plugins/wps-hide-login/" target="_blank">↗ wordpress.org/plugins/wps-hide-login</a>
-      </div>
 
-      <div class="plugin-card">
-        <div class="plugin-top">
-          <div class="plugin-emoji">🌩️</div>
+        <div class="tool-card">
+          <div class="tool-icon">⌨️</div>
           <div>
-            <div class="plugin-name">Cloudflare (Free Plan)</div>
-            <div class="plugin-type">CDN + DDoS Protection + WAF</div>
+            <div class="tool-name">WPScan CLI (Terminal Tool)</div>
+            <div class="tool-desc">Open-source command-line vulnerability scanner specifically for WordPress. Detects
+              plugin/theme vulnerabilities, user enumeration, exposed config files. Use on your own test site only.
+            </div>
+            <a class="tool-link" href="https://github.com/wpscanteam/wpscan" target="_blank">↗
+              github.com/wpscanteam/wpscan</a>
+            <span style="display:inline-block; margin-left:10px;"><a class="tool-link"
+                href="https://wpscan.com/wordpress-security-scanner" target="_blank">↗ wpscan.com (online
+                version)</a></span>
           </div>
         </div>
-        <div class="plugin-desc">Free tier includes DDoS mitigation, bot protection, free SSL, Turnstile CAPTCHA (better than reCAPTCHA), and basic WAF rules. Proxy your DNS through Cloudflare — hides your real server IP.</div>
-        <div class="plugin-tags">
-          <span class="tag tag-free">Free Plan</span>
-          <span class="tag tag-waf">WAF</span>
+
+        <div class="tool-card">
+          <div class="tool-icon">🐉</div>
+          <div>
+            <div class="tool-name">Burp Suite Community</div>
+            <div class="tool-desc">Industry-standard web application security testing tool. Intercepts HTTP requests,
+              tests for XSS/SQLi manually, and performs web application fuzzing. Free Community Edition available. Used
+              by professional pentesters.</div>
+            <a class="tool-link" href="https://portswigger.net/burp/communitydownload" target="_blank">↗
+              portswigger.net/burp/communitydownload</a>
+          </div>
         </div>
-        <a class="plugin-link" href="https://www.cloudflare.com/plans/free/" target="_blank">↗ cloudflare.com/plans/free</a>
-      </div>
 
-    </div>
+        <div class="tool-card">
+          <div class="tool-icon">⚡</div>
+          <div>
+            <div class="tool-name">WP-CLI (WordPress CLI)</div>
+            <div class="tool-desc">The official command-line interface for WordPress. Update all plugins, scan for
+              vulnerabilities, manage users, run security checks — all from terminal. Essential for server-level
+              WordPress management.</div>
+            <a class="tool-link" href="https://wp-cli.org/" target="_blank">↗ wp-cli.org</a>
+          </div>
+        </div>
 
-    <div class="divider"></div>
+        <div class="divider"></div>
 
-    <!-- ─── EXTERNAL TOOLS ─── -->
-    <span class="section-anchor" id="tools"></span>
-    <div class="section-head">
-      <span class="section-num">05</span>
-      <span class="section-icon-big">🛠️</span>
-      <h2>External Tools & Scanners</h2>
-    </div>
+        <!-- ─── CHECKLIST ─── -->
+        <span class="section-anchor" id="checklist"></span>
+        <div class="section-head">
+          <span class="section-num">06</span>
+          <span class="section-icon-big">✅</span>
+          <h2>Security Checklist — Start Here</h2>
+        </div>
 
-    <!-- ONLINE SCANNERS -->
-    <span id="scanners"></span>
-    <p style="color:var(--muted2); font-size:0.88rem; margin-bottom:16px;">These tools are free and run directly from your browser — no installation needed. Use them to audit any site.</p>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-label" style="color:var(--red);">CRITICAL — Do These First</div>
+            <ul class="checklist">
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Change default "admin"
+                  username</span><span class="check-priority pr-must">MUST</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Enable 2FA on all admin
+                  accounts</span><span class="check-priority pr-must">MUST</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Install Wordfence and run
+                  first scan</span><span class="check-priority pr-must">MUST</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Set up automated backups
+                  (UpdraftPlus)</span><span class="check-priority pr-must">MUST</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Install SSL and force
+                  HTTPS</span><span class="check-priority pr-must">MUST</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Update WordPress core,
+                  all plugins, all themes</span><span class="check-priority pr-must">MUST</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Delete unused plugins and
+                  themes</span><span class="check-priority pr-must">MUST</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Limit login attempts
+                  (plugin)</span><span class="check-priority pr-must">MUST</span></li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="card-label" style="color:var(--yellow);">HIGH PRIORITY</div>
+            <ul class="checklist">
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Change login URL (WPS
+                  Hide Login)</span><span class="check-priority pr-high">HIGH</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Add security constants to
+                  wp-config.php</span><span class="check-priority pr-high">HIGH</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Disable
+                  xmlrpc.php</span><span class="check-priority pr-high">HIGH</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Set correct file
+                  permissions (644/755/400)</span><span class="check-priority pr-high">HIGH</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Add HTTP Security
+                  Headers</span><span class="check-priority pr-high">HIGH</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Change database table
+                  prefix from wp_</span><span class="check-priority pr-high">HIGH</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Point DNS through
+                  Cloudflare</span><span class="check-priority pr-high">HIGH</span></li>
+              <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Disable directory listing
+                  (.htaccess)</span><span class="check-priority pr-high">HIGH</span></li>
+            </ul>
+          </div>
+        </div>
 
-    <div class="tool-card">
-      <div class="tool-icon">🔍</div>
-      <div>
-        <div class="tool-name">Sucuri SiteCheck</div>
-        <div class="tool-desc">Free online malware scanner. Checks for known malware, blacklisting, website errors, and outdated software. Paste any URL, get instant results. Great for live class demos.</div>
-        <a class="tool-link" href="https://sitecheck.sucuri.net/" target="_blank">↗ sitecheck.sucuri.net</a>
-      </div>
-    </div>
+        <div class="warn-box" style="margin-top:16px;">
+          <span class="tip-icon">⛔</span>
+          <div><strong>NEVER Do These:</strong> Use nulled/pirated themes or plugins • Keep "admin" as username • Leave
+            WP_DEBUG=true in production • Skip backups before updating • Use weak passwords • Keep unused plugins
+            (deactivated is not enough — delete them) • Share admin credentials via chat or email</div>
+        </div>
 
-    <div class="tool-card">
-      <div class="tool-icon">🌐</div>
-      <div>
-        <div class="tool-name">SecurityHeaders.com</div>
-        <div class="tool-desc">Instantly grades your HTTP security headers (A+ to F). Shows exactly which headers are missing and what they do. Perfect before/after demo — add headers in functions.php and watch grade improve live.</div>
-        <a class="tool-link" href="https://securityheaders.com/" target="_blank">↗ securityheaders.com</a>
-      </div>
-    </div>
+        <div class="divider"></div>
 
-    <div class="tool-card">
-      <div class="tool-icon">🔒</div>
-      <div>
-        <div class="tool-name">SSL Labs by Qualys</div>
-        <div class="tool-desc">Deep analysis of your HTTPS/TLS configuration. Checks certificate validity, supported cipher suites, protocol versions (TLS 1.2 vs 1.3), vulnerabilities like POODLE and BEAST. Grade A = good config.</div>
-        <a class="tool-link" href="https://www.ssllabs.com/ssltest/" target="_blank">↗ ssllabs.com/ssltest</a>
-      </div>
-    </div>
+        <!-- ─── RESOURCES ─── -->
+        <span class="section-anchor" id="resources"></span>
+        <div class="section-head">
+          <span class="section-num">07</span>
+          <span class="section-icon-big">📚</span>
+          <h2>Resources & Further Learning</h2>
+        </div>
 
-    <div class="tool-card">
-      <div class="tool-icon">🧪</div>
-      <div>
-        <div class="tool-name">Mozilla Observatory</div>
-        <div class="tool-desc">Comprehensive security scan covering HTTP headers, cookies, CORS, CSP, and more. Provides actionable recommendations. Free, no account needed. Excellent complement to SecurityHeaders.com.</div>
-        <a class="tool-link" href="https://observatory.mozilla.org/" target="_blank">↗ observatory.mozilla.org</a>
-      </div>
-    </div>
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>Resource</th>
+              <th>Category</th>
+              <th>Link</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>OWASP Top 10</td>
+              <td><span class="badge badge-red">Must Read</span></td>
+              <td><a href="https://owasp.org/www-project-top-ten/" target="_blank">owasp.org/www-project-top-ten</a>
+              </td>
+              <td>Industry standard for web app vulnerabilities</td>
+            </tr>
+            <tr>
+              <td>OWASP WordPress Security</td>
+              <td><span class="badge badge-red">Must Read</span></td>
+              <td><a href="https://owasp.org/www-project-wordpress-security-hardening/" target="_blank">OWASP WP
+                  Hardening Guide</a></td>
+              <td>WP-specific OWASP guidelines</td>
+            </tr>
+            <tr>
+              <td>WordPress Security Docs</td>
+              <td><span class="badge badge-green">Official</span></td>
+              <td><a href="https://developer.wordpress.org/apis/security/"
+                  target="_blank">developer.wordpress.org/apis/security</a></td>
+              <td>Official WP developer security guide</td>
+            </tr>
+            <tr>
+              <td>WPScan CVE Database</td>
+              <td><span class="badge badge-blue">CVE List</span></td>
+              <td><a href="https://wpscan.com/vulnerability-list/" target="_blank">wpscan.com/vulnerability-list</a>
+              </td>
+              <td>Real-time WordPress vulnerability database</td>
+            </tr>
+            <tr>
+              <td>Wordfence Blog</td>
+              <td><span class="badge badge-blue">Threat Intel</span></td>
+              <td><a href="https://www.wordfence.com/blog/" target="_blank">wordfence.com/blog</a></td>
+              <td>Real attack reports, CVE disclosures, trends</td>
+            </tr>
+            <tr>
+              <td>Sucuri Blog</td>
+              <td><span class="badge badge-blue">Threat Intel</span></td>
+              <td><a href="https://blog.sucuri.net/" target="_blank">blog.sucuri.net</a></td>
+              <td>Malware analysis, attack post-mortems</td>
+            </tr>
+            <tr>
+              <td>NIST NVD — WP CVEs</td>
+              <td><span class="badge badge-purple">CVE Database</span></td>
+              <td><a href="https://nvd.nist.gov/vuln/search/results?query=wordpress" target="_blank">nvd.nist.gov —
+                  WordPress</a></td>
+              <td>Official US government CVE registry</td>
+            </tr>
+            <tr>
+              <td>Have I Been Pwned</td>
+              <td><span class="badge badge-yellow">Check Breach</span></td>
+              <td><a href="https://haveibeenpwned.com/" target="_blank">haveibeenpwned.com</a></td>
+              <td>Check emails for credential breaches</td>
+            </tr>
+            <tr>
+              <td>WP Salt Generator</td>
+              <td><span class="badge badge-green">Tool</span></td>
+              <td><a href="https://api.wordpress.org/secret-key/1.1/salt/"
+                  target="_blank">api.wordpress.org/secret-key/1.1/salt</a></td>
+              <td>Generate fresh secret keys for wp-config.php</td>
+            </tr>
+            <tr>
+              <td>SecurityHeaders.com</td>
+              <td><span class="badge badge-green">Tool</span></td>
+              <td><a href="https://securityheaders.com/" target="_blank">securityheaders.com</a></td>
+              <td>Check & grade your HTTP security headers</td>
+            </tr>
+            <tr>
+              <td>Sucuri SiteCheck</td>
+              <td><span class="badge badge-green">Tool</span></td>
+              <td><a href="https://sitecheck.sucuri.net/" target="_blank">sitecheck.sucuri.net</a></td>
+              <td>Free instant malware & blacklist scan</td>
+            </tr>
+            <tr>
+              <td>PortSwigger Web Academy</td>
+              <td><span class="badge badge-purple">Learn More</span></td>
+              <td><a href="https://portswigger.net/web-security" target="_blank">portswigger.net/web-security</a></td>
+              <td>Free hands-on labs: XSS, SQLi, CSRF and more</td>
+            </tr>
+            <tr>
+              <td>PHP Security Manual</td>
+              <td><span class="badge badge-blue">Reference</span></td>
+              <td><a href="https://www.php.net/manual/en/security.php"
+                  target="_blank">php.net/manual/en/security.php</a></td>
+              <td>Official PHP security documentation</td>
+            </tr>
+            <tr>
+              <td>WordPress Codex — Hardening</td>
+              <td><span class="badge badge-green">Official</span></td>
+              <td><a href="https://wordpress.org/documentation/article/hardening-wordpress/"
+                  target="_blank">wordpress.org — Hardening WordPress</a></td>
+              <td>Official hardening guide from WordPress.org</td>
+            </tr>
+          </tbody>
+        </table>
 
-    <div class="tool-card">
-      <div class="tool-icon">🦠</div>
-      <div>
-        <div class="tool-name">VirusTotal</div>
-        <div class="tool-desc">Scan any file (plugin zip, theme zip) against 70+ antivirus engines before installing. Also scans URLs. Essential habit before installing any plugin — especially from non-official sources.</div>
-        <a class="tool-link" href="https://www.virustotal.com/" target="_blank">↗ virustotal.com</a>
-      </div>
-    </div>
+        <!-- FOOTER -->
+        <div
+          style="margin-top:50px; padding:28px; background:var(--card); border:1px solid var(--border); border-radius:14px; text-align:center;">
+          <div
+            style="font-family:var(--mono); font-size:0.65rem; color:var(--muted); letter-spacing:2px; margin-bottom:10px;">
+            WORDPRESS SECURITY HANDBOOK — 2026 EDITION</div>
+          <p style="color:var(--muted2); font-size:0.85rem; max-width:500px; margin:0 auto; line-height:1.7;">
+            Security is not a product, it's a process. Stay updated, scan regularly, back up always, and never stop
+            learning. The threat landscape changes daily — you should too.
+          </p>
+          <div
+            style="margin-top:16px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:16px;">
+            <a href="https://owasp.org" target="_blank"
+              style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">OWASP</a>
+            <a href="https://wpscan.com" target="_blank"
+              style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">WPScan</a>
+            <a href="https://wordfence.com" target="_blank"
+              style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">Wordfence</a>
+            <a href="https://sucuri.net" target="_blank"
+              style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">Sucuri</a>
+            <a href="https://nvd.nist.gov" target="_blank"
+              style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">NIST NVD</a>
+          </div>
+          <div style="border-top:1px solid var(--border); padding-top:16px; font-size:0.75rem; color:var(--muted2);">
+            Developed by <a href="https://www.facebook.com/sabbirsk787" target="_blank"
+              style="color:var(--neon); text-decoration:none; font-family:var(--mono); font-weight:700;">Developer
+              Sabbir</a>
+          </div>
+        </div>
+        <div style="height:60px;"></div>
 
-    <div class="tool-card">
-      <div class="tool-icon">💧</div>
-      <div>
-        <div class="tool-name">Have I Been Pwned</div>
-        <div class="tool-desc">Check if an email address or password has been exposed in known data breaches. Check all your admin emails and client emails here. If compromised, change passwords immediately + enable 2FA.</div>
-        <a class="tool-link" href="https://haveibeenpwned.com/" target="_blank">↗ haveibeenpwned.com</a>
-      </div>
-    </div>
+      </div><!-- /content -->
+    </main>
+  </div><!-- /layout -->
 
-    <div class="tool-card">
-      <div class="tool-icon">📋</div>
-      <div>
-        <div class="tool-name">WPScan Vulnerability Database</div>
-        <div class="tool-desc">The most comprehensive database of WordPress-specific vulnerabilities — plugins, themes, and core. Search any plugin name to see known CVEs, severity, affected versions, and patch status.</div>
-        <a class="tool-link" href="https://wpscan.com/vulnerability-list/" target="_blank">↗ wpscan.com/vulnerability-list</a>
-      </div>
-    </div>
-
-    <div class="tool-card">
-      <div class="tool-icon">⌨️</div>
-      <div>
-        <div class="tool-name">WPScan CLI (Terminal Tool)</div>
-        <div class="tool-desc">Open-source command-line vulnerability scanner specifically for WordPress. Detects plugin/theme vulnerabilities, user enumeration, exposed config files. Use on your own test site only.</div>
-        <a class="tool-link" href="https://github.com/wpscanteam/wpscan" target="_blank">↗ github.com/wpscanteam/wpscan</a>
-        <span style="display:inline-block; margin-left:10px;"><a class="tool-link" href="https://wpscan.com/wordpress-security-scanner" target="_blank">↗ wpscan.com (online version)</a></span>
-      </div>
-    </div>
-
-    <div class="tool-card">
-      <div class="tool-icon">🐉</div>
-      <div>
-        <div class="tool-name">Burp Suite Community</div>
-        <div class="tool-desc">Industry-standard web application security testing tool. Intercepts HTTP requests, tests for XSS/SQLi manually, and performs web application fuzzing. Free Community Edition available. Used by professional pentesters.</div>
-        <a class="tool-link" href="https://portswigger.net/burp/communitydownload" target="_blank">↗ portswigger.net/burp/communitydownload</a>
-      </div>
-    </div>
-
-    <div class="tool-card">
-      <div class="tool-icon">⚡</div>
-      <div>
-        <div class="tool-name">WP-CLI (WordPress CLI)</div>
-        <div class="tool-desc">The official command-line interface for WordPress. Update all plugins, scan for vulnerabilities, manage users, run security checks — all from terminal. Essential for server-level WordPress management.</div>
-        <a class="tool-link" href="https://wp-cli.org/" target="_blank">↗ wp-cli.org</a>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ─── CHECKLIST ─── -->
-    <span class="section-anchor" id="checklist"></span>
-    <div class="section-head">
-      <span class="section-num">06</span>
-      <span class="section-icon-big">✅</span>
-      <h2>Security Checklist — Start Here</h2>
-    </div>
-
-    <div class="grid2">
-      <div class="card">
-        <div class="card-label" style="color:var(--red);">CRITICAL — Do These First</div>
-        <ul class="checklist">
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Change default "admin" username</span><span class="check-priority pr-must">MUST</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Enable 2FA on all admin accounts</span><span class="check-priority pr-must">MUST</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Install Wordfence and run first scan</span><span class="check-priority pr-must">MUST</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Set up automated backups (UpdraftPlus)</span><span class="check-priority pr-must">MUST</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Install SSL and force HTTPS</span><span class="check-priority pr-must">MUST</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Update WordPress core, all plugins, all themes</span><span class="check-priority pr-must">MUST</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Delete unused plugins and themes</span><span class="check-priority pr-must">MUST</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Limit login attempts (plugin)</span><span class="check-priority pr-must">MUST</span></li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="card-label" style="color:var(--yellow);">HIGH PRIORITY</div>
-        <ul class="checklist">
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Change login URL (WPS Hide Login)</span><span class="check-priority pr-high">HIGH</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Add security constants to wp-config.php</span><span class="check-priority pr-high">HIGH</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Disable xmlrpc.php</span><span class="check-priority pr-high">HIGH</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Set correct file permissions (644/755/400)</span><span class="check-priority pr-high">HIGH</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Add HTTP Security Headers</span><span class="check-priority pr-high">HIGH</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Change database table prefix from wp_</span><span class="check-priority pr-high">HIGH</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Point DNS through Cloudflare</span><span class="check-priority pr-high">HIGH</span></li>
-          <li class="check-item"><span class="check-icon">✓</span><span class="check-text">Disable directory listing (.htaccess)</span><span class="check-priority pr-high">HIGH</span></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="warn-box" style="margin-top:16px;">
-      <span class="tip-icon">⛔</span>
-      <div><strong>NEVER Do These:</strong> Use nulled/pirated themes or plugins • Keep "admin" as username • Leave WP_DEBUG=true in production • Skip backups before updating • Use weak passwords • Keep unused plugins (deactivated is not enough — delete them) • Share admin credentials via chat or email</div>
-    </div>
-
-    <div class="divider"></div>
-
-    <!-- ─── RESOURCES ─── -->
-    <span class="section-anchor" id="resources"></span>
-    <div class="section-head">
-      <span class="section-num">07</span>
-      <span class="section-icon-big">📚</span>
-      <h2>Resources & Further Learning</h2>
-    </div>
-
-    <table class="ref-table">
-      <thead>
-        <tr>
-          <th>Resource</th>
-          <th>Category</th>
-          <th>Link</th>
-          <th>Note</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>OWASP Top 10</td>
-          <td><span class="badge badge-red">Must Read</span></td>
-          <td><a href="https://owasp.org/www-project-top-ten/" target="_blank">owasp.org/www-project-top-ten</a></td>
-          <td>Industry standard for web app vulnerabilities</td>
-        </tr>
-        <tr>
-          <td>OWASP WordPress Security</td>
-          <td><span class="badge badge-red">Must Read</span></td>
-          <td><a href="https://owasp.org/www-project-wordpress-security-hardening/" target="_blank">OWASP WP Hardening Guide</a></td>
-          <td>WP-specific OWASP guidelines</td>
-        </tr>
-        <tr>
-          <td>WordPress Security Docs</td>
-          <td><span class="badge badge-green">Official</span></td>
-          <td><a href="https://developer.wordpress.org/apis/security/" target="_blank">developer.wordpress.org/apis/security</a></td>
-          <td>Official WP developer security guide</td>
-        </tr>
-        <tr>
-          <td>WPScan CVE Database</td>
-          <td><span class="badge badge-blue">CVE List</span></td>
-          <td><a href="https://wpscan.com/vulnerability-list/" target="_blank">wpscan.com/vulnerability-list</a></td>
-          <td>Real-time WordPress vulnerability database</td>
-        </tr>
-        <tr>
-          <td>Wordfence Blog</td>
-          <td><span class="badge badge-blue">Threat Intel</span></td>
-          <td><a href="https://www.wordfence.com/blog/" target="_blank">wordfence.com/blog</a></td>
-          <td>Real attack reports, CVE disclosures, trends</td>
-        </tr>
-        <tr>
-          <td>Sucuri Blog</td>
-          <td><span class="badge badge-blue">Threat Intel</span></td>
-          <td><a href="https://blog.sucuri.net/" target="_blank">blog.sucuri.net</a></td>
-          <td>Malware analysis, attack post-mortems</td>
-        </tr>
-        <tr>
-          <td>NIST NVD — WP CVEs</td>
-          <td><span class="badge badge-purple">CVE Database</span></td>
-          <td><a href="https://nvd.nist.gov/vuln/search/results?query=wordpress" target="_blank">nvd.nist.gov — WordPress</a></td>
-          <td>Official US government CVE registry</td>
-        </tr>
-        <tr>
-          <td>Have I Been Pwned</td>
-          <td><span class="badge badge-yellow">Check Breach</span></td>
-          <td><a href="https://haveibeenpwned.com/" target="_blank">haveibeenpwned.com</a></td>
-          <td>Check emails for credential breaches</td>
-        </tr>
-        <tr>
-          <td>WP Salt Generator</td>
-          <td><span class="badge badge-green">Tool</span></td>
-          <td><a href="https://api.wordpress.org/secret-key/1.1/salt/" target="_blank">api.wordpress.org/secret-key/1.1/salt</a></td>
-          <td>Generate fresh secret keys for wp-config.php</td>
-        </tr>
-        <tr>
-          <td>SecurityHeaders.com</td>
-          <td><span class="badge badge-green">Tool</span></td>
-          <td><a href="https://securityheaders.com/" target="_blank">securityheaders.com</a></td>
-          <td>Check & grade your HTTP security headers</td>
-        </tr>
-        <tr>
-          <td>Sucuri SiteCheck</td>
-          <td><span class="badge badge-green">Tool</span></td>
-          <td><a href="https://sitecheck.sucuri.net/" target="_blank">sitecheck.sucuri.net</a></td>
-          <td>Free instant malware & blacklist scan</td>
-        </tr>
-        <tr>
-          <td>PortSwigger Web Academy</td>
-          <td><span class="badge badge-purple">Learn More</span></td>
-          <td><a href="https://portswigger.net/web-security" target="_blank">portswigger.net/web-security</a></td>
-          <td>Free hands-on labs: XSS, SQLi, CSRF and more</td>
-        </tr>
-        <tr>
-          <td>PHP Security Manual</td>
-          <td><span class="badge badge-blue">Reference</span></td>
-          <td><a href="https://www.php.net/manual/en/security.php" target="_blank">php.net/manual/en/security.php</a></td>
-          <td>Official PHP security documentation</td>
-        </tr>
-        <tr>
-          <td>WordPress Codex — Hardening</td>
-          <td><span class="badge badge-green">Official</span></td>
-          <td><a href="https://wordpress.org/documentation/article/hardening-wordpress/" target="_blank">wordpress.org — Hardening WordPress</a></td>
-          <td>Official hardening guide from WordPress.org</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <!-- FOOTER -->
-    <div style="margin-top:50px; padding:28px; background:var(--card); border:1px solid var(--border); border-radius:14px; text-align:center;">
-      <div style="font-family:var(--mono); font-size:0.65rem; color:var(--muted); letter-spacing:2px; margin-bottom:10px;">WORDPRESS SECURITY HANDBOOK — 2026 EDITION</div>
-      <p style="color:var(--muted2); font-size:0.85rem; max-width:500px; margin:0 auto; line-height:1.7;">
-        Security is not a product, it's a process. Stay updated, scan regularly, back up always, and never stop learning. The threat landscape changes daily — you should too.
-      </p>
-      <div style="margin-top:16px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
-        <a href="https://owasp.org" target="_blank" style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">OWASP</a>
-        <a href="https://wpscan.com" target="_blank" style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">WPScan</a>
-        <a href="https://wordfence.com" target="_blank" style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">Wordfence</a>
-        <a href="https://sucuri.net" target="_blank" style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">Sucuri</a>
-        <a href="https://nvd.nist.gov" target="_blank" style="font-size:0.75rem; color:var(--neon2); text-decoration:none;">NIST NVD</a>
-      </div>
-    </div>
-    <div style="height:60px;"></div>
-
-  </div><!-- /content -->
-</main>
-</div><!-- /layout -->
-
-<script>
-function toggleAttack(header) {
-  const body = header.nextElementSibling;
-  const toggle = header.querySelector('.attack-toggle');
-  const isOpen = body.classList.contains('open');
-  body.classList.toggle('open', !isOpen);
-  toggle.classList.toggle('open', !isOpen);
-}
-
-// Nav active state on scroll
-const navItems = document.querySelectorAll('.nav-item');
-const sections = document.querySelectorAll('[id]');
-
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.id;
-      navItems.forEach(item => {
-        item.classList.toggle('active', item.getAttribute('href') === '#' + id);
-      });
+  <script>
+    function toggleAttack(header) {
+      const body = header.nextElementSibling;
+      const toggle = header.querySelector('.attack-toggle');
+      const isOpen = body.classList.contains('open');
+      body.classList.toggle('open', !isOpen);
+      toggle.classList.toggle('open', !isOpen);
     }
-  });
-}, { threshold: 0.3, rootMargin: '-20px 0px -60% 0px' });
 
-sections.forEach(s => observer.observe(s));
+    // Nav active state on scroll
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('[id]');
 
-// Smooth scroll to section
-navItems.forEach(item => {
-  item.addEventListener('click', e => {
-    navItems.forEach(n => n.classList.remove('active'));
-    item.classList.add('active');
-  });
-});
-</script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          navItems.forEach(item => {
+            item.classList.toggle('active', item.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { threshold: 0.3, rootMargin: '-20px 0px -60% 0px' });
+
+    sections.forEach(s => observer.observe(s));
+
+    // Smooth scroll to section
+    navItems.forEach(item => {
+      item.addEventListener('click', e => {
+        navItems.forEach(n => n.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+  </script>
 </body>
+
 </html>
